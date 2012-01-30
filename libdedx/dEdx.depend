@@ -1,0 +1,333 @@
+# depslib dependency file v1.0
+1278611741 source:c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\main.c
+	<stdio.h>
+	<stdlib.h>
+	"program.h"
+	"_dedx_convert_to_binary.h"
+
+1278612075 o_binary.h"
+
+1278605061 c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\program.h
+	"LoadFile.h"
+	"constants.h"
+
+1281772140 .h"
+
+1278605057 source:c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\program.c
+	"program.h"
+
+1282051462 "
+
+1278605044 c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\loadfile.h
+	<stdio.h>
+	<stdlib.h>
+	"split.h"
+
+1282040815 
+
+1278346832 source:c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\split.c
+	"split.h"
+
+1275662164 c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\split.h
+
+1278605045 source:c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\loadfile.c
+	"LoadFile.h"
+
+1278605045 h"
+
+1278355688 c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\constants.h
+
+1278610952 source:c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\_dedx_convert_to_binary.c
+	"_dedx_convert_to_binary.h"
+
+1278611677 c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\_dedx_convert_to_binary.h
+	<stdio.h>
+	<stdlib.h>
+	"constants.h"
+	"stopping_data.h"
+
+1278957120 data.h"
+
+1278610508 c:\users\jakob\documents\my dropbox\bachelor\dedx\dedx\stopping_data.h
+	"constants.h"
+
+1278612075 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\_dedx_convert_to_binary.c
+	"_dedx_convert_to_binary.h"
+
+1278957120 c:\users\jakob\documents\bachelor\libdedx\libdedx\_dedx_convert_to_binary.h
+	<stdio.h>
+	<stdlib.h>
+	"constants.h"
+	"stopping_data.h"
+
+1282043274 c:\users\jakob\documents\bachelor\libdedx\libdedx\constants.h
+
+1279188710 c:\users\jakob\documents\bachelor\libdedx\libdedx\stopping_data.h
+	"constants.h"
+
+1283424826 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\program.c
+	"program.h"
+
+1283360357 c:\users\jakob\documents\bachelor\libdedx\libdedx\program.h
+	"constants.h"
+	"program_file.h"
+	"stopping_data.h"
+	"spline.h"
+	"lookup_data.h"
+
+1281948634 ta.h"
+
+1278605044 c:\users\jakob\documents\bachelor\libdedx\libdedx\loadfile.h
+	<stdio.h>
+	<stdlib.h>
+	"split.h"
+
+1278857972 c:\users\jakob\documents\bachelor\libdedx\libdedx\split.h
+
+1283368239 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\split.c
+	"split.h"
+
+1278605045 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\loadfile.c
+	"LoadFile.h"
+
+1283360290 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\main.c
+	<stdio.h>
+	<stdlib.h>
+	"program.h"
+	"file_access.h"
+
+1282681292 ss.h"
+
+1281878126 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\program_file.c
+	"program_file.h"
+
+1282132830 ile.h"
+
+1279188710 c:\users\jakob\documents\bachelor\libdedx\libdedx\program_file.h
+
+1283368814 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\file_access.c
+	"file_access.h"
+
+1283368804 c:\users\jakob\documents\bachelor\libdedx\libdedx\file_access.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"constants.h"
+	"stopping_data.h"
+	"program_file.h"
+
+1279021117 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\utils\array_util.c
+	"array_util.h"
+
+1279021117 l.h"
+
+1279021067 c:\users\jakob\documents\bachelor\libdedx\libdedx\utils\array_util.h
+
+1282040816 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\spline.c
+	"spline.h"
+
+1281875858 c:\users\jakob\documents\bachelor\libdedx\libdedx\spline.h
+	<stdio.h>
+	<stdlib.h>
+	"spline_base.h"
+	"math.h"
+	"lookup_accelerator.h"
+
+1281875857 celerator.h"
+
+1281772140 c:\users\jakob\documents\bachelor\libdedx\libdedx\spline_base.h
+	"constants.h"
+
+1279117016 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\spline_base.h
+	"constants.h"
+
+1281966828 c:\users\jakob\documents\bachelor\libdedx\libdedx\lookup_accelerator.h
+
+1282051462 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\program.c
+	"program.h"
+
+1281948634 c:\users\carsten\desktop\jakob\libdedx\libdedx\program.h
+	"constants.h"
+	"program_file.h"
+	"stopping_data.h"
+	"spline.h"
+	"lookup_data.h"
+
+1282043272 c:\users\carsten\desktop\jakob\libdedx\libdedx\constants.h
+
+1279188709 c:\users\carsten\desktop\jakob\libdedx\libdedx\program_file.h
+
+1279188709 c:\users\carsten\desktop\jakob\libdedx\libdedx\stopping_data.h
+	"constants.h"
+
+1281875857 c:\users\carsten\desktop\jakob\libdedx\libdedx\spline.h
+	<stdio.h>
+	<stdlib.h>
+	"spline_base.h"
+	"math.h"
+	"lookup_accelerator.h"
+
+1281772140 c:\users\carsten\desktop\jakob\libdedx\libdedx\spline_base.h
+	"constants.h"
+
+1281966826 c:\users\carsten\desktop\jakob\libdedx\libdedx\lookup_accelerator.h
+
+1281878124 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\program_file.c
+	"program_file.h"
+
+1282040815 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\spline.c
+	"spline.h"
+
+1282045109 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\split.c
+	"split.h"
+
+1278857971 c:\users\carsten\desktop\jakob\libdedx\libdedx\split.h
+
+1282132820 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\file_access.c
+	"file_access.h"
+
+1282132830 c:\users\carsten\desktop\jakob\libdedx\libdedx\file_access.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"constants.h"
+	"stopping_data.h"
+	"program_file.h"
+
+1282131518 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\main.c
+	<stdio.h>
+	<stdlib.h>
+	"program.h"
+	"file_access.h"
+
+1281966787 c:\users\carsten\desktop\jakob\libdedx\libdedx\lookup_data.h
+
+1282131562 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\mstar.c
+	"mstar.h"
+
+1282130774 c:\users\carsten\desktop\jakob\libdedx\libdedx\mstar.h
+	"stopping_data.h"
+	"mpaul.h"
+
+1282130625 c:\users\carsten\desktop\jakob\libdedx\libdedx\mpaul.h
+
+1282132733 source:c:\users\carsten\desktop\jakob\libdedx\libdedx\mpaul.c
+	"mpaul.h"
+
+1281966788 c:\users\jakob\documents\bachelor\libdedx\libdedx\lookup_data.h
+
+1282903254 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\mpaul.c
+	"mpaul.h"
+
+1282681292 c:\users\jakob\documents\bachelor\libdedx\libdedx\mpaul.h
+	"math.h"
+	"file_access.h"
+
+1282816974 source:c:\users\jakob\documents\bachelor\libdedx\libdedx\mstar.c
+	"mstar.h"
+
+1282130776 c:\users\jakob\documents\bachelor\libdedx\libdedx\mstar.h
+	"stopping_data.h"
+	"mpaul.h"
+
+1285512614 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/file_access.c
+	"file_access.h"
+
+1285512476 /home/jakob/Documents/bachelor/source/libdedx/libdedx/file_access.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"constants.h"
+	"stopping_data.h"
+	"program_file.h"
+	"utils/dedx_string.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/constants.h
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/stopping_data.h
+	"constants.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/program_file.h
+
+1285534850 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/main.c
+	<stdio.h>
+	<stdlib.h>
+	"program.h"
+	"file_access.h"
+
+1284717446 /home/jakob/Documents/bachelor/source/libdedx/libdedx/program.h
+	"constants.h"
+	"program_file.h"
+	"stopping_data.h"
+	"spline.h"
+	"lookup_data.h"
+	"bethe.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/spline.h
+	<stdio.h>
+	<stdlib.h>
+	"spline_base.h"
+	"math.h"
+	"lookup_accelerator.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/spline_base.h
+	"constants.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/lookup_accelerator.h
+
+1283935101 /home/jakob/Documents/bachelor/source/libdedx/libdedx/lookup_data.h
+
+1284570697 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/mpaul.c
+	"mpaul.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/mpaul.h
+	"math.h"
+	"file_access.h"
+
+1284309355 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/mstar.c
+	"mstar.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/mstar.h
+	"stopping_data.h"
+	"mpaul.h"
+
+1285090824 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/program_file.c
+	"program_file.h"
+
+1283790755 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/spline.c
+	"spline.h"
+
+1284569332 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/split.c
+	"split.h"
+
+1283790755 /home/jakob/Documents/bachelor/source/libdedx/libdedx/split.h
+
+1285329503 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/program.c
+	"program.h"
+
+1284981383 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/utils/shieldhit.c
+	"shieldhit.h"
+
+1284566681 /home/jakob/Documents/bachelor/source/libdedx/libdedx/utils/shieldhit.h
+	<stdio.h>
+	<stdlib.h>
+	"../program.h"
+	"../constants.h"
+
+1284568860 /home/jakob/Documents/bachelor/source/libdedx/libdedx/utils/dedx_string.h
+
+1284569340 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/utils/dedx_string.c
+	"dedx_string.h"
+
+1285514623 /home/jakob/Documents/bachelor/source/libdedx/libdedx/bethe.h
+	"file_access.h"
+	"gold_struct.h"
+	"bethe_struct.h"
+
+1285534777 source:/home/jakob/Documents/bachelor/source/libdedx/libdedx/bethe.c
+	"bethe.h"
+
+1285530026 /home/jakob/Documents/bachelor/source/libdedx/libdedx/gold_struct.h
+
+1285529448 /home/jakob/Documents/bachelor/source/libdedx/libdedx/bethe_struct.h
+
