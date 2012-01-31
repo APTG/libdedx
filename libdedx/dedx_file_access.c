@@ -185,7 +185,6 @@ void _dedx_read_energy_data(float * energy, int prog,int *err)
     strcat(path,folder);
     strcat(path,_dedx_get_energy_file(prog));
     strcat(path,".bin");
-printf("%s\n",path);
     FILE *fp = fopen(path,"rb");
     if(fp == NULL)
     {

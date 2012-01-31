@@ -909,7 +909,6 @@ int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, i
 	}
 	else  if(prog == DEDX_BETHE) //Load bethe data
 	{
-		
 		_dedx_read_energy_data(energy,prog, err);
 		_dedx_load_bethe_2(data,config, energy, err);
 		return 0;
@@ -976,17 +975,18 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 			weight[i] = compos[i]*density[i]/sum;
 		}
 		free(density);
-		free(compound_data);
 	}
 	for(i = 0; i < length; i++)
 	{
 		config->target = targets[i];
-		if(config->compound_use_own_potential == 1)
+		config->i_pot = 0;
+		if(config->compound_use_own_potential > 0)
 			config->i_pot = config->compound_i_pot[i];
 		_dedx_find_data2(&compound_data[i],config,energy,err);
 		if(*err != 0)
 		{
 			free(weight);
+			free(compound_data);
 			return -1;
 		}
 	}
@@ -999,15 +999,14 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 			data.data[j] += weight[i]*compound_data[i].data[j];
 		}
 	}
-
 	data.length = compound_data[0].length;
-	free(weight);	
+	free(weight);
+	free(compound_data);	
 	return _dedx_load_data(ws,&data,energy,config->prog,err);
-	return 0;
 }
 int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energy, int * err)
 {
-	
+	int i = 0;	
 	if(config->target > 99)
 	{
 		*err = 202;
@@ -1024,7 +1023,6 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	{
 		pot = config->i_pot;
 	}
-	int i = 0;
 	data->length = 122;
 	//Get energy grid.
 	_dedx_read_energy_data(energy,DEDX_BETHE, err);
@@ -1036,7 +1034,6 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	{
 		data->data[i] = _dedx_calculate_bethe_energy(energy[i], PZ, PA, TZ, TA, rho, pot);
 	}
-
 	return 0;
 }
 const char * dedx_get_program_version(int program)
