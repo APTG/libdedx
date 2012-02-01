@@ -26,6 +26,7 @@
 #include "dedx_periodic_table.h"
 #include "dedx_program_const.h"
 #include "dedx_workspace.h"
+#include <math.h>
 
 dedx_workspace * workspace;
 int _dedx_find_data(stopping_data * data, int prog, int ion, int target, float * energy, int *err);
@@ -780,12 +781,105 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *use_br
 int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err);
 int _dedx_load_bethe_2(stopping_data * data, dedx_config * config,float * energy, int * err);
 int _dedx_find_bragg_data_2(stopping_data * data, dedx_config *config, float * energy, int *err);
+int _dedx_calculate_element_i_pot(dedx_config * config, int *err);
+int _dedx_validate_config(dedx_config * config,int *err);
+int _dedx_evaluate_i_pot(dedx_config * config, int *err);
+int _dedx_evaluate_compound(dedx_config * config,int *err);
 
 int dedx_load_config2(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
 {
+	_dedx_validate_config(config,err);
 	if(config->compound == 1)
 		return _dedx_load_compound(ws,config,err);
 	return _dedx_load_config_clean(ws,config,bragg_used,err);	
+}
+int _dedx_evaluate_i_pot(dedx_config * config, int *err)
+{
+	if(config->compound_i_pot == NULL)
+	{
+		if(config->i_pot == 0.0)
+		{
+			config->i_pot = _dedx_get_i_value(config->target,err);
+		}
+		if(*err != 0)
+			return -1;
+	}
+	if(config->compound_targets != NULL && config->compound_i_pot == NULL)
+	{
+		_dedx_calculate_element_i_pot(config,err);
+	}	
+	return 0;
+}
+int _dedx_evaluate_compound(dedx_config * config,int *err)
+{
+	int i = 0;
+	if(config->target <= 99)
+	{
+		return 0;
+	}
+	if(config->compound_targets == NULL)
+	{
+		int compos_len;
+		float composition[20][2];
+		_dedx_get_composition(config->target, composition, &compos_len, err);
+		if(*err != 0)
+			return -1;
+		if(compos_len == 0)
+		{
+			*err = 201;
+			return -1;
+		}
+		config->compound = 1;
+		config->compound_targets = (int *)malloc(sizeof(int)*compos_len);
+		config->compound_weight = (float *)malloc(sizeof(float)*compos_len);
+		for(i= 0; i < compos_len; i++)
+		{
+			config->compound_targets[i] = (int)composition[i][0];
+			config->compound_weight[i] = composition[i][1];
+		}
+		config->compound_length = compos_len;
+	}
+	else if(config->compound_weight == NULL && config->compound_quantity != NULL)
+	{
+		int length = config->compound_length;
+		int * compos = config->compound_quantity;
+		float * density = malloc(sizeof(float)*length);
+		float * weight = malloc(sizeof(float)*length);
+		float f, sum = 0;
+		for(i = 0; i < length; i++)
+		{
+			f = _dedx_read_density(config->compound_targets[i],err);
+			if(*err != 0)
+			{
+				free(density);
+				free(weight);
+				return -1;
+			}
+			density[i] = f;
+			sum += compos[i]*f;
+		}
+
+		for(i = 0; i < length; i++)
+		{
+			weight[i] = compos[i]*density[i]/sum;
+		}
+		free(density);
+		config->compound_weight = weight;
+	}
+	else
+	{
+		return -1;
+	}
+	return 0;
+}
+int _dedx_validate_config(dedx_config * config,int *err)
+{
+	if(config->prog == 100)
+	{
+		_dedx_evaluate_compound(config,err);
+		_dedx_evaluate_i_pot(config,err);	
+	}
+	return 0;
 }
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
 {
@@ -946,14 +1040,13 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	float energy[_DEDX_MAXELEMENTS];
 	stopping_data data;
 	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
-
 	if(config->compound_weight != NULL)
 	{
 		weight = config->compound_weight;
 	}
 	else
 	{
-		
+
 		compos = config->compound_quantity;
 		density = malloc(sizeof(float)*length);
 		weight = malloc(sizeof(float)*length);
@@ -979,9 +1072,7 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	for(i = 0; i < length; i++)
 	{
 		config->target = targets[i];
-		config->i_pot = 0;
-		if(config->compound_use_own_potential > 0)
-			config->i_pot = config->compound_i_pot[i];
+		config->i_pot = config->compound_i_pot[i];
 		_dedx_find_data2(&compound_data[i],config,energy,err);
 		if(*err != 0)
 		{
@@ -1035,6 +1126,31 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 		data->data[i] = _dedx_calculate_bethe_energy(energy[i], PZ, PA, TZ, TA, rho, pot);
 	}
 	return 0;
+}
+
+int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
+{
+	int i;
+	float charge_avg = 0;
+	float avg_pot = 0;
+	float log_x,i_pot_x;
+	int target;
+	for(i = 0; i < config->compound_length; i++)
+	{
+		target = config->compound_targets[i];
+		charge_avg += config->compound_weight[i]*target/_dedx_get_atom_mass(target,err);
+		avg_pot += config->compound_weight[i]*target/_dedx_get_atom_mass(target,err)*log(_dedx_get_i_value(target,err));
+	}
+	log_x = log(config->i_pot);
+	log_x -= avg_pot/charge_avg;
+	i_pot_x = exp(log_x);
+	config->compound_i_pot = (float *)malloc(sizeof(float)*config->compound_length);
+	for(i = 0; i < config->compound_length; i++)
+	{
+		config->compound_i_pot[i] = _dedx_get_i_value(config->compound_targets[i],err)*i_pot_x;
+	}
+	return 0;
+
 }
 const char * dedx_get_program_version(int program)
 {
