@@ -1010,7 +1010,7 @@ int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, i
 	_dedx_read_binary_data(data, prog_load, ion_load, target_load, err);
 	if(*err != 0)
 		return -1;
-	_dedx_read_energy_data(energy,prog, err);
+	_dedx_read_energy_data(energy,prog_load, err);
 	if(prog == DEDX_MSTAR){
 		stopping_data out;
 		char mode = 'b';
