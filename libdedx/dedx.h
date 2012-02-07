@@ -196,23 +196,43 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err);
 //Experimental New API
 typedef struct
 {
-	int prog;
-	int target;
-	int ion;
-	int compound;
-	int compound_use_own_potential;
-	int compound_length;
-	int * compound_targets;
-	int * compound_quantity;
-	char mstar_mode;
-	float i_pot;
-	float * compound_weight;
-	float * compound_i_pot;
-		
+  int prog;
+  int target;   // target can either be an element or a compound
+  int ion;
+  int compound;  // bragg_used
+  int compound_use_own_potential; // compound_use_own_i_value
+  int compound_state              // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
+  int compound_length;            // elements_length  --- number of unique elements in comp.
+  int * compound_targets;         // elements_id      --- Z of each element
+  int * compound_quantity;        // elements_atoms   --- number of atoms per comp. unit
+  char mstar_mode;
+  float i_pot;                   // i_value   --- mean excitation potential of target 
+  float * compound_weight;       // elements_mass_fraction
+  float * compound_i_pot;        // elements_i_value
+  
 } dedx_config;
 
 
-int dedx_load_config2(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err);
+int dedx_load_config2(dedx_workspace *ws, 
+		      dedx_config * config, int *bragg_used, int *err);
+//
+// dedx_config must be specified BEFORE calling dedx_load_config2()
+//
+// prog: must have
+// target: if NOT specified, then specify element_id
+// ion: must have
+// compound: is set to TRUE by dedx_load_config2(), if target was not found in default list, and was generated from individual elements instead.
+// compound_use_own_potential: ? 
+// compound_state: if DEDX_DEFAULT (0), then this val is set to normal state of aggregation
+// compound_length: must be specified if target is undefined (DEDX_UNDEFINED)
+// *compound_targets: must be specified if target is undefined
+// *compound_quantity: must be specified if target AND element_mass_fraction are undefined
+// mstar_mode: if DEDX_DEFAULT, then 'b' method of MSTAR is used
+// i_value: if DEDX_DEFAULT, then ICRU I values are used for target compound, if target is set, or if target is 0, then it is calculated from the individual i-values set in elements_i_value
+// elements_mass_fraction: must be specified if target=0 and elements_atoms = 0
+// elements_i_value: if target is 0, then individual I-values of elements can be specified here.
+//
+// Once dedx_load_config2() was invoked, dedx_config is out of scope, any changes to this structure will have no effect. But the user can still use it to check applied I-values, element compositions and states, etc.
 
 dedx_config * dedx_get_default_config();
 
