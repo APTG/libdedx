@@ -22,7 +22,7 @@ void _dedx_convert_energy_to_mstar(stopping_data * in, stopping_data * out,char 
 	int err = 0;
 	if(state == 'a' || state == 'b')
 	{
-		if(_dedx_mstar_target_is_gas(in->target,&err))
+		if(_dedx_target_is_gas(in->target,&err))
 		{
 			if(state == 'a')
 				state = 'g';

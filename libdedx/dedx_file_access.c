@@ -253,13 +253,13 @@ float _dedx_read_effective_charge(int id,int *err)
 	return charge;
 }
 
-size_t _dedx_mstar_target_is_gas(int target,int *err)
+size_t _dedx_target_is_gas(int target,int *err)
 {
 	*err = 0;
 	size_t is_gas = 0;
 	char str[100];
 
-	char file[] = "mstar_gas_states.dat";
+	char file[] = "gas_states.dat";
 	char path[80];
 	strcpy(path,folder);
 	strcat(path,file);

@@ -7,6 +7,7 @@
 enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
       DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
       DEDX_ICRU, DEDX_BETHE=100};
+enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
 
 enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
       DEDX_CARBON, DEDX_GRAPHITE=906, DEDX_NITROGEN=7, DEDX_OXYGEN,
@@ -199,16 +200,15 @@ typedef struct
   int prog;
   int target;   // target can either be an element or a compound
   int ion;
-  int compound;  // bragg_used
-  int compound_use_own_potential; // compound_use_own_i_value
-  int compound_state              // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
-  int compound_length;            // elements_length  --- number of unique elements in comp.
-  int * compound_targets;         // elements_id      --- Z of each element
-  int * compound_quantity;        // elements_atoms   --- number of atoms per comp. unit
+  int bragg_used;  // bragg_used
+  int compound_state;              // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
+  int elements_length;            // elements_length  --- number of unique elements in comp.
+  int * elements_id;         // elements_id      --- Z of each element
+  int * elements_atoms;        // elements_atoms   --- number of atoms per comp. unit
   char mstar_mode;
-  float i_pot;                   // i_value   --- mean excitation potential of target 
-  float * compound_weight;       // elements_mass_fraction
-  float * compound_i_pot;        // elements_i_value
+  float i_value;                   // i_value   --- mean excitation potential of target 
+  float * elements_mass_fraction;       // elements_mass_fraction
+  float * elements_i_value;        // elements_i_value
   
 } dedx_config;
 

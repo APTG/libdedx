@@ -789,22 +789,22 @@ int _dedx_evaluate_compound(dedx_config * config,int *err);
 int dedx_load_config2(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
 {
 	_dedx_validate_config(config,err);
-	if(config->compound == 1)
+	if(config->elements_id != NULL)
 		return _dedx_load_compound(ws,config,err);
 	return _dedx_load_config_clean(ws,config,bragg_used,err);	
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 {
-	if(config->compound_i_pot == NULL)
+	if(config->elements_i_value == NULL)
 	{
-		if(config->i_pot == 0.0)
+		if(config->i_value == 0.0)
 		{
-			config->i_pot = _dedx_get_i_value(config->target,err);
+			config->i_value = _dedx_get_i_value(config->target,err);
 		}
 		if(*err != 0)
 			return -1;
 	}
-	if(config->compound_targets != NULL && config->compound_i_pot == NULL)
+	if(config->elements_id != NULL && config->elements_i_value == NULL)
 	{
 		_dedx_calculate_element_i_pot(config,err);
 	}	
@@ -817,7 +817,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 	{
 		return 0;
 	}
-	if(config->compound_targets == NULL)
+	if(config->elements_id == NULL)
 	{
 		int compos_len;
 		float composition[20][2];
@@ -829,26 +829,26 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 			*err = 201;
 			return -1;
 		}
-		config->compound = 1;
-		config->compound_targets = (int *)malloc(sizeof(int)*compos_len);
-		config->compound_weight = (float *)malloc(sizeof(float)*compos_len);
+		config->bragg_used = 1;
+		config->elements_id = (int *)malloc(sizeof(int)*compos_len);
+		config->elements_mass_fraction = (float *)malloc(sizeof(float)*compos_len);
 		for(i= 0; i < compos_len; i++)
 		{
-			config->compound_targets[i] = (int)composition[i][0];
-			config->compound_weight[i] = composition[i][1];
+			config->elements_id[i] = (int)composition[i][0];
+			config->elements_mass_fraction[i] = composition[i][1];
 		}
-		config->compound_length = compos_len;
+		config->elements_length = compos_len;
 	}
-	else if(config->compound_weight == NULL && config->compound_quantity != NULL)
+	else if(config->elements_mass_fraction == NULL && config->elements_atoms != NULL)
 	{
-		int length = config->compound_length;
-		int * compos = config->compound_quantity;
+		int length = config->elements_length;
+		int * compos = config->elements_atoms;
 		float * density = malloc(sizeof(float)*length);
 		float * weight = malloc(sizeof(float)*length);
 		float f, sum = 0;
 		for(i = 0; i < length; i++)
 		{
-			f = _dedx_read_density(config->compound_targets[i],err);
+			f = _dedx_read_density(config->elements_id[i],err);
 			if(*err != 0)
 			{
 				free(density);
@@ -864,7 +864,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 			weight[i] = compos[i]*density[i]/sum;
 		}
 		free(density);
-		config->compound_weight = weight;
+		config->elements_mass_fraction = weight;
 	}
 	else
 	{
@@ -920,15 +920,15 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *bragg_
 				return -1;
 			}
 			*bragg_used= 1;
-			config->compound = 1;
-			config->compound_targets = (int *)malloc(sizeof(int)*compos_len);
-			config->compound_weight = (float *)malloc(sizeof(float)*compos_len);
+			config->bragg_used = 1;
+			config->elements_id = (int *)malloc(sizeof(int)*compos_len);
+			config->elements_mass_fraction = (float *)malloc(sizeof(float)*compos_len);
 			for(i= 0; i < compos_len; i++)
 			{
-				config->compound_targets[i] = (int)composition[i][0];
-				config->compound_weight[i] = composition[i][1];
+				config->elements_id[i] = (int)composition[i][0];
+				config->elements_mass_fraction[i] = composition[i][1];
 			}
-			config->compound_length = compos_len;
+			config->elements_length = compos_len;
 			cfg = _dedx_load_compound(ws,config,err);
 			if(*err != 0)
 				return -1;
@@ -947,8 +947,6 @@ dedx_config * dedx_get_default_config()
 {
 	dedx_config *config = (dedx_config *)malloc(sizeof(dedx_config));
 	config->mstar_mode = 'b';
-	config->compound = 0;
-	config->compound_use_own_potential = 0;
 	return config;
 }
 int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, int * err)
@@ -1030,8 +1028,8 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	*err = 0;
 	int i = 0;
 	int j = 0;
-	int length = config->compound_length;
-	int * targets = config->compound_targets;
+	int length = config->elements_length;
+	int * targets = config->elements_id;
 	float * density;
 	float * weight;
 	int * compos;
@@ -1040,14 +1038,14 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	float energy[_DEDX_MAXELEMENTS];
 	stopping_data data;
 	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
-	if(config->compound_weight != NULL)
+	if(config->elements_mass_fraction != NULL)
 	{
-		weight = config->compound_weight;
+		weight = config->elements_mass_fraction;
 	}
 	else
 	{
 
-		compos = config->compound_quantity;
+		compos = config->elements_atoms;
 		density = malloc(sizeof(float)*length);
 		weight = malloc(sizeof(float)*length);
 		for(i = 0; i < length; i++)
@@ -1072,7 +1070,7 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	for(i = 0; i < length; i++)
 	{
 		config->target = targets[i];
-		config->i_pot = config->compound_i_pot[i];
+		config->i_value = config->elements_i_value[i];
 		_dedx_find_data2(&compound_data[i],config,energy,err);
 		if(*err != 0)
 		{
@@ -1110,9 +1108,9 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	TA = _dedx_get_atom_mass(config->target,err);
 	rho = _dedx_read_density(config->target,err);
 	pot = _dedx_get_i_value(config->target,err);
-	if(config->i_pot != 0.0)
+	if(config->i_value != 0.0)
 	{
-		pot = config->i_pot;
+		pot = config->i_value;
 	}
 	data->length = 122;
 	//Get energy grid.
@@ -1135,19 +1133,19 @@ int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
 	float avg_pot = 0;
 	float log_x,i_pot_x;
 	int target;
-	for(i = 0; i < config->compound_length; i++)
+	for(i = 0; i < config->elements_length; i++)
 	{
-		target = config->compound_targets[i];
-		charge_avg += config->compound_weight[i]*target/_dedx_get_atom_mass(target,err);
-		avg_pot += config->compound_weight[i]*target/_dedx_get_atom_mass(target,err)*log(_dedx_get_i_value(target,err));
+		target = config->elements_id[i];
+		charge_avg += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err);
+		avg_pot += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err)*log(_dedx_get_i_value(target,err));
 	}
-	log_x = log(config->i_pot);
+	log_x = log(config->i_value);
 	log_x -= avg_pot/charge_avg;
 	i_pot_x = exp(log_x);
-	config->compound_i_pot = (float *)malloc(sizeof(float)*config->compound_length);
-	for(i = 0; i < config->compound_length; i++)
+	config->elements_i_value = (float *)malloc(sizeof(float)*config->elements_length);
+	for(i = 0; i < config->elements_length; i++)
 	{
-		config->compound_i_pot[i] = _dedx_get_i_value(config->compound_targets[i],err)*i_pot_x;
+		config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i],err)*i_pot_x;
 	}
 	return 0;
 

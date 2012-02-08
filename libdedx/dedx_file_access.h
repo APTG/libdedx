@@ -18,7 +18,7 @@ void _dedx_read_binary_data(stopping_data * data, int prog, int ion, int target,
 void _dedx_convert_energy_binary(char * path, char * output,int *err);
 void _dedx_read_energy_data(float * energy, int prog,int *err);
 float _dedx_read_effective_charge(int id,int *err);
-size_t _dedx_mstar_target_is_gas(int target,int *err);
+size_t _dedx_target_is_gas(int target,int *err);
 float _dedx_read_density(int id,int *err);
 //void _dedx_get_short_name(int id,char * name, int *err);
 float _dedx_get_i_value(int target, int * err);
