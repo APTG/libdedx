@@ -139,7 +139,7 @@ int _dedx_load_bethe(stopping_data * data, int ion, int target, float * energy, 
     TZ = _dedx_get_atom_charge(target,err);
     TA = _dedx_get_atom_mass(target,err);
     rho = _dedx_read_density(target,err);
-    pot = _dedx_get_i_value(target,err);
+    pot = _dedx_get_i_value(target,DEDX_GAS,err);
     _dedx_load_bethe2(data,PZ,PA,TZ,TA,rho,pot,energy,err);
     return 0;
 }
@@ -626,7 +626,7 @@ void dedx_get_composition(int target, float composition[][2], int * comp_len, in
 }
 float dedx_get_i_value(int target, int *err)
 {
-	return _dedx_get_i_value(target,err);
+	return _dedx_get_i_value(target,DEDX_GAS,err);
 }
 
 const int * dedx_get_program_list(void) {
@@ -785,6 +785,8 @@ int _dedx_calculate_element_i_pot(dedx_config * config, int *err);
 int _dedx_validate_config(dedx_config * config,int *err);
 int _dedx_evaluate_i_pot(dedx_config * config, int *err);
 int _dedx_evaluate_compound(dedx_config * config,int *err);
+int _dedx_validate_state(dedx_config *config,int *err);
+
 
 int dedx_load_config2(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
 {
@@ -799,7 +801,7 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 	{
 		if(config->i_value == 0.0)
 		{
-			config->i_value = _dedx_get_i_value(config->target,err);
+			config->i_value = _dedx_get_i_value(config->target,config->compound_state,err);
 		}
 		if(*err != 0)
 			return -1;
@@ -874,12 +876,28 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 }
 int _dedx_validate_config(dedx_config * config,int *err)
 {
-	if(config->prog == 100)
+	if(config->prog == DEDX_BETHE)
 	{
+		//Order is important
 		_dedx_evaluate_compound(config,err);
+		_dedx_validate_state(config,err);
 		_dedx_evaluate_i_pot(config,err);	
 	}
 	return 0;
+}
+int _dedx_validate_state(dedx_config *config,int *err)
+{
+	if(config->compound_state == DEDX_DEFAULT_STATE)
+	{
+		if(_dedx_target_is_gas(config->target,err))
+		{
+			config->compound_state = DEDX_GAS;		
+		}	
+		else
+		{
+			config->compound_state = DEDX_CONDENSED;
+		}	
+	}
 }
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
 {
@@ -1107,7 +1125,7 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	TZ = _dedx_get_atom_charge(config->target,err);
 	TA = _dedx_get_atom_mass(config->target,err);
 	rho = _dedx_read_density(config->target,err);
-	pot = _dedx_get_i_value(config->target,err);
+	pot = _dedx_get_i_value(config->target,config->compound_state,err);
 	if(config->i_value != 0.0)
 	{
 		pot = config->i_value;
@@ -1137,7 +1155,7 @@ int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
 	{
 		target = config->elements_id[i];
 		charge_avg += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err);
-		avg_pot += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err)*log(_dedx_get_i_value(target,err));
+		avg_pot += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err)*log(_dedx_get_i_value(target,config->compound_state,err));
 	}
 	log_x = log(config->i_value);
 	log_x -= avg_pot/charge_avg;
@@ -1145,7 +1163,7 @@ int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
 	config->elements_i_value = (float *)malloc(sizeof(float)*config->elements_length);
 	for(i = 0; i < config->elements_length; i++)
 	{
-		config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i],err)*i_pot_x;
+		config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i],config->compound_state,err)*i_pot_x;
 	}
 	return 0;
 

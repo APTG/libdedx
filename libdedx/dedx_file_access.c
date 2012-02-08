@@ -263,7 +263,6 @@ size_t _dedx_target_is_gas(int target,int *err)
 	char path[80];
 	strcpy(path,folder);
 	strcat(path,file);
-
 	FILE *fp = fopen(path,"r");
 	if(fp == NULL)
 	{
@@ -356,7 +355,7 @@ float _dedx_read_density(int id,int *err)
 /*     fclose(fp); */
 /* } */
 
-float _dedx_get_i_value(int target, int * err)
+float _dedx_get_i_value(int target,int state, int * err)
 {
 	float pot = 0.0;
 	char file[] = "compos.txt";
@@ -381,7 +380,15 @@ float _dedx_get_i_value(int target, int * err)
 		temp = _dedx_split(str,'\t',&items, 100);
 		if(atoi(temp[0]) == target)
 		{
-			pot = atof(temp[2]);
+			if(items == 4)
+			{
+				if(state == atoi(temp[3]))
+				{
+					pot = atof(temp[2]);
+				}
+			}
+			else
+				pot = atof(temp[2]);
 		}
 	}
 	fclose(fp);
