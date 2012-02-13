@@ -22,6 +22,7 @@
 #include "dedx_spline.h"
 #include "dedx_lookup_data.h"
 #include "dedx_bethe.h"
+//#include "dedx_atima.h"
 #include "dedx_config.h"
 #include "dedx_periodic_table.h"
 #include "dedx_program_const.h"
@@ -531,8 +532,6 @@ float dedx_get_blackbox_stp(int ion, int target, float energy, int * err)
 
 /*Return an explanation to the error code*/
 void dedx_get_error_code(char *err_str, int err) {
-
-
 	switch(err)
 	{
 		case 0:
@@ -567,6 +566,9 @@ void dedx_get_error_code(char *err_str, int err) {
 			break;
 		case 10:
 			strcpy(err_str,"Unable to read composition file.");
+			break;
+		case 11:
+			strcpy(err_str,"Unable to read atima composition file.");
 			break;
 		case 101:
 			strcpy(err_str,"Energy out of bounds.");
@@ -777,7 +779,7 @@ int _dedx_check_ion(int prog, int ion) {
 
 
 //Experimental New API
-int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *use_bragg, int *err);
+int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err);
 int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err);
 int _dedx_load_bethe_2(stopping_data * data, dedx_config * config,float * energy, int * err);
 int _dedx_find_bragg_data_2(stopping_data * data, dedx_config *config, float * energy, int *err);
@@ -786,14 +788,18 @@ int _dedx_validate_config(dedx_config * config,int *err);
 int _dedx_evaluate_i_pot(dedx_config * config, int *err);
 int _dedx_evaluate_compound(dedx_config * config,int *err);
 int _dedx_validate_state(dedx_config *config,int *err);
+int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err);
 
 
-int dedx_load_config2(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
+
+int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	_dedx_validate_config(config,err);
-	if(config->elements_id != NULL)
-		return _dedx_load_compound(ws,config,err);
-	return _dedx_load_config_clean(ws,config,bragg_used,err);	
+	dedx_config *temp = (dedx_config *)malloc(sizeof(dedx_config));
+	memcpy(temp,config,sizeof(dedx_config));
+	if(temp->elements_id != NULL)
+		return _dedx_load_compound(ws,temp,err);
+	return _dedx_load_config_clean(ws,temp,err);	
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 {
@@ -898,8 +904,9 @@ int _dedx_validate_state(dedx_config *config,int *err)
 			config->compound_state = DEDX_CONDENSED;
 		}	
 	}
+	return 0;
 }
-int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *bragg_used, int *err)
+int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	float energy[_DEDX_MAXELEMENTS];
 	float composition[20][2];
@@ -909,7 +916,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *bragg_
 	int prog = config->prog;
 	int ion = config->ion;
 	int target = config->target;
-	*bragg_used = 0;
+	config->bragg_used = 0;
 	*err = 0;
 	stopping_data data;
 
@@ -937,7 +944,6 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config,int *bragg_
 				*err = 201;
 				return -1;
 			}
-			*bragg_used= 1;
 			config->bragg_used = 1;
 			config->elements_id = (int *)malloc(sizeof(int)*compos_len);
 			config->elements_mass_fraction = (float *)malloc(sizeof(float)*compos_len);
@@ -1143,6 +1149,11 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	}
 	return 0;
 }
+int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err)
+{
+	return 0;
+}
+
 
 int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
 {

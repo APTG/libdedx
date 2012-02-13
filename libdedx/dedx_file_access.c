@@ -140,6 +140,7 @@ void _dedx_read_binary_data(stopping_data * data, int prog, int ion, int target,
         }
     }
     fclose(fp);
+    return;
 }
 void _dedx_convert_energy_binary(char * path, char * output,int *err)
 {
@@ -443,4 +444,44 @@ void _dedx_get_composition(int target, float composition[][2], int * length, int
 			}
 	}
 	fclose(fp);
+}
+
+float * _dedx_get_atima_data(int target,int *err)
+{
+	*err = 0;
+	char file[] = "atima_compos";
+	char path[80];
+	char str[100];
+	float *compos;
+
+	FILE *fp;
+	int items;
+	char **temp;
+
+	strcpy(path,folder);
+	strcat(path,file);
+
+	fp = fopen(path,"r");
+	if(fp == NULL)
+	{
+		*err = 10;
+		return NULL;
+	}
+	compos = (float *)malloc(sizeof(float)*4);
+	while(!feof(fp) && fgets(str,100,fp) != NULL)
+	{
+		temp = _dedx_split(str,'\t',&items,100);
+		if(atoi(temp[0]) == target)
+		{
+			compos = (float *)malloc(sizeof(float)*4);
+			compos[0] = atof(temp[1]);
+			compos[1] = atof(temp[2]);
+			compos[2] = atof(temp[3]);
+			compos[3] = atof(temp[4]);
+		}
+		free(temp);			
+	}
+	fclose(fp);
+	return compos;
+
 }

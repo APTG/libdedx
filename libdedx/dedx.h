@@ -214,7 +214,7 @@ typedef struct
 
 
 int dedx_load_config2(dedx_workspace *ws, 
-		      dedx_config * config, int *bragg_used, int *err);
+		      dedx_config * config, int *err);
 //
 // dedx_config must be specified BEFORE calling dedx_load_config2()
 //
