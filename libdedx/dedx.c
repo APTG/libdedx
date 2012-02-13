@@ -181,7 +181,7 @@ int _dedx_load_bethe_config(dedx_workspace * ws, float PZ, float PA, float TZ, f
     float energy[_DEDX_MAXELEMENTS];
     //Get stopping data and energy grid
     _dedx_load_bethe2(&data,PZ,PA,TZ,TA,rho,pot,energy,err);
-    //Calculate spline values and store then in memoery.
+    //Calculate spline values and store them in memory.
     return _dedx_load_data(ws,&data,energy,DEDX_BETHE,err);
 }
 int dedx_load_compound_weigth(dedx_workspace * ws, int prog, int ion, int * targets, float * weight, int length, int * err)
@@ -819,12 +819,13 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 	return 0;
 }
 int _dedx_evaluate_compound(dedx_config * config,int *err)
-{
+{	
 	int i = 0;
-	if(config->target <= 99)
+	if(config->target > 0 && config->target <= 99)
 	{
 		return 0;
 	}
+	config->bragg_used = 1;
 	if(config->elements_id == NULL)
 	{
 		int compos_len;
@@ -837,7 +838,6 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 			*err = 201;
 			return -1;
 		}
-		config->bragg_used = 1;
 		config->elements_id = (int *)malloc(sizeof(int)*compos_len);
 		config->elements_mass_fraction = (float *)malloc(sizeof(float)*compos_len);
 		for(i= 0; i < compos_len; i++)
@@ -889,6 +889,10 @@ int _dedx_validate_config(dedx_config * config,int *err)
 		_dedx_validate_state(config,err);
 		_dedx_evaluate_i_pot(config,err);	
 	}
+	if(config->target == 0 && config->elements_id != NULL)
+	{
+		_dedx_evaluate_compound(config,err);
+	}
 	return 0;
 }
 int _dedx_validate_state(dedx_config *config,int *err)
@@ -935,8 +939,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 		if(*err == 202 && target > 99)
 		{
 			*err = 0;
-			_dedx_get_composition(target, composition, &compos_len, err);
-
+			_dedx_evaluate_compound(config,err);
 			if(*err != 0)
 				return -1;
 			if(compos_len == 0)
@@ -944,15 +947,6 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 				*err = 201;
 				return -1;
 			}
-			config->bragg_used = 1;
-			config->elements_id = (int *)malloc(sizeof(int)*compos_len);
-			config->elements_mass_fraction = (float *)malloc(sizeof(float)*compos_len);
-			for(i= 0; i < compos_len; i++)
-			{
-				config->elements_id[i] = (int)composition[i][0];
-				config->elements_mass_fraction[i] = composition[i][1];
-			}
-			config->elements_length = compos_len;
 			cfg = _dedx_load_compound(ws,config,err);
 			if(*err != 0)
 				return -1;
@@ -1062,43 +1056,15 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	float energy[_DEDX_MAXELEMENTS];
 	stopping_data data;
 	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
-	if(config->elements_mass_fraction != NULL)
-	{
-		weight = config->elements_mass_fraction;
-	}
-	else
-	{
-
-		compos = config->elements_atoms;
-		density = malloc(sizeof(float)*length);
-		weight = malloc(sizeof(float)*length);
-		for(i = 0; i < length; i++)
-		{
-			f = _dedx_read_density(targets[i],err);
-			if(*err != 0)
-			{
-				free(density);
-				free(weight);
-				return -1;
-			}
-			density[i] = f;
-			sum += compos[i]*f;
-		}
-
-		for(i = 0; i < length; i++)
-		{
-			weight[i] = compos[i]*density[i]/sum;
-		}
-		free(density);
-	}
+	weight = config->elements_mass_fraction;
 	for(i = 0; i < length; i++)
 	{
 		config->target = targets[i];
-		config->i_value = config->elements_i_value[i];
+		if(config->elements_i_value != NULL)
+			config->i_value = config->elements_i_value[i];
 		_dedx_find_data2(&compound_data[i],config,energy,err);
 		if(*err != 0)
 		{
-			free(weight);
 			free(compound_data);
 			return -1;
 		}
@@ -1113,7 +1079,6 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 		}
 	}
 	data.length = compound_data[0].length;
-	free(weight);
 	free(compound_data);	
 	return _dedx_load_data(ws,&data,energy,config->prog,err);
 }
