@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
   float energy  = -1.0;
   int z = -1;
   float stp;
-  int cfg = 0;
+  int cfg_id = 0;
+  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
+
   int prog = -1;
   int target = DEDX_WATER;
   char *str = (char *)malloc(100);
@@ -43,8 +45,6 @@ int main(int argc, char *argv[])
   }
   
   opterr = 0;
-
-
 
   if (isdigit(*argv[1]))
     prog = atoi(argv[1]);
@@ -161,8 +161,7 @@ int main(int argc, char *argv[])
 	     dedx_get_min_energy(prog,z),
 	     dedx_get_max_energy(prog,z)
 	     ); 
-      printf("Use -e option to specify the energy.\n");
-      abort();
+      exit(-1);
     }
   
   if(prog == DEDX_ESTAR) {    
@@ -189,7 +188,11 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  cfg = dedx_load_config(ws,prog,z,target,&bragg, &err);
+  cfg->prog = prog;
+  cfg->target = target;
+  cfg->ion = z;
+  cfg_id = dedx_load_config2(ws,cfg,&err);  
+
   if (err != 0) {
     fprintf(stderr,"dedx_load_config, error %i:", err);
     dedx_get_error_code(str, err);      
@@ -197,7 +200,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  stp = dedx_get_stp(ws,cfg,energy,&err);
+  stp = dedx_get_stp(ws,cfg_id,energy,&err);
   if (err != 0) {
     fprintf(stderr,"dedx_read_energy, error %i:", err);
     dedx_get_error_code(str, err);      
@@ -207,6 +210,7 @@ int main(int argc, char *argv[])
 
   dedx_free_workspace(ws,&err);
   free(str);
+  free(cfg);
 
   if (bragg) {
     printf(" Bragg's additivity rule was applied,\n");
@@ -214,7 +218,7 @@ int main(int argc, char *argv[])
 	   dedx_get_material_name(target),  
 	   dedx_get_program_name(prog));
   }
-  printf("dE/dx = %6.3E MeV cm2/g\n",stp);
+  printf("1/rho dE/dx = %6.3E MeV cm2/g\n",stp);
 
   return 0;
 }
