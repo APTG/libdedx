@@ -4,14 +4,10 @@
 
 int main(int argc, char *argv[])
 {
-  /* function to build all binaray files before installation */
+  /* function to build all binary tables before installation */
 
-  int err = 0;
-  int cfg = 0;  // gcc bug? Cant get rid of the warning here.
-  int prog = 0;
-  int target = DEDX_WATER;
-  int i;
-  int bragg = 0;
+  int i, err = 0;
+  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
   dedx_workspace *ws;
   int max_tables = 9; // maximum number of tables to be loaded
 
@@ -22,32 +18,31 @@ int main(int argc, char *argv[])
   char *str = (char *)malloc(100);
 
   ws = dedx_allocate_workspace(max_tables,&err);
-
-  // TODO: no helium ions in ICRU 73? 
   
+  cfg->target = DEDX_WATER;
+
   for (i = 1; i<= max_tables; ++i) {
-    prog = prog_id[i];
-    cfg = dedx_load_config(ws,prog,z[i],target,&bragg,&err);
+    cfg->prog = prog_id[i];
+    cfg->ion = z[i];
+    dedx_load_config2(ws,cfg,&err);
     printf("Setup %i %s ... ",
-	prog, dedx_get_program_name(prog));
+	cfg->prog, dedx_get_program_name(cfg->prog));
     
     if (err == 0) 
       printf("OK\n");
     else {
-
       printf("failed! Code %i:",err);
       dedx_get_error_code(str, err);      
       printf("  %s\n",str);
       printf("  %s ion z = %i on %s.\n",
-	     dedx_get_program_name(prog),
+	     dedx_get_program_name(cfg->prog),
 	     z[i], 
-	     dedx_get_material_name(target) );
+	     dedx_get_material_name(cfg->target) );
     }
   }
 
   dedx_free_workspace(ws,&err);
-  //dedx_clean_up();
   free(str);
-  
+  free(cfg);  
   return 0;
 }
