@@ -5,9 +5,9 @@
 #include <string.h>
 #include <math.h>
 #include "dedx.h"
-//#include "dedx_const.h"
+#include "dedx_const.h"
 #include "dedx_periodic_table.h"
-//#include "tools/dedx_math.h"
+#include "tools/dedx_math.h"
 #include "dedx_stopping_data.h"
 
 #include "dedx_file.h"
