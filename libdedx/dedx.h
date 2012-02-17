@@ -197,6 +197,7 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err);
 //Experimental New API
 typedef struct
 {
+  int cfg_id;
   int prog;
   int target;   // target can either be an element or a compound
   int ion;
@@ -215,6 +216,9 @@ typedef struct
 
 int dedx_load_config2(dedx_workspace *ws, 
 		      dedx_config * config, int *err);
+float dedx_get_stp2(dedx_workspace * ws, 
+		      dedx_config * config, float energy, int * err);
+
 //
 // dedx_config must be specified BEFORE calling dedx_load_config2()
 //

@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  stp = dedx_get_stp(ws,cfg_id,energy,&err);
+  stp = dedx_get_stp2(ws,cfg,energy,&err);
   if (err != 0) {
     fprintf(stderr,"dedx_read_energy, error %i:", err);
     dedx_get_error_code(str, err);      

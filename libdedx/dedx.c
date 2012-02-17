@@ -794,12 +794,13 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 
 int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err)
 {
+	int cfg_id;
 	_dedx_validate_config(config,err);
-	dedx_config *temp = (dedx_config *)malloc(sizeof(dedx_config));
-	memcpy(temp,config,sizeof(dedx_config));
-	if(temp->elements_id != NULL)
-		return _dedx_load_compound(ws,temp,err);
-	return _dedx_load_config_clean(ws,temp,err);	
+	if(config->elements_id != NULL)
+		cfg_id = _dedx_load_compound(ws,config,err);
+	else
+		cfg_id = _dedx_load_config_clean(ws,config,err);	
+	return cfg_id;
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 {
@@ -1054,9 +1055,14 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	float sum = 0;
 	float f;
 	float energy[_DEDX_MAXELEMENTS];
+	float i_value;
+	int target;
 	stopping_data data;
 	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
 	weight = config->elements_mass_fraction;
+	//Backup i_value and target
+	i_value = config->i_value;
+	target = config->target;
 	for(i = 0; i < length; i++)
 	{
 		config->target = targets[i];
@@ -1069,7 +1075,9 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 			return -1;
 		}
 	}
-
+	//Restore I_value and target
+	config->i_value = i_value;
+	config->target = target;	
 	for(j = 0; j < compound_data[0].length; j++)
 	{
 		data.data[j] = 0.0;
@@ -1143,6 +1151,22 @@ int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
 	}
 	return 0;
 
+}
+float dedx_get_stp2(dedx_workspace * ws, dedx_config * config, float energy, int * err)
+{	
+	int id = config->cfg_id;
+	//Check that the energy is inside the boundery
+	if((*err = _dedx_check_energy_bounds(ws->loaded_data[id],energy)) != 0)
+		return 0;
+	if(id > ws->active_datasets) //Check that the dataset is loaded.
+	{
+		*err = 203;
+		return 0;
+	}
+	//Evaluating the spline function
+	return _dedx_evaluate_spline(ws->loaded_data[id]->base, energy, 
+			&(ws->loaded_data[id]->acc), 
+			ws->loaded_data[id]->n);
 }
 const char * dedx_get_program_version(int program)
 {
