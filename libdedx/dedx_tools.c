@@ -5,9 +5,10 @@
 
 typedef struct
 {
-	int id;
-	double A;
-	dedx_workspace * ws;
+  //int id;
+  //  double A;
+  dedx_workspace * ws;
+  dedx_config *cfg;
 } _dedx_tools_settings;
 double _dedx_adapt24(double (*func)(double x,_dedx_tools_settings * set), _dedx_tools_settings * set,double a, double b, double f2, double f3, double acc, double eps, double *err)
 {
@@ -32,21 +33,26 @@ double _dedx_adapt24(double (*func)(double x,_dedx_tools_settings * set), _dedx_
     return ql+qr;
   }
 }
-double _dedx_adapt(double (*func)(double x,_dedx_tools_settings * set),_dedx_tools_settings * set,double a, double b, double acc, double eps, double *err)
+double _dedx_adapt(double (*func)(double x,_dedx_tools_settings * set),
+		   _dedx_tools_settings * set,
+		   double a, double b, double acc, double eps, 
+		   double *err)
 {
   double h = b-a;
   return _dedx_adapt24(func,set,a,b,(*func)(a+h/3,set),(*func)(a+2*h/3,set),acc,eps,err);
 }
+
 double _dedx_adapt_stp(double energy, _dedx_tools_settings * set)
 {
 	int err = 0;
-	return 1/dedx_get_stp(set->ws,set->id,energy/set->A,&err);
+	// TODO: i am sure sure if its cfg->ion_mass or ion_A !!
+	return 1/dedx_get_stp2(set->ws,set->cfg,energy/(set->cfg->ion_mass),&err);
 }
 
 double _dedx_find_min_stp_func(double x,_dedx_tools_settings * set)
 {
 	int err = 0;
-	float stp = 1/dedx_get_stp(set->ws, set->id,x,&err);
+	float stp = 1/dedx_get_stp2(set->ws, set->cfg,x,&err);
 	if(err != 0)
 		return INFINITY;
 	return stp;
@@ -119,7 +125,8 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 	if(*err != 0)
 		return -1;
 	dedx_load_config2(set.ws,config,err);
-	set.id = config->cfg_id;
+	//	set.id = config->cfg_id;
+	set.cfg = config;
 	
 	if(*err != 0)
 		return -1;
@@ -141,7 +148,7 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 	while(fabs(x1-x2)>acc)
 	{
 		x_temp = (x1+x2)/2;
-		f_temp = dedx_get_stp(set.ws, set.id,x_temp,err);
+		f_temp = dedx_get_stp2(set.ws, set.cfg, x_temp,err);
 		
 		if(f_temp >= stp)
 		{
@@ -153,6 +160,7 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 		}
 	}
 	dedx_free_workspace(set.ws,err);
+	//free(cfg); might be used later again
 	return (x1+x2)/2;
 }
 double dedx_get_csda(dedx_config * config,float energy,int *err)
@@ -162,14 +170,16 @@ double dedx_get_csda(dedx_config * config,float energy,int *err)
 	double eps = 1e-6;
 	_dedx_tools_settings set;
 	double range = 0.0;
-	double A = config->nucleon_number;
+	double A = config->ion_mass;  // TODO: or nucleon number?
+
 	dedx_workspace *ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)
 		return -1;
-	set.id = dedx_load_config2(ws,config,err);
+	dedx_load_config2(ws,config,err);
 	if(*err != 0)
 		return -1;
-	set.A = config->nucleon_number;	
+	set.cfg = config;
+	//set.A = config->nucleon_number;	
 	set.ws = ws;
 	range = _dedx_adapt(_dedx_adapt_stp,&set,dedx_get_min_energy(config->program,config->ion)*A,energy*A,
 			    acc,eps,&calculation_error);

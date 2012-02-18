@@ -7,22 +7,28 @@ int main()
   int err = 0;
   float energy  = 100; /* MeV/u */
   float ste;
-  int cfg = 0;
-  int bragg = 0;
+  //int cfg = 0;
+  //int bragg = 0;
   dedx_workspace *ws;
+  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
 
   printf("init\n");
   ws = dedx_allocate_workspace(1,&err);
   printf("initialized with err %i\n",err);
 
-  cfg = dedx_load_config(ws,DEDX_PSTAR,1,DEDX_WATER,&bragg, &err);
+  cfg->program = DEDX_PSTAR;
+  cfg->target = DEDX_WATER;
+  cfg->ion = DEDX_PROTON;
+
+  dedx_load_config2(ws, cfg, &err);
   printf("config loaded with err %i\n",err);
 
-  ste = dedx_get_stp(ws,cfg,energy,&err);
+  ste = dedx_get_stp2(ws,cfg,energy,&err);
 
   printf("dedx_cleanup\n");
   dedx_free_workspace(ws,&err);
-  printf("dEdx = %6.3E MeV cm2/g\n",ste);
+  printf("1/rho dEdx = %6.3E MeV cm2/g\n",ste);
 
+  free(cfg);
   return 0;
 }

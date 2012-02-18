@@ -88,41 +88,50 @@ int _dedx_load_data(dedx_workspace * ws, stopping_data * data, float * energy, i
 float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err)
 {
     float ste = 0;
-    int use_bragg = 0;
-    _dedx_lookup_data * loaded_data;
+    //int use_bragg = 0;
+    //    _dedx_lookup_data * loaded_data;
+    dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
 
     //Checks that the library is initialized, if not it does so.
     if(workspace == NULL)
     {
         workspace = dedx_allocate_workspace(1,err);
     }
-	else
-	{
-    //Checks if the loaded configuration is the same as the one thats asked for, if so it just ask for the stopping power through dedx_get_energy and return.
-		loaded_data = workspace->loaded_data[0];
-		if((loaded_data->prog == program) && 
-		   (loaded_data->target == target) && 
-		   (loaded_data->ion == ion))
-		{
-		    ste = dedx_get_stp(workspace,0, energy, err);
-		    if(*err != 0)
-		    {
-				return 0;
-		    }
-		    return ste;
-		}
-	}
-    workspace->active_datasets = 0;
-    dedx_load_config(workspace,program, ion, target, &use_bragg,err);
+    /* 	else */
+    /* 	{ */
+    /* //Checks if the loaded configuration is the same as the one thats asked for, if so it just ask for the stopping power through dedx_get_sty and return. */
+    /* 		loaded_data = workspace->loaded_data[0]; */
+    /* 		if((loaded_data->prog == program) &&  */
+    /* 		   (loaded_data->target == target) &&  */
+    /* 		   (loaded_data->ion == ion)) */
+    /* 		{ */
+    /* 		    ste = dedx_get_stp(workspace,0, energy, err); */
+    /* 		    if(*err != 0) */
+    /* 		    { */
+    /* 				return 0; */
+    /* 		    } */
+    /* 		    return ste; */
+    /* 		} */
+    /* 	} */
+    //    workspace->active_datasets = 0;
+
+
+    cfg->program = program;
+    cfg->ion = ion;
+    cfg->target = target;
+
+    //    dedx_load_config(workspace,program, ion, target, &use_bragg,err);
+    dedx_load_config2(workspace,cfg,err);
     if(*err != 0)
     {
       return 0;
     }
-    ste = dedx_get_stp(workspace,0, energy, err);
+    ste = dedx_get_stp2(workspace,cfg, energy, err);
+    free(cfg);
+    free(workspace);
+
     if(*err != 0)
-    {
       return 0;
-    }
     return ste;
 }
 /*Return bethe data and energy grid, wrapper function to _dedx_bethe2, it find PA, PZ, TZ, TA, rho, potentiale for a given target ion combination.
@@ -162,6 +171,7 @@ int _dedx_load_bethe2(stopping_data * data, float PZ, float PA, float TZ, float 
     return 0;
 }
 /*Loads a specific ion target configuration, with a specific potentiale, as far it doesn't work for compounds. Returns a unik reference Id*/
+
 int dedx_load_bethe_config(dedx_workspace * ws, int ion, int target, float pot, int * err)
 {
     float PZ, PA, TZ, TA, rho;
@@ -172,6 +182,7 @@ int dedx_load_bethe_config(dedx_workspace * ws, int ion, int target, float pot, 
     rho = _dedx_read_density(target,err);
     return _dedx_load_bethe_config(ws,PZ,PA,TZ,TA,rho,pot,err);
 }
+
 /*Load in bethe configuration to the memory, return a unik reference Id*/
 int _dedx_load_bethe_config(dedx_workspace * ws, float PZ, float PA, float TZ, float TA, float rho, float pot, int * err)
 {
@@ -184,6 +195,7 @@ int _dedx_load_bethe_config(dedx_workspace * ws, float PZ, float PA, float TZ, f
     //Calculate spline values and store them in memory.
     return _dedx_load_data(ws,&data,energy,DEDX_BETHE,err);
 }
+/*
 int dedx_load_compound_weigth(dedx_workspace * ws, int prog, int ion, int * targets, float * weight, int length, int * err)
 {
     *err = 0;
@@ -213,6 +225,7 @@ int dedx_load_compound_weigth(dedx_workspace * ws, int prog, int ion, int * targ
     free(compound_data);
     return _dedx_load_data(ws,&data,energy,DEDX_BETHE,err);
 }
+*/
 
 /*Initialize the library, allocate memory to contain loaded data set*/
 int dedx_initialize(int count, int * err)
@@ -227,6 +240,8 @@ int dedx_initialize(int count, int * err)
     return 0;
 }
 /*It is the main function to load configuration handles all data set and algoritm in default mode. return a unik reference Id*/
+
+/*
 int dedx_load_config(dedx_workspace * ws, int prog, int ion, int target, int * use_bragg, int * err)
 {
     float energy[_DEDX_MAXELEMENTS];
@@ -272,7 +287,9 @@ int dedx_load_config(dedx_workspace * ws, int prog, int ion, int target, int * u
 
     return _dedx_load_data(ws,&data,energy,prog,err);
 }
+*/
 //return stopping power for a specific energy
+ /*
 float dedx_get_stp(dedx_workspace * ws, int id, float energy, int * err)
 {
 	//Check that the energy is inside the boundery
@@ -288,7 +305,9 @@ float dedx_get_stp(dedx_workspace * ws, int id, float energy, int * err)
 			&(ws->loaded_data[id]->acc), 
 			ws->loaded_data[id]->n);
 }
+ */
 /*Load a specific compound target combination using bragg rule*/
+  /*
 int dedx_load_compound(dedx_workspace * ws, 
 		int prog, int ion, int * targets, 
 		int * compos, int length, int * err)
@@ -340,6 +359,7 @@ int dedx_load_compound(dedx_workspace * ws,
 	free(compound_data);
 	return _dedx_load_data(ws,&data,energy,prog,err);
 }
+  */
 /*Clean up, deallocate memory*/
 void dedx_clean_up()
 {
