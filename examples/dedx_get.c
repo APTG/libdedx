@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <string.h>
 #include <dedx.h>
@@ -9,23 +8,18 @@
 int main(int argc, char *argv[])
 {
   int err = 0;
-  float energy  = -1.0;
-  int z = -1;
-  float stp;
-  int cfg_id = 0;
-  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
-
   int prog = -1;
   int target = DEDX_WATER;
-  char *str = (char *)malloc(100);
-  int bragg = 0;
+  int z = -1;
   int vmaj = 0, vmin = 0, vpatch = 0, vsvn=0; // version number
   const int *ion_list, *mat_list, *prog_list;
   int i = 0;
-  //  char buff[127];
+  float energy  = -1.0;
+  float stp = 0;
   dedx_workspace *ws;
-  
-  //if ((argc > 5) || (argc < 2)){
+  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
+  char *str = (char *)malloc(100);
+
   if (argc != 5) {
     dedx_get_version(&vmaj,&vmin,&vpatch,&vsvn);
     printf("\n This is getdedx using libdEdx version %i.%i.%i-svn%i\n",
@@ -44,8 +38,6 @@ int main(int argc, char *argv[])
     return 0;
   }
   
-  opterr = 0;
-
   if (isdigit(*argv[1]))
     prog = atoi(argv[1]);
   else if (*argv[1] == '-'){
@@ -106,7 +98,7 @@ int main(int argc, char *argv[])
     prog_list = dedx_get_program_list();
     i = 0;
     while (prog_list[i] != -1) {
-      printf("%i: %s\n", prog_list[i], dedx_get_program_name(prog_list[i]));
+      printf("%3i: %s\n", prog_list[i], dedx_get_program_name(prog_list[i]));
       i++;
     }
     printf("\n");
@@ -127,14 +119,13 @@ int main(int argc, char *argv[])
   }
 
 
-
   if (target == -1) {
     printf ("%s can handle the following materials:\n",
 	    dedx_get_program_name(prog));
     mat_list = dedx_get_material_list(prog);
     i = 0;
     while (mat_list[i] != -1) {
-      printf("%i: %s\n", mat_list[i], dedx_get_material_name(mat_list[i]));
+      printf("%3i: %s\n", mat_list[i], dedx_get_material_name(mat_list[i]));
       i++;
     }
     printf("\nAdditional materials are possible by Braggs additivity rule,\n");
@@ -180,6 +171,7 @@ int main(int argc, char *argv[])
 	   dedx_get_program_name(prog)); 
   }
 
+  /* prepare worspace */
   ws = dedx_allocate_workspace(1,&err);
   if (err != 0) {
     fprintf(stderr,"dedx_initialize, error %i:", err);
@@ -188,10 +180,11 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  cfg->prog = prog;
+  /* load configuration */
+  cfg->program = prog;
   cfg->target = target;
   cfg->ion = z;
-  cfg_id = dedx_load_config2(ws,cfg,&err);  
+  dedx_load_config2(ws,cfg,&err);  
 
   if (err != 0) {
     fprintf(stderr,"dedx_load_config, error %i:", err);
@@ -200,6 +193,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  /* get stopping power */
   stp = dedx_get_stp2(ws,cfg,energy,&err);
   if (err != 0) {
     fprintf(stderr,"dedx_read_energy, error %i:", err);
@@ -208,17 +202,18 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  /* check if braggs additivity rule was used */
+  if (cfg->bragg_used) {
+    printf(" Bragg's additivity rule was applied,\n");
+    printf("since compound %s is not in %s data table.\n", 
+	   cfg->target_name,  
+	   cfg->program_name);
+  }
+  printf("1/rho dE/dx = %6.3E MeV cm2/g\n",stp);
+
   dedx_free_workspace(ws,&err);
   free(str);
   free(cfg);
-
-  if (bragg) {
-    printf(" Bragg's additivity rule was applied,\n");
-    printf("since compound %s is not in %s data table.\n", 
-	   dedx_get_material_name(target),  
-	   dedx_get_program_name(prog));
-  }
-  printf("1/rho dE/dx = %6.3E MeV cm2/g\n",stp);
 
   return 0;
 }

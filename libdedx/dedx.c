@@ -809,7 +809,7 @@ int _dedx_set_names(dedx_config * config, int *err)
 		config->target_name = dedx_get_material_name(config->target);
 	
 	config->ion_name = dedx_get_ion_name(config->ion);
-	config->program_name = dedx_get_program_name(config->prog);
+	config->program_name = dedx_get_program_name(config->program);
 	return 0;
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
@@ -893,7 +893,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 }
 int _dedx_validate_config(dedx_config * config,int *err)
 {
-	if(config->prog == DEDX_BETHE)
+	if(config->program == DEDX_BETHE)
 	{
 		//Order is important
 		_dedx_evaluate_compound(config,err);
@@ -926,7 +926,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 	float energy[_DEDX_MAXELEMENTS];
 	int cfg;
 	int compos_len = 0;
-	int prog = config->prog;
+	int prog = config->program;
 	int ion = config->ion;
 	int target = config->target;
 	config->bragg_used = 0;
@@ -978,7 +978,7 @@ dedx_config * dedx_get_default_config()
 }
 int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, int * err)
 {
-	int prog = config->prog;
+	int prog = config->program;
 	int target = config->target;
 	int ion = config->ion;
 
@@ -1092,8 +1092,9 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	}
 	data.length = compound_data[0].length;
 	free(compound_data);	
-	return _dedx_load_data(ws,&data,energy,config->prog,err);
+	return _dedx_load_data(ws,&data,energy,config->program,err);
 }
+
 int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energy, int * err)
 {
 	int i = 0;	

@@ -87,8 +87,8 @@ double dedx_get_inverse_csda(dedx_config * config,float range,int *err)
 {
 
 	double acc = 1e-5;
-	double min = dedx_get_min_energy(config->prog,config->ion);
-	double max = dedx_get_max_energy(config->prog,config->ion);
+	double min = dedx_get_min_energy(config->program,config->ion);
+	double max = dedx_get_max_energy(config->program,config->ion);
 
 	double x_temp;
 	double f_temp;
@@ -130,13 +130,13 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 	double f_temp;
 	if(side < 0)
 	{
-		x1 = dedx_get_min_energy(config->prog,config->ion);
+		x1 = dedx_get_min_energy(config->program,config->ion);
 		x2 = max;
 	}
 	else
 	{
 		x2 = max;
-		x1 = dedx_get_max_energy(config->prog,config->ion);
+		x1 = dedx_get_max_energy(config->program,config->ion);
 	}
 	while(fabs(x1-x2)>acc)
 	{
@@ -171,7 +171,7 @@ double dedx_get_csda(dedx_config * config,float energy,int *err)
 		return -1;
 	set.A = config->nucleon_number;	
 	set.ws = ws;
-	range = _dedx_adapt(_dedx_adapt_stp,&set,dedx_get_min_energy(config->prog,config->ion)*A,energy*A,
+	range = _dedx_adapt(_dedx_adapt_stp,&set,dedx_get_min_energy(config->program,config->ion)*A,energy*A,
 			    acc,eps,&calculation_error);
 	dedx_free_workspace(ws,err);
 	return range;

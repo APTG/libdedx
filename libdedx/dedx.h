@@ -198,7 +198,7 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err);
 typedef struct
 {
 	int cfg_id;
-	int prog;
+	int program;
 	int target;   // target can either be an element or a compound
 	int ion;
 	int bragg_used;  // bragg_used

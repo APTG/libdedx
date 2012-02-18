@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
   cfg->target = DEDX_WATER;
 
   for (i = 1; i<= max_tables; ++i) {
-    cfg->prog = prog_id[i];
+    cfg->program = prog_id[i];
     cfg->ion = z[i];
     dedx_load_config2(ws,cfg,&err);
     printf("Setup %i %s ... ",
-	cfg->prog, dedx_get_program_name(cfg->prog));
+	cfg->program, dedx_get_program_name(cfg->program));
     
     if (err == 0) 
       printf("OK\n");
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
       dedx_get_error_code(str, err);      
       printf("  %s\n",str);
       printf("  %s ion z = %i on %s.\n",
-	     dedx_get_program_name(cfg->prog),
+	     dedx_get_program_name(cfg->program),
 	     z[i], 
 	     dedx_get_material_name(cfg->target) );
     }
