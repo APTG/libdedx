@@ -1,5 +1,4 @@
 #include "dedx_tools.h"
-#include "dedx.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -84,16 +83,12 @@ double _dedx_find_min(double (*func)(double x, _dedx_tools_settings * set),_dedx
 	}	
 	return (x[0]+x[1])/2;
 }
-double dedx_get_inverse_csda(int program,int ion,double A,int target,float range,int *err)
+double dedx_get_inverse_csda(dedx_config * config,float range,int *err)
 {
 
-	int bragg = 0;
 	double acc = 1e-5;
-
-
-
-	double min = dedx_get_min_energy(program,ion);
-	double max = dedx_get_max_energy(program,ion);
+	double min = dedx_get_min_energy(config->prog,config->ion);
+	double max = dedx_get_max_energy(config->prog,config->ion);
 
 	double x_temp;
 	double f_temp;
@@ -101,7 +96,7 @@ double dedx_get_inverse_csda(int program,int ion,double A,int target,float range
 	while((max-min)>acc)
 	{
 		x_temp = (max+min)/2;
-		f_temp = dedx_get_csda(program,ion,A,target,x_temp,err);
+		f_temp = dedx_get_csda(config,x_temp,err);
 		if(*err != 0)
 			return -1;
 		
@@ -116,16 +111,16 @@ double dedx_get_inverse_csda(int program,int ion,double A,int target,float range
 	}
 	return (min+max)/2;
 }
-double dedx_get_inverse_stp(int program,int ion,int target,float stp,int side,int *err)
+double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 {
-	int bragg = 0;
 	double acc = 1e-5;
-	dedx_workspace *ws;
 	_dedx_tools_settings set;
 	set.ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)
 		return -1;
-	set.id = dedx_load_config(set.ws, program,ion,target,&bragg,err);
+	dedx_load_config2(set.ws,config,err);
+	set.id = config->cfg_id;
+	
 	if(*err != 0)
 		return -1;
 	double max = _dedx_find_min(_dedx_find_min_stp_func,&set,acc*100);
@@ -133,16 +128,15 @@ double dedx_get_inverse_stp(int program,int ion,int target,float stp,int side,in
 	double x2;
 	double x_temp;
 	double f_temp;
-	int success = 0;
 	if(side < 0)
 	{
-		x1 = dedx_get_min_energy(program,ion);
+		x1 = dedx_get_min_energy(config->prog,config->ion);
 		x2 = max;
 	}
 	else
 	{
 		x2 = max;
-		x1 = dedx_get_max_energy(program,ion);
+		x1 = dedx_get_max_energy(config->prog,config->ion);
 	}
 	while(fabs(x1-x2)>acc)
 	{
@@ -161,23 +155,23 @@ double dedx_get_inverse_stp(int program,int ion,int target,float stp,int side,in
 	dedx_free_workspace(set.ws,err);
 	return (x1+x2)/2;
 }
-double dedx_get_csda(int program,int ion,double A,int target,float energy,int *err)
+double dedx_get_csda(dedx_config * config,float energy,int *err)
 {
 	double calculation_error = 0;
-	int bragg = 0;
 	double acc = 1e-6;
 	double eps = 1e-6;
 	_dedx_tools_settings set;
 	double range = 0.0;
+	double A = config->nucleon_number;
 	dedx_workspace *ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)
 		return -1;
-	set.id = dedx_load_config(ws,program,ion,target,&bragg,err);
+	set.id = dedx_load_config2(ws,config,err);
 	if(*err != 0)
 		return -1;
-	set.A = A;	
+	set.A = config->nucleon_number;	
 	set.ws = ws;
-	range = _dedx_adapt(_dedx_adapt_stp,&set,dedx_get_min_energy(program,ion)*A,energy*A,
+	range = _dedx_adapt(_dedx_adapt_stp,&set,dedx_get_min_energy(config->prog,config->ion)*A,energy*A,
 			    acc,eps,&calculation_error);
 	dedx_free_workspace(ws,err);
 	return range;

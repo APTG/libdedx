@@ -789,7 +789,7 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err);
 int _dedx_evaluate_compound(dedx_config * config,int *err);
 int _dedx_validate_state(dedx_config *config,int *err);
 int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err);
-
+int _dedx_set_names(dedx_config * config, int *err);
 
 
 int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err)
@@ -799,8 +799,18 @@ int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err)
 	if(config->elements_id != NULL)
 		cfg_id = _dedx_load_compound(ws,config,err);
 	else
-		cfg_id = _dedx_load_config_clean(ws,config,err);	
+		cfg_id = _dedx_load_config_clean(ws,config,err);
+	_dedx_set_names(config,err);
 	return cfg_id;
+}
+int _dedx_set_names(dedx_config * config, int *err)
+{
+	if(config->target != 0)
+		config->target_name = dedx_get_material_name(config->target);
+	
+	config->ion_name = dedx_get_ion_name(config->ion);
+	config->program_name = dedx_get_program_name(config->prog);
+	return 0;
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 {
@@ -914,10 +924,8 @@ int _dedx_validate_state(dedx_config *config,int *err)
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	float energy[_DEDX_MAXELEMENTS];
-	float composition[20][2];
-	int i = 0;
 	int cfg;
-	int compos_len;
+	int compos_len = 0;
 	int prog = config->prog;
 	int ion = config->ion;
 	int target = config->target;
@@ -1049,11 +1057,7 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	int j = 0;
 	int length = config->elements_length;
 	int * targets = config->elements_id;
-	float * density;
 	float * weight;
-	int * compos;
-	float sum = 0;
-	float f;
 	float energy[_DEDX_MAXELEMENTS];
 	float i_value;
 	int target;

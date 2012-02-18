@@ -197,27 +197,31 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err);
 //Experimental New API
 typedef struct
 {
-  int cfg_id;
-  int prog;
-  int target;   // target can either be an element or a compound
-  int ion;
-  int bragg_used;  // bragg_used
-  int compound_state;              // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
-  int elements_length;            // elements_length  --- number of unique elements in comp.
-  int * elements_id;         // elements_id      --- Z of each element
-  int * elements_atoms;        // elements_atoms   --- number of atoms per comp. unit
-  char mstar_mode;
-  float i_value;                   // i_value   --- mean excitation potential of target 
-  float * elements_mass_fraction;       // elements_mass_fraction
-  float * elements_i_value;        // elements_i_value
-  
+	int cfg_id;
+	int prog;
+	int target;   // target can either be an element or a compound
+	int ion;
+	int bragg_used;  // bragg_used
+	int compound_state;              // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
+	int elements_length;            // elements_length  --- number of unique elements in comp.
+	int * elements_id;         // elements_id      --- Z of each element
+	int * elements_atoms;        // elements_atoms   --- number of atoms per comp. unit
+	char mstar_mode;
+	float i_value;                   // i_value   --- mean excitation potential of target 
+	float * elements_mass_fraction;       // elements_mass_fraction
+	float * elements_i_value;        // elements_i_value
+	const char * target_name;
+	const char * ion_name;
+	const char * program_name;
+	double nucleon_number;
+
 } dedx_config;
 
 
 int dedx_load_config2(dedx_workspace *ws, 
-		      dedx_config * config, int *err);
+		dedx_config * config, int *err);
 float dedx_get_stp2(dedx_workspace * ws, 
-		      dedx_config * config, float energy, int * err);
+		dedx_config * config, float energy, int * err);
 
 //
 // dedx_config must be specified BEFORE calling dedx_load_config2()
@@ -241,7 +245,7 @@ float dedx_get_stp2(dedx_workspace * ws,
 dedx_config * dedx_get_default_config();
 
 /*
-int _calculate_bethe_energi_test(int ion, int target, float pot, int *err);
-int _calculate_bethe_energi_test2(int ion, int target, float * pot, int *err);
-*/
+   int _calculate_bethe_energi_test(int ion, int target, float pot, int *err);
+   int _calculate_bethe_energi_test2(int ion, int target, float * pot, int *err);
+ */
 #endif // DEDX_H_INCLUDED
