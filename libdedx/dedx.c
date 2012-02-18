@@ -97,6 +97,7 @@ float dedx_get_simple_stp(int program, int ion, int target, float energy, int * 
     {
         workspace = dedx_allocate_workspace(1,err);
     }
+    /* ? Do we really need this for simple_stp? */
     /* 	else */
     /* 	{ */
     /* //Checks if the loaded configuration is the same as the one thats asked for, if so it just ask for the stopping power through dedx_get_sty and return. */
@@ -620,15 +621,21 @@ void dedx_get_error_code(char *err_str, int err) {
 	}
 }
 
-// TODO: warning: return discards qualifiers from pointer target type
 const char * dedx_get_program_name(int program)
 {
 	return dedx_program_table[program];
 }
+
+const char * dedx_get_program_version(int program)
+{
+	return dedx_program_version_table[program];
+}
+
 const char * dedx_get_material_name(int material)
 {
 	return dedx_material_table[material];
 }
+
 const char * dedx_get_ion_name(int ion)
 {
 	return dedx_ion_table[ion];
@@ -1193,8 +1200,3 @@ float dedx_get_stp2(dedx_workspace * ws, dedx_config * config, float energy, int
 			&(ws->loaded_data[id]->acc), 
 			ws->loaded_data[id]->n);
 }
-const char * dedx_get_program_version(int program)
-{
-	return dedx_program_version[program];
-}
-// TODO: Add function which returns version string.

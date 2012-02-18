@@ -128,6 +128,7 @@ void dedx_clean_up();
 
 void dedx_get_error_code(char *err_str, int err);
 const char * dedx_get_program_name(int program);
+const char * dedx_get_program_version(int program);
 const char * dedx_get_material_name(int material);
 const char * dedx_get_ion_name(int ion);
 void dedx_get_version(int *major, int *minor, int *patch, int *svn);
