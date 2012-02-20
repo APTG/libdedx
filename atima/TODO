@@ -1,0 +1,22 @@
+--- libdEdx TODO list ---
+
+TBD = To Be Determined
+TBC = To Be Confirmed
+
+Not listed by priority.
+
+* IMPORTANT: Override I-value for compounds 
+* A clearer error message if MSTAR or similar is accessed with Braggs additivity rule but one or more of the constituent target/ion combinations are invalid.
+* implement ESTAR.
+* look into ATIMA, what it actually does. It is probably unrealistic to implement. In that case, calculate dEdx tables for all available compounds and ions Z = 1 to 18. 
+* look into SRIM, what it actually does. It is probably unrealistic to implement. In that case, calculate dEdx tables for [TBD] compounds and ions Z = 1 to 18.
+* Agreement between code and the inherited should be better than 0.1 promille [TBC]
+
+* Test also if program could run using mingw (cross compiler for generating windoze exec/dlls)
+* Nullsoft installer for windows
+* Should be able to run on fancy ARM platform (ie. my HTC desire)
+* GUI frontend
+
+* implement CTEST framework
+* RPM target
+* Add man pages
