@@ -223,6 +223,7 @@ typedef struct
   char mstar_mode;
   float i_value;         // i_value   --- mean excitation potential of target 
   float ion_mass;     // mass of ion in amu (this is not the nucleon number!)
+float rho;
   float * elements_mass_fraction;       // elements_mass_fraction
   float * elements_i_value;        // elements_i_value
   const char * target_name;

@@ -813,6 +813,7 @@ int _dedx_find_bragg_data_2(stopping_data * data, dedx_config *config, float * e
 int _dedx_calculate_element_i_pot(dedx_config * config, int *err);
 int _dedx_validate_config(dedx_config * config,int *err);
 int _dedx_evaluate_i_pot(dedx_config * config, int *err);
+int _dedx_validate_rho(dedx_config * config, int *err);
 int _dedx_evaluate_compound(dedx_config * config,int *err);
 int _dedx_validate_state(dedx_config *config,int *err);
 int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err);
@@ -837,6 +838,14 @@ int _dedx_set_names(dedx_config * config, int *err)
 	
 	config->ion_name = dedx_get_ion_name(config->ion);
 	config->program_name = dedx_get_program_name(config->program);
+	return 0;
+}
+int _dedx_validate_rho(dedx_config * config, int *err)
+{
+	if(config->rho == 0.0 && config->target != 0)	
+	{
+		config->rho = _dedx_read_density(config->target,err); 
+	}
 	return 0;
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
@@ -920,6 +929,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 }
 int _dedx_validate_config(dedx_config * config,int *err)
 {
+	_dedx_validate_rho(config,err);
 	if(config->program == DEDX_BETHE)
 	{
 		//Order is important
