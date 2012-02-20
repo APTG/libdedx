@@ -62,3 +62,10 @@ char **_dedx_split(char* string, char splitCaracter, int* items, int strLength)
     (*items)++;
     return words;
 }
+void _dedx_free_split_temp(char ** temp)
+{
+	int i = 0;
+	for(i = 0; i < 10; i++)
+		free(temp[i]);
+	free(temp);
+}

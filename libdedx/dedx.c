@@ -67,7 +67,13 @@ dedx_workspace * dedx_allocate_workspace(int count, int *err)
 }
 void dedx_free_workspace(dedx_workspace * workspace, int *err)
 {
-    free(workspace);
+	int i = 0;
+	for(i = 0; i < workspace->datasets; i++)
+	{
+		free(workspace->loaded_data[i]);
+	}
+	free(workspace->loaded_data);
+	free(workspace);
 }
 int _dedx_load_data(dedx_workspace * ws, stopping_data * data, float * energy, int prog, int * err)
 {
@@ -962,7 +968,6 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	float energy[_DEDX_MAXELEMENTS];
 	int cfg;
-	int compos_len = 0;
 	int prog = config->program;
 	int ion = config->ion;
 	int target = config->target;
@@ -988,7 +993,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 			_dedx_evaluate_compound(config,err);
 			if(*err != 0)
 				return -1;
-			if(compos_len == 0)
+			if(config->elements_length == 0)
 			{
 				*err = 201;
 				return -1;
@@ -1209,4 +1214,19 @@ float dedx_get_stp2(dedx_workspace * ws, dedx_config * config, float energy, int
 	return _dedx_evaluate_spline(ws->loaded_data[id]->base, energy, 
 			&(ws->loaded_data[id]->acc), 
 			ws->loaded_data[id]->n);
+}
+void dedx_free_config(dedx_config * config, int *err)
+{
+	if(config != NULL)
+	{
+		if(config->elements_id != NULL)
+			free(config->elements_id);
+		if(config->elements_atoms != NULL)
+			free(config->elements_atoms);
+		if(config->elements_mass_fraction != NULL)
+			free(config->elements_mass_fraction);
+		if(config->elements_i_value != NULL)
+			free(config->elements_i_value);
+		free(config);
+	}
 }

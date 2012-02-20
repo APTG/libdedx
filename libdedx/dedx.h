@@ -133,7 +133,7 @@ const char * dedx_get_material_name(int material);
 const char * dedx_get_ion_name(int ion);
 void dedx_get_version(int *major, int *minor, int *patch, int *svn);
 void dedx_get_composition(int target, float composition[][2], 
-			  int * comp_len, int *err);
+		int * comp_len, int *err);
 float dedx_get_i_value(int target, int *err);
 
 const int * dedx_get_program_list(void);
@@ -144,63 +144,63 @@ float dedx_get_max_energy(int program, int ion);
 
 typedef struct
 {
-    int cache;
-    int hits;
-    int miss;
+	int cache;
+	int hits;
+	int miss;
 } _dedx_lookup_accelerator;
 
 
 typedef struct
 {
-    float a;
-    float b;
-    float c;
-    float d;
-    float x;
+	float a;
+	float b;
+	float c;
+	float d;
+	float x;
 } _dedx_spline_base;
 
 typedef struct
 {
-    _dedx_spline_base base[_DEDX_MAXELEMENTS];
-    int n;
-    int prog;
-    int target;
-    int ion;
-    int datapoints;
-    _dedx_lookup_accelerator acc;
+	_dedx_spline_base base[_DEDX_MAXELEMENTS];
+	int n;
+	int prog;
+	int target;
+	int ion;
+	int datapoints;
+	_dedx_lookup_accelerator acc;
 } _dedx_lookup_data;
 
 
 typedef struct
 {
-    _dedx_lookup_data ** loaded_data;
-    int datasets;
-    int active_datasets;
+	_dedx_lookup_data ** loaded_data;
+	int datasets;
+	int active_datasets;
 } dedx_workspace;
 
 
 // This is obsolete and will be removed.
 /*
-int dedx_load_compound_weigth(dedx_workspace * ws, 
-				 int prog, int ion, int * targets, 
-				 float * weight, int length, int * err);
-*/
+   int dedx_load_compound_weigth(dedx_workspace * ws, 
+   int prog, int ion, int * targets, 
+   float * weight, int length, int * err);
+ */
 /*
-int dedx_load_config(dedx_workspace * ws, 
-			int program, int ion, int target, 
-			int * use_bragg, int * err);
-*/
+   int dedx_load_config(dedx_workspace * ws, 
+   int program, int ion, int target, 
+   int * use_bragg, int * err);
+ */
 /*float dedx_get_stp(dedx_workspace * ws, 
-		      int id, float energy, int * err);
-*/
+  int id, float energy, int * err);
+ */
 /*
-int dedx_load_compound(dedx_workspace * ws, 
-			  int prog, int ion, int * targets, 
-			  int * compos, int length, int * err);
-*/
+   int dedx_load_compound(dedx_workspace * ws, 
+   int prog, int ion, int * targets, 
+   int * compos, int length, int * err);
+ */
 
 int dedx_load_bethe_config(dedx_workspace * ws, 
-			      int ion, int target, float pot, int * err);
+		int ion, int target, float pot, int * err);
 
 //  ------ end of obsolete functions -------------
 dedx_workspace * dedx_allocate_workspace(int count, int *err);
@@ -210,26 +210,25 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err);
 //Experimental New API
 typedef struct
 {
-  int cfg_id;
-  int program;
-  int target;            // target can either be an element or a compound
-  int ion;               // z of projectile
-  int ion_A;             // nucleon number of projectile
-  int bragg_used;        // bragg_used
-  int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
-  int elements_length;   // elements_length  --- number of unique elements in comp.
-  int * elements_id;     // elements_id      --- Z of each element
-  int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
-  char mstar_mode;
-  float i_value;         // i_value   --- mean excitation potential of target 
-  float ion_mass;     // mass of ion in amu (this is not the nucleon number!)
-float rho;
-  float * elements_mass_fraction;       // elements_mass_fraction
-  float * elements_i_value;        // elements_i_value
-  const char * target_name;
-  const char * ion_name;
-  const char * program_name;
-  //double nucleon_number; (renamed)
+	int cfg_id;
+	int program;
+	int target;            // target can either be an element or a compound
+	int ion;               // z of projectile
+	int ion_a;             // nucleon number of projectile
+	int bragg_used;        // bragg_used
+	int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
+	int elements_length;   // elements_length  --- number of unique elements in comp.
+	int * elements_id;     // elements_id      --- Z of each element
+	int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
+	char mstar_mode;
+	float i_value;         // i_value   --- mean excitation potential of target 
+	float rho;
+	float * elements_mass_fraction;       // elements_mass_fraction
+	float * elements_i_value;        // elements_i_value
+	const char * target_name;
+	const char * ion_name;
+	const char * program_name;
+	//double nucleon_number; (renamed)
 
 } dedx_config;
 
@@ -239,38 +238,39 @@ int dedx_load_config2(dedx_workspace *ws,
 float dedx_get_stp2(dedx_workspace * ws, 
 		dedx_config * config, float energy, int * err);
 
+void dedx_free_config(dedx_config * config, int *err);
 /*
-  dedx_config must be specified BEFORE calling dedx_load_config2()
-  
-  cfg_id: configuration id, which is set by dedx_config. Don't touch.
-  program: must have
-  target: if NOT specified, then specify element_id
-  ion: must have
-  compound: is set to TRUE by dedx_load_config2(), 
-            if target was not found in default list, 
-            and was generated from individual elements instead.
-  compound_use_own_potential: ? 
-  compound_state: if DEDX_DEFAULT (0), then this val is set to 
-                  normal state of aggregation
-  compound_length: must be specified if target is undefined (DEDX_UNDEFINED)
-  *compound_targets: must be specified if target is undefined
-  *compound_quantity: must be specified if target AND element_mass_fraction 
-                      are undefined
-  mstar_mode: if DEDX_DEFAULT, then 'b' method of MSTAR is used
-  i_value: if DEDX_DEFAULT, then ICRU I values are used for target compound, 
-           if target is set, or if target is 0, then it is calculated from 
-           the individual i-values set in elements_i_value.
-  elements_mass_fraction: must be specified if target=0 and elements_atoms = 0
-  elements_i_value: if target is 0, then individual I-values of elements can 
-                    be specified here.
-  
-  Once dedx_load_config2() was invoked, dedx_config is out of scope, 
-  any changes to this structure will have no effect, except for cfg_id.
-  The user can still use it to check applied I-values, element compositions 
-  and states, etc.
+   dedx_config must be specified BEFORE calling dedx_load_config2()
+
+cfg_id: configuration id, which is set by dedx_config. Don't touch.
+program: must have
+target: if NOT specified, then specify element_id
+ion: must have
+compound: is set to TRUE by dedx_load_config2(), 
+if target was not found in default list, 
+and was generated from individual elements instead.
+compound_use_own_potential: ? 
+compound_state: if DEDX_DEFAULT (0), then this val is set to 
+normal state of aggregation
+compound_length: must be specified if target is undefined (DEDX_UNDEFINED)
+ *compound_targets: must be specified if target is undefined
+ *compound_quantity: must be specified if target AND element_mass_fraction 
+ are undefined
+mstar_mode: if DEDX_DEFAULT, then 'b' method of MSTAR is used
+i_value: if DEDX_DEFAULT, then ICRU I values are used for target compound, 
+if target is set, or if target is 0, then it is calculated from 
+the individual i-values set in elements_i_value.
+elements_mass_fraction: must be specified if target=0 and elements_atoms = 0
+elements_i_value: if target is 0, then individual I-values of elements can 
+be specified here.
+
+Once dedx_load_config2() was invoked, dedx_config is out of scope, 
+any changes to this structure will have no effect, except for cfg_id.
+The user can still use it to check applied I-values, element compositions 
+and states, etc.
 
 dedx_config * dedx_get_default_config();
-*/
+ */
 
 /*
    int _calculate_bethe_energi_test(int ion, int target, float pot, int *err);

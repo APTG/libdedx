@@ -36,6 +36,10 @@ float _dedx_calculate_bethe_energy(float energy, float PZ, float PA, float TZ, f
     }
     else
     {
+	if(gold != NULL)
+		free(gold);
+	if(bet != NULL)
+		free(bet);
         gold = malloc(sizeof(gold_struct));
         bet = malloc(sizeof(bethe_struct));
     }

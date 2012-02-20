@@ -45,8 +45,8 @@ double _dedx_adapt(double (*func)(double x,_dedx_tools_settings * set),
 double _dedx_adapt_stp(double energy, _dedx_tools_settings * set)
 {
 	int err = 0;
-	// TODO: i am sure sure if its cfg->ion_mass or ion_A !!
-	return 1/dedx_get_stp2(set->ws,set->cfg,energy/(set->cfg->ion_mass),&err);
+	// TODO: i am sure sure if its cfg->ion_a or ion_A !!
+	return 1/dedx_get_stp2(set->ws,set->cfg,energy/(set->cfg->ion_a),&err);
 }
 
 double _dedx_find_min_stp_func(double x,_dedx_tools_settings * set)
@@ -170,7 +170,7 @@ double dedx_get_csda(dedx_config * config,float energy,int *err)
 	double eps = 1e-6;
 	_dedx_tools_settings set;
 	double range = 0.0;
-	double A = config->ion_mass;  // TODO: or nucleon number?
+	double A = config->ion_a;  // TODO: or nucleon number?
 
 	dedx_workspace *ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)

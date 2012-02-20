@@ -245,11 +245,11 @@ float _dedx_read_effective_charge(int id,int *err)
 		if(atoi(temp[0]) == id)
 		{
 			charge = atof(temp[1]);
+			_dedx_free_split_temp(temp);
 			break;
 		}
-
+		_dedx_free_split_temp(temp);
 	}
-	free(temp);
 	fclose(fp);
 	return charge;
 }
@@ -312,10 +312,10 @@ float _dedx_read_density(int id,int *err)
 		if(atoi(temp[0]) == id)
 		{
 			density = atof(temp[1]);
-			free(temp);
+			_dedx_free_split_temp(temp);
 			break;
-		}
-		free(temp);
+		}	
+		_dedx_free_split_temp(temp);
 	}
 	fclose(fp);
 	if(density == 0.0)
@@ -391,6 +391,7 @@ float _dedx_get_i_value(int target,int state, int * err)
 			else
 				pot = atof(temp[2]);
 		}
+		_dedx_free_split_temp(temp);
 	}
 	fclose(fp);
 	if(pot == 0.0)
@@ -436,7 +437,7 @@ void _dedx_get_composition(int target, float composition[][2], int * length, int
 						temp = _dedx_split(str,':',&items,100);
 						composition[(*length)][0] = atof(temp[0]);
 						composition[(*length)++][1] = atof(temp[1]);
-						free(temp);
+						_dedx_free_split_temp(temp);
 					}
 
 					break;
@@ -479,7 +480,7 @@ float * _dedx_get_atima_data(int target,int *err)
 			compos[2] = atof(temp[3]);
 			compos[3] = atof(temp[4]);
 		}
-		free(temp);			
+		_dedx_free_split_temp(temp);
 	}
 	fclose(fp);
 	return compos;
