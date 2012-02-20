@@ -848,7 +848,7 @@ int _dedx_set_names(dedx_config * config, int *err)
 }
 int _dedx_validate_rho(dedx_config * config, int *err)
 {
-	if(config->rho == 0.0 && config->target != 0)	
+	if(config->rho <= 0.0 && config->target != 0)	
 	{
 		config->rho = _dedx_read_density(config->target,err); 
 	}
