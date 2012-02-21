@@ -136,29 +136,6 @@ float dedx_get_min_energy(int program, int ion);
 float dedx_get_max_energy(int program, int ion);
 typedef struct
 {
-    double TZ0;
-    double TA0;
-    double potentiale;
-    double rho;
-    double PZ0;
-    double PA0;
-} _dedx_bethe_struct;
-
-typedef struct
-{
-    double e_min;
-    double e_max;
-    double epsilon;
-    double h;
-    double e_zero;
-    double e_extr;
-    double f_extr;
-    double e_sewn;
-    double f_sewn;
-} _dedx_gold_struct;
-
-typedef struct
-{
 	int cache;
 	int hits;
 	int miss;
@@ -191,8 +168,6 @@ typedef struct
 	_dedx_lookup_data ** loaded_data;
 	int datasets;
 	int active_datasets;
-	_dedx_bethe_struct * bet;
-	_dedx_gold_struct * gold;
 	
 } dedx_workspace;
 
