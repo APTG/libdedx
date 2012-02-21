@@ -39,6 +39,9 @@ int _dedx_load_bethe2(stopping_data * data,
 int _dedx_load_bethe_config(dedx_workspace * ws, 
 			    float PZ, float PA, float TZ, float TA, 
 			    float rho, float pot, int * err);
+int _dedx_find_bragg_data(stopping_data * data,int 
+			   prog, int ion, float composition[][2], 
+			  int length, float * energy, int *err);
 int _calculate_bethe_energi_test(int ion, int target, float pot, int *err);
 int _dedx_load_data(dedx_workspace * ws, stopping_data * data, 
 		    float * energy, int prog, int * err);
@@ -87,6 +90,401 @@ int _dedx_load_data(dedx_workspace * ws, stopping_data * data, float * energy, i
     ws->active_datasets++;
     return active_dataset;
 }
+
+float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err)
+{
+    float ste = 0;
+    //int use_bragg = 0;
+    //    _dedx_lookup_data * loaded_data;
+    dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
+
+    //Checks that the library is initialized, if not it does so.
+    if(workspace == NULL)
+    {
+        workspace = dedx_allocate_workspace(1,err);
+    }
+    /* ? Do we really need this for simple_stp? */
+    /* 	else */
+    /* 	{ */
+    /* //Checks if the loaded configuration is the same as the one thats asked for, if so it just ask for the stopping power through dedx_get_sty and return. */
+    /* 		loaded_data = workspace->loaded_data[0]; */
+    /* 		if((loaded_data->prog == program) &&  */
+    /* 		   (loaded_data->target == target) &&  */
+    /* 		   (loaded_data->ion == ion)) */
+    /* 		{ */
+    /* 		    ste = dedx_get_stp(workspace,0, energy, err); */
+    /* 		    if(*err != 0) */
+    /* 		    { */
+    /* 				return 0; */
+    /* 		    } */
+    /* 		    return ste; */
+    /* 		} */
+    /* 	} */
+    //    workspace->active_datasets = 0;
+
+
+    cfg->program = program;
+    cfg->ion = ion;
+    cfg->target = target;
+
+    //    dedx_load_config(workspace,program, ion, target, &use_bragg,err);
+    dedx_load_config2(workspace,cfg,err);
+    if(*err != 0)
+    {
+      return 0;
+    }
+    ste = dedx_get_stp2(workspace,cfg, energy, err);
+    free(cfg);
+    free(workspace);
+
+    if(*err != 0)
+      return 0;
+    return ste;
+}
+/*Return bethe data and energy grid, wrapper function to _dedx_bethe2, it find PA, PZ, TZ, TA, rho, potentiale for a given target ion combination.
+It only work for target with ID < 100*/
+int _dedx_load_bethe(stopping_data * data, int ion, int target, float * energy, int * err)
+{
+    if(target > 99)
+    {
+        *err = 202;
+        return -1;
+    }
+    float PZ, PA, TZ, TA, rho, pot;
+    PZ = _dedx_get_atom_charge(ion,err);
+    PA = _dedx_get_atom_mass(ion,err);
+    TZ = _dedx_get_atom_charge(target,err);
+    TA = _dedx_get_atom_mass(target,err);
+    rho = _dedx_read_density(target,err);
+    pot = _dedx_get_i_value(target,DEDX_GAS,err);
+    _dedx_load_bethe2(data,PZ,PA,TZ,TA,rho,pot,energy,err);
+    return 0;
+}
+/*Return bethe data and energy grid for at given combination of PZ, PA, TZ, TA, rho, potentiale*/
+int _dedx_load_bethe2(stopping_data * data, float PZ, float PA, float TZ, float TA, float rho, float pot, float * energy, int * err)
+{
+    int i = 0;
+    data->length = 122;
+
+    //Get energy grid.
+    _dedx_read_energy_data(energy,DEDX_BETHE, err);
+    if(*err != 0)
+      return 0;
+    //Fill the data grid with values.
+    for(i = 0; i < data->length; i++)
+    {
+        data->data[i] = _dedx_calculate_bethe_energy(energy[i], PZ, PA, TZ, TA, rho, pot);
+    }
+    return 0;
+}
+/*Loads a specific ion target configuration, with a specific potentiale, as far it doesn't work for compounds. Returns a unik reference Id*/
+
+int dedx_load_bethe_config(dedx_workspace * ws, int ion, int target, float pot, int * err)
+{
+    float PZ, PA, TZ, TA, rho;
+    PZ = _dedx_get_atom_charge(ion,err);
+    PA = _dedx_get_atom_mass(ion,err);
+    TZ = _dedx_get_atom_charge(target,err);
+    TA = _dedx_get_atom_mass(target,err);
+    rho = _dedx_read_density(target,err);
+    return _dedx_load_bethe_config(ws,PZ,PA,TZ,TA,rho,pot,err);
+}
+
+/*Load in bethe configuration to the memory, return a unik reference Id*/
+int _dedx_load_bethe_config(dedx_workspace * ws, float PZ, float PA, float TZ, float TA, float rho, float pot, int * err)
+{
+    *err = 0;
+    //int i = 0;
+    stopping_data data;
+    float energy[_DEDX_MAXELEMENTS];
+    //Get stopping data and energy grid
+    _dedx_load_bethe2(&data,PZ,PA,TZ,TA,rho,pot,energy,err);
+    //Calculate spline values and store them in memory.
+    return _dedx_load_data(ws,&data,energy,DEDX_BETHE,err);
+}
+/*
+int dedx_load_compound_weigth(dedx_workspace * ws, int prog, int ion, int * targets, float * weight, int length, int * err)
+{
+    *err = 0;
+    int i = 0;
+    int j = 0;
+
+    float *density = malloc(sizeof(float)*length);
+    float energy[_DEDX_MAXELEMENTS];
+    stopping_data data;
+    stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
+    //float sum = 0;
+    //float * f;
+    for(i = 0; i < length; i++)
+    {
+        _dedx_find_data(&compound_data[i], prog, ion, targets[i],energy,err);
+    }
+    for(j = 0; j < compound_data[0].length; j++)
+    {
+        data.data[j] = 0.0;
+        for(i = 0; i < length; i++)
+        {
+            data.data[j] += weight[i]*compound_data[i].data[j];
+        }
+    }
+    data.length = compound_data[0].length;
+    free(density);
+    free(compound_data);
+    return _dedx_load_data(ws,&data,energy,DEDX_BETHE,err);
+}
+*/
+
+/*Initialize the library, allocate memory to contain loaded data set*/
+int dedx_initialize(int count, int * err)
+{
+    *err = 0;
+    if(count < 1)
+    {
+        *err = 202;
+        return -1;
+    }
+    workspace = dedx_allocate_workspace(count,err);
+    return 0;
+}
+/*It is the main function to load configuration handles all data set and algoritm in default mode. return a unik reference Id*/
+
+/*
+int dedx_load_config(dedx_workspace * ws, int prog, int ion, int target, int * use_bragg, int * err)
+{
+    float energy[_DEDX_MAXELEMENTS];
+    float composition[20][2];
+    int compos_len;
+    *use_bragg = 0;
+    *err = 0;
+    stopping_data data;
+
+    //check if ion is available in requested program
+    if (!_dedx_check_ion(prog, ion)) {
+      *err = 207;
+      return -1;
+    }
+
+    //Load data
+    _dedx_find_data(&data,prog,ion,target,energy,err);
+
+    if(*err != 0)
+    {
+        //Check whether the error was that the combination wasn't in the data files and target is a compound
+
+        if(*err == 202 && target > 99)
+        {
+
+            *err = 0;
+            _dedx_get_composition(target, composition, &compos_len, err);
+
+            if(*err != 0)
+                return -1;
+			if(compos_len == 0)
+			{
+				*err = 201;
+			}
+            *use_bragg= 1;
+            _dedx_find_bragg_data(&data, prog, ion, composition, compos_len,energy,err);
+        }
+        if(*err != 0)
+        {
+            return -1;
+        }
+    }
+
+    return _dedx_load_data(ws,&data,energy,prog,err);
+}
+*/
+//return stopping power for a specific energy
+ /*
+float dedx_get_stp(dedx_workspace * ws, int id, float energy, int * err)
+{
+	//Check that the energy is inside the boundery
+	if((*err = _dedx_check_energy_bounds(ws->loaded_data[id],energy)) != 0)
+		return 0;
+	if(id > ws->active_datasets) //Check that the dataset is loaded.
+	{
+		*err = 203;
+		return 0;
+	}
+	//Evaluating the spline function
+	return _dedx_evaluate_spline(ws->loaded_data[id]->base, energy, 
+			&(ws->loaded_data[id]->acc), 
+			ws->loaded_data[id]->n);
+}
+ */
+/*Load a specific compound target combination using bragg rule*/
+  /*
+int dedx_load_compound(dedx_workspace * ws, 
+		int prog, int ion, int * targets, 
+		int * compos, int length, int * err)
+{
+
+	*err = 0;
+	int i = 0;
+	int j = 0;
+	float * density = malloc(sizeof(float)*length);
+	float * weight = malloc(sizeof(float)*length);
+	float energy[_DEDX_MAXELEMENTS];
+	stopping_data data;
+	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
+	float sum = 0;
+	float f;
+	for(i = 0; i < length; i++)
+	{
+		f = _dedx_read_density(targets[i],err);
+		if(*err != 0)
+		{
+			free(density);
+			free(weight);
+			return 0;
+		}
+		density[i] = f;
+		sum += f;
+	}
+	for(i = 0; i < length; i++)
+	{
+		weight[i] = compos[i]*density[i]/sum;
+		_dedx_find_data(&compound_data[i], prog, ion, targets[i],energy,err);
+		if(*err != 0)
+		{
+			free(density);
+			free(weight);
+			return 0;
+		}
+	}
+	for(j = 0; j < compound_data[0].length; j++)
+	{
+		data.data[j] = 0.0;
+		for(i = 0; i < length; i++)
+		{
+			data.data[j] += weight[i]*compound_data[i].data[j];
+		}
+	}
+	data.length = compound_data[0].length;
+	free(density);
+	free(compound_data);
+	return _dedx_load_data(ws,&data,energy,prog,err);
+}
+  */
+/*Clean up, deallocate memory*/
+void dedx_clean_up()
+{
+	int err;
+	dedx_free_workspace(workspace,&err);
+}
+
+/*Finds stopping and energy grid for the different programs*/
+int _dedx_find_data(stopping_data * data, 
+		int prog, int ion, int target, 
+		float * energy, int * err)
+{
+	if(prog == DEDX_ICRU)
+	{
+		if(ion == 1)
+		{
+			_dedx_read_binary_data(data, _DEDX_0008, ion, target, err);
+			if(*err != 0)
+				return 0;
+			_dedx_read_energy_data(energy,_DEDX_0008, err);
+		}
+		else if(ion == 2)
+		{
+			_dedx_read_binary_data(data, DEDX_ICRU49, ion, target, err);
+			if(*err != 0)
+				return 0;
+			_dedx_read_energy_data(energy,DEDX_ICRU49, err);
+		}
+		else
+		{
+			if(!(target == DEDX_WATER || target == DEDX_AIR))
+			{
+				_dedx_read_binary_data(data, DEDX_ICRU73_OLD, ion, target, err);
+			}
+			else
+			{
+				_dedx_read_binary_data(data, DEDX_ICRU73, ion, target, err);
+			}
+			if(*err != 0)
+				return 0;
+			_dedx_read_energy_data(energy,DEDX_ICRU73, err);
+		}
+
+	}
+	//ESTAR not supported
+	else if(prog == DEDX_ESTAR)
+	{
+		*err = 205;
+		return -1;
+	}
+	/*Get data for pure data lookup, ASTAR, PSTAR, ESTAR and ICRU73*/
+	else if(prog < DEDX_ESTAR || prog == DEDX_ICRU73_OLD || prog == DEDX_ICRU73)
+	{
+		if(prog == DEDX_ICRU73 && !(target == 276 || target == 104))
+		{
+			_dedx_read_binary_data(data, DEDX_ICRU73_OLD, ion, target, err);
+		}
+		else
+			_dedx_read_binary_data(data, prog, ion, target, err);
+		if(*err != 0)
+			return 0;
+		_dedx_read_energy_data(energy,prog, err);
+	}
+	else if(prog == DEDX_ICRU49)
+	{
+		if(ion == 1)
+		{
+			_dedx_read_binary_data(data, _DEDX_0008, ion, target, err);
+			if(*err != 0)
+				return 0;
+			_dedx_read_energy_data(energy,_DEDX_0008, err);
+		}
+		else if(ion == 2)
+		{
+			_dedx_read_binary_data(data, DEDX_ICRU49, ion, target, err);
+			if(*err != 0)
+				return 0;
+			_dedx_read_energy_data(energy,DEDX_ICRU49, err);
+		}
+		else
+		{
+			*err = 202;		
+		}
+	}
+	else if(prog == DEDX_MSTAR) //Load ASTAR data, and scale them with the MSTAR method
+	{
+		if(ion < 2)
+		{
+			*err = 206;
+			return 0;
+		}
+		_dedx_read_binary_data(data, prog, 2,target,err);
+		if(*err != 0)
+			return 0;
+		stopping_data out;
+		_dedx_read_energy_data(energy,prog,err);
+		if(*err != 0)
+			return 0;
+		data->ion = ion;
+		_dedx_convert_energy_to_mstar(data,&out,'a',energy);
+		if(*err != 0)
+			return 0;
+		memcpy(data,&out,sizeof(stopping_data));
+	}
+	else  if(prog == DEDX_BETHE) //Load bethe data
+	{
+		_dedx_read_energy_data(energy,prog, err);
+		_dedx_load_bethe(data, ion, target, energy, err);
+	}
+	else
+	{
+		if(*err == 0)
+		{
+			*err = 203;
+		}
+	}	
+	return 0;
+}
 /*Check the whether the energy are inside the boundery*/
 int _dedx_check_energy_bounds(_dedx_lookup_data * data, float energy)
 {
@@ -98,6 +496,65 @@ int _dedx_check_energy_bounds(_dedx_lookup_data * data, float energy)
 		return 101;
 	}
 	return 0;
+}
+/*Calculating the stopping power grid with bragg rule*/
+int _dedx_find_bragg_data(stopping_data * data, int prog, int ion, float composition[][2], int length, float * energy, int *err)
+{
+	stopping_data temp_data;
+	int i,j = 0;
+	for(j = 0; j < _DEDX_MAXELEMENTS; j++)
+	{
+		data->data[j] = 0;
+	}
+	for(i = 0; i < length; i++)
+	{
+		_dedx_find_data(&temp_data, prog, ion, (int)composition[i][0], energy,err);
+		if(*err != 0)
+			return 0;
+		data->length = temp_data.length;
+		for(j = 0; j < data->length; j++)
+		{
+			data->data[j] += composition[i][1]*temp_data.data[j];
+		}
+	}
+	return 0;
+}
+
+float dedx_get_blackbox_stp(int ion, int target, float energy, int * err)
+{
+	float ste = 0.0;
+	if(ion == -1)
+	{
+		//Use ESTAR
+		ste = dedx_get_simple_stp(3,-1,target, energy, err);
+	}
+	else if(ion == 1)
+	{
+		//Use PSTAR
+		ste = dedx_get_simple_stp(2,1,target, energy, err);
+	}
+	else if(ion == 2)
+	{
+		//Use ASTAR
+		ste = dedx_get_simple_stp(1,2,target, energy, err);
+	}
+	else if(ion > 2)
+	{
+		//USE ICRU73
+		ste = dedx_get_simple_stp(6,ion,target, energy, err);
+		if(*err == 202)
+		{
+			//Use MSTAR
+			ste = dedx_get_simple_stp(4,ion,target, energy, err);
+		}
+	}
+	if(*err == 202)
+	{
+		//Use Bethe
+		ste = dedx_get_simple_stp(100,ion,target, energy, err);
+	}
+	return ste;
+
 }
 
 /*Return an explanation to the error code*/

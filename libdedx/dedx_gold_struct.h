@@ -1,7 +1,7 @@
 #ifndef DEDX_GOLD_STRUCT_H_INCLUDED
 #define DEDX_GOLD_STRUCT_H_INCLUDED
 
-typedef struct
+/*typedef struct
 {
     double e_min;
     double e_max;
@@ -12,6 +12,6 @@ typedef struct
     double f_extr;
     double e_sewn;
     double f_sewn;
-} gold_struct;
+} gold_struct;*/
 
 #endif // DEDX_GOLD_STRUCT_H_INCLUDED

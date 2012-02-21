@@ -115,9 +115,16 @@ enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
 #define DEDX_TEFLON   DEDX_POLYTETRAFLUOROETHYLENE
 #define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
 
+// obosolete
+//int dedx_initialize(int count, int *err);
 
 
+float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err);
+float dedx_get_blackbox_stp(int ion, int target, float energy, int * err);
 
+/* this obsolete? */
+void dedx_clean_up();
+/* ---- */
 
 void dedx_get_error_code(char *err_str, int err);
 const char * dedx_get_program_name(int program);
@@ -197,6 +204,30 @@ typedef struct
 } dedx_workspace;
 
 
+// This is obsolete and will be removed.
+/*
+   int dedx_load_compound_weigth(dedx_workspace * ws, 
+   int prog, int ion, int * targets, 
+   float * weight, int length, int * err);
+ */
+/*
+   int dedx_load_config(dedx_workspace * ws, 
+   int program, int ion, int target, 
+   int * use_bragg, int * err);
+ */
+/*float dedx_get_stp(dedx_workspace * ws, 
+  int id, float energy, int * err);
+ */
+/*
+   int dedx_load_compound(dedx_workspace * ws, 
+   int prog, int ion, int * targets, 
+   int * compos, int length, int * err);
+ */
+
+int dedx_load_bethe_config(dedx_workspace * ws, 
+		int ion, int target, float pot, int * err);
+
+//  ------ end of obsolete functions -------------
 dedx_workspace * dedx_allocate_workspace(int count, int *err);
 void dedx_free_workspace(dedx_workspace * workspace, int *err);
 

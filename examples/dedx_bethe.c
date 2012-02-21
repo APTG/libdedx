@@ -47,7 +47,7 @@ int main()
 
   /* overriding I-value */ // TODO not implemented for compounds
   //cfg2 = dedx_load_bethe_config(ws, z, target, I, &err);
-  dedx_load_bethe_config(ws, cfg2->ion, cfg2->target, cfg2->i_value, &err);
+  dedx_load_config2(ws,cfg2,&err);
   if (err != 0){
     printf("load bethe config1 err %i\n",err);
     exit(-1);

@@ -18,12 +18,12 @@
 #include "dedx_bethe.h"
 #include <math.h>
 
-gold_struct * gold;
-bethe_struct * bet;
+_dedx_gold_struct * gold;
+_dedx_bethe_struct * bet;
 
-void _dedx_gold_section(bethe_struct bet, gold_struct * gold, int *err);
-float _dedx_m(float PT,bethe_struct bet, int * err);
-float _dedx_mm(float PT, bethe_struct bet, gold_struct gold, int * err);
+void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct * gold, int *err);
+float _dedx_m(float PT,_dedx_bethe_struct bet, int * err);
+float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int * err);
 
 float _dedx_calculate_bethe_energy(float energy, float PZ, float PA, float TZ, float TA, float rho, float Io_Pot)
 {
@@ -40,8 +40,8 @@ float _dedx_calculate_bethe_energy(float energy, float PZ, float PA, float TZ, f
 		free(gold);
 	if(bet != NULL)
 		free(bet);
-        gold = malloc(sizeof(gold_struct));
-        bet = malloc(sizeof(bethe_struct));
+        gold = malloc(sizeof(_dedx_gold_struct));
+        bet = malloc(sizeof(_dedx_bethe_struct));
     }
     //float mass = 940*PA;
 
@@ -67,7 +67,7 @@ float _dedx_calculate_bethe_energy(float energy, float PZ, float PA, float TZ, f
 
     return dedx;
 }
-float _dedx_mm(float PT, bethe_struct bet, gold_struct gold, int * err)
+float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int * err)
 {
     double T = PT;
     float dedx;
@@ -153,7 +153,7 @@ float _dedx_mm(float PT, bethe_struct bet, gold_struct gold, int * err)
     dedx=0.307075*bet.TZ0/bet.TA0*(ZPART2/beta_2)*(log((1.022E+06/bet.potentiale)*beta_gamma)-beta_2-delta/2.0);
     return dedx;
 }
-void _dedx_gold_section(bethe_struct bet, gold_struct * gold, int * err)
+void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct * gold, int * err)
 {
 
     double e_min = gold->e_min;
@@ -268,7 +268,7 @@ void _dedx_gold_section(bethe_struct bet, gold_struct * gold, int * err)
     }
 
 }
-float _dedx_m(float PT,bethe_struct bet, int * err)
+float _dedx_m(float PT,_dedx_bethe_struct bet, int * err)
 {
     double T = PT;
     double mass = 940*bet.PA0;
