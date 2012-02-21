@@ -117,8 +117,6 @@ enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
 
 
 
-
-
 void dedx_get_error_code(char *err_str, int err);
 const char * dedx_get_program_name(int program);
 const char * dedx_get_program_version(int program);
@@ -172,7 +170,7 @@ typedef struct
 } dedx_workspace;
 
 
-dedx_workspace * dedx_allocate_workspace(int count, int *err);
+dedx_workspace * dedx_allocate_workspace(int count, int *err); // TODO: size_t for count
 void dedx_free_workspace(dedx_workspace * workspace, int *err);
 
 
@@ -182,23 +180,21 @@ typedef struct
 	int cfg_id;
 	int program;
 	int target;            // target can either be an element or a compound
-	int ion;               // z of projectile
+	int ion;               // id number of projectile
 	int ion_a;             // nucleon number of projectile
-	int bragg_used;        // bragg_used
+	int bragg_used;        // is 1 if braggs additivity rule was applied
 	int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
-	int elements_length;   // elements_length  --- number of unique elements in comp.
+	int elements_length;   // elements_length  --- number of unique elements in comp. // TODO: size_t
 	int * elements_id;     // elements_id      --- Z of each element
 	int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
 	char mstar_mode;
 	float i_value;         // i_value   --- mean excitation potential of target 
 	float rho;
-	float * elements_mass_fraction;       // elements_mass_fraction
-	float * elements_i_value;        // elements_i_value
+	float * elements_mass_fraction;     // mass_fraction of each element
+	float * elements_i_value;           // i_value of each element
 	const char * target_name;
 	const char * ion_name;
 	const char * program_name;
-	//double nucleon_number; (renamed)
-
 } dedx_config;
 
 

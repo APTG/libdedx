@@ -39,8 +39,13 @@ A.4 Additional notes
 1. Introduction
 -------------------------------------------------------------------------------
 
-libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles. It is a collection of commonly known stopping power tables and stopping-power routines. 
-You can either you it as a library, by including the <dedx.h> file and linking against the dedx library, or manually access a value with the getdedx command.
+libdEdx is an easy to use library which provides electronic stopping powers of 
+fast charged particles. It is a collection of commonly known stopping power 
+tables and stopping-power routines. You can either you it as a library, by 
+including the <dedx.h> file and linking against the dedx library, or manually 
+access a value with the getdedx command.
+
+A web front end is available on http://dedx.au.dk
 
 -------------------------------------------------------------------------------
 2. Data available
@@ -66,13 +71,14 @@ Energy range: 25 keV/u to 1 GeV/u
 Particles: See icru73_particle_targets
 Targets: See icru73_particle_targets
 
-Bethe-Bloch:
+BETHE: Bethe equation with Linhard-Scharff at lower energies.
 Energy range: ?
-Particles: ?
-Targets: ?
+Particles: Any
+Targets: Any
 
-For all data tables and equations it is possible to use Bragg's additivity rule, if a specific target is unavailable by default.
-
+For all data tables and equations it is possible to use Bragg's additivity rule,
+if a specific target is unavailable by default.
+ 
 -------------------------------------------------------------------------------
 3. Installation
 -------------------------------------------------------------------------------
@@ -83,20 +89,24 @@ See the INSTALL file.
 4. Use
 -------------------------------------------------------------------------------
 
-UNITS: Energies are always in terms of MeV/amu, except for ESTAR, where the Electron energy must be specified in terms of MeV. The resulting mass stopping power is in MeV cm2/g.
+UNITS: Energies are always in terms of MeV/amu, except for ESTAR, where the 
+Electron energy must be specified in terms of MeV. The resulting mass stopping 
+power is in MeV cm2/g.
 
-Stopping power values can be retrieved in two different ways: 1) a simple method for simple implementation, 2) a bit more complicated way, but more suitable for fast applications.
+Stopping power values can be retrieved in two different ways: 
+	 1) a simple method for simple implementation, 
+	 2) a bit more complicated way, but more suitable for fast and 
+	    multithreaded applications.
 
 Method 1) involves two function calls:
         
-        float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err);
+        float dedx_get_simple_stp(int program, 
+	      			  int ion, 
+				  int target, 
+				  float energy, 
+				  int * err);
 
 The function returns the stopping power of the specific configuration.
-
-When you finished using the library you should use
-
-        dedx_clean_up()
-
 which releases the memory that is used.
 
 The program parameter specifies the data table to be used:
@@ -111,26 +121,35 @@ The program parameter specifies the data table to be used:
 100.: Bethe equation.
 
 ion: is the Z value of the particle
-target: is the id of the target, the id follow the ICRU naming convention the id can be found in the respective target files for each program.
+target: is the id of the target, the id follow the ICRU naming convention the 
+	id can be found in the respective target files for each program.
 energy: is the kinetic energy for the ion per nucleon (MeV/amu).
-*err: contains the error code and is 0 if no error was encountered. An explanation of the error codes can be found in the error_codes.txt file.
+*err: contains the error code and is 0 if no error was encountered. An 
+      explanation of the error codes can be found in the error_codes.txt file.
 
-This method is fast if you use this function with the same target material and ion combination but with different energies. If you use different materials or ions, it is recommended to use the "high-performance" method 2):
+This method is fast if you use this function with the same target material and 
+ion combination but with different energies. If you use different materials or ions, 
+it is recommended to use the "high-performance" method 2):
 
-Here, you first call 
+  dedx_workspace *ws;
+  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
 
-        ws = dedx_allocate_workspace(int datasets, int *err)
+  ws = dedx_allocate_workspace(int datasets, int *err)
 
-datasets: is the number of combinations you want to be able to have loaded at the same time.
+datasets: is the number of combinations you want to be able to have loaded at 
+	  the same time.
 *err: (see above)
-The function returns a struct of the type dedx_workspace *ws
+      The function returns a struct of the type dedx_workspace *ws
 
-Next you have to call:
+Next initialize your configuraion:
 
-        cfg = dedx_load_config(dedx_workspace *ws, int program, int ion, int target, int *bragg, int *err)
+     int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err);
 
-The function returns an integer with you have to store and use in the next function. The *bragg integer returns true, if Braggs additivity rule had to be applied if the compound is not found in the default list for that particular table.)
-The program parameter specifies which data table to use:
+
+The function returns an integer with you have to store and use in the next 
+function. The *bragg integer returns true, if Braggs additivity rule had to be 
+applied if the compound is not found in the default list for that particular 
+table.) The program parameter specifies which data table to use:
 
 1. ASTAR
 2. PSTAR
@@ -139,7 +158,8 @@ The program parameter specifies which data table to use:
 5. ICRU73
 
 ion: is the Z value of the particle
-target: is the id of the target, the id follows the ICRU naming convention. [TODO: make target_id.txt file.]
+target: is the id of the target, the id follows the ICRU naming convention. 
+	[TODO: make target_id.txt file.]
 
 You have to call dedx_load_config() for each target/ion combination. 
 
@@ -192,9 +212,8 @@ A.1 API
 List of functions available in dedx.h:
 
 dedx_workspace dedx_allocate_workspace(int count, int *err);
-void  dedx_clean_up();
 void  dedx_free_workspace(dedx_workspace *ws, int *err);
-float dedx_get_blackbox_stp(int ion, int target, float energy, int * err);
+void  dedx_free_config(dedx_config *config, int *err);
 void  dedx_get_composition(int target, float ** composition, int * comp_len, int *err);
 void  dedx_get_error_code(char *err_str, int err);
 char *dedx_get_ion_name(int ion);
@@ -208,10 +227,7 @@ int * dedx_get_program_list(void);
 float dedx_get_stp(dedx_workspace *ws, int id, float energy, int * err);
 float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err);
 void  dedx_get_version(int *major, int *minor, int *patch, int *svn);
-int   dedx_load_bethe_config(dedx_workspace *ws, int ion, int target, float pot, int * err);
-int   dedx_load_compound(dedx_workspace *ws, int prog, int ion, int * targets, int * compos, int length, int * err);
-int   dedx_load_compound_weigth(dedx_workspace *ws, int prog, int ion, int * targets, float * weight, int length, int * err);
-int   dedx_load_config(dedx_workspace *ws, int program, int ion, int target, int * use_bragg, int * err);
+int   dedx_load_config(dedx_workspace *ws, dedx_config *config, int * err);
 
 
 Descriptions of variables:

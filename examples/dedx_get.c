@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     ion_list = dedx_get_ion_list(prog);
     i = 0;
     while (ion_list[i] != -1) {
-      printf("%i: %s\n", ion_list[i], dedx_get_ion_name(ion_list[i]));
+      printf("%2i: %s\n", ion_list[i], dedx_get_ion_name(ion_list[i]));
       i++;
     }
     printf("\n");

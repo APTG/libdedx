@@ -212,19 +212,24 @@ const int * dedx_get_program_list(void) {
 	return dedx_available_programs;
 }
 const int * dedx_get_material_list(int program) {
-	/* returns a list of available materials, terminated with -1 */
-	if (program == DEDX_BETHE)
-		return 0; /* any material, no restrictions */
-	else
-		return dedx_program_available_materials[program];
+  /* returns a list of available materials, terminated with -1 */
+  if (program == DEDX_BETHE)
+    return dedx_program_available_materials[0];
+  else
+    return dedx_program_available_materials[program];
 }
 
 const int * dedx_get_ion_list(int program) {
 	/* returns a list of available ions, terminated with -1 */
-	if (program == DEDX_BETHE)
-		return 0; /* any ion, no restrictions */
-	else
-		return dedx_program_available_ions[program];
+  if (program == DEDX_BETHE) {  /* any ion, no restrictions */    
+    static int temp[113],i; 
+    for (i=0;i<112;i++)
+      temp[i]=i+1;
+    temp[112]=-1; // stopper
+    return temp;  // TODO: Hey Jakob, er det her lovligt eller et nyt mem leak?
+  }
+  else
+    return dedx_program_available_ions[program];
 }
 
 float dedx_get_min_energy(int program, int ion) {
