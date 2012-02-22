@@ -25,10 +25,10 @@ int main()
 
   ste = dedx_get_stp(ws,cfg,energy,&err);
 
-  printf("dedx_cleanup\n");
-  dedx_free_workspace(ws,&err);
   printf("1/rho dEdx = %6.3E MeV cm2/g\n",ste);
 
-  free(cfg);
+  //printf("dedx_cleanup\n");
+  dedx_free_workspace(ws,&err);
+  dedx_free_config(cfg,&err);
   return 0;
 }

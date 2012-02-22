@@ -212,8 +212,8 @@ int main(int argc, char *argv[])
   printf("1/rho dE/dx = %6.3E MeV cm2/g\n",stp);
 
   dedx_free_workspace(ws,&err);
+  dedx_free_config(cfg);
   free(str);
-  free(cfg);
 
   return 0;
 }
