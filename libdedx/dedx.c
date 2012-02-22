@@ -49,7 +49,7 @@ float _dedx_get_max_energy_icru(int ion);
 int _dedx_check_ion(int prog, int ion);
 int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, int * err);
 
-dedx_workspace * dedx_allocate_workspace(int count, int *err)
+dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err)
 {
     int i = 0;
     dedx_workspace * temp = malloc(sizeof(dedx_workspace));
@@ -198,7 +198,7 @@ void dedx_get_version(int *major, int *minor, int *patch, int *svn)
 	*svn   = DEDX_VERSION_SVN;
 	return;
 }
-void dedx_get_composition(int target, float composition[][2], int * comp_len, int *err)
+void dedx_get_composition(int target, float composition[][2], unsigned int * comp_len, int *err)
 {
 	_dedx_get_composition(target, composition, comp_len, err);
 }
@@ -429,7 +429,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 	config->bragg_used = 1;
 	if(config->elements_id == NULL)
 	{
-		int compos_len;
+		unsigned int compos_len;
 		float composition[20][2];
 		_dedx_get_composition(config->target, composition, &compos_len, err);
 		if(*err != 0)
@@ -713,7 +713,7 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	_dedx_bethe_coll_struct * bethe = (_dedx_bethe_coll_struct *)calloc(1,sizeof(_dedx_bethe_coll_struct));
 	for(i = 0; i < data->length; i++)
 	{
-		//data->data[i] = _dedx_calculate_bethe_energy(bethe,energy[i], PZ, PA, TZ, TA, rho, pot);
+		data->data[i] = _dedx_calculate_bethe_energy(bethe,energy[i], PZ, PA, TZ, TA, rho, pot);
 	}
 	if(bethe->bet != NULL)
 		free(bethe->bet);

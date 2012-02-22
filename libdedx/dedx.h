@@ -2,7 +2,6 @@
 #define DEDX_H_INCLUDED
 
 #define _DEDX_MAXELEMENTS 150
-
 /* available data tables */
 enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
       DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
@@ -124,7 +123,7 @@ const char * dedx_get_material_name(int material);
 const char * dedx_get_ion_name(int ion);
 void dedx_get_version(int *major, int *minor, int *patch, int *svn);
 void dedx_get_composition(int target, float composition[][2], 
-		int * comp_len, int *err);
+	unsigned int * comp_len, int *err);
 float dedx_get_i_value(int target, int *err);
 
 const int * dedx_get_program_list(void);
@@ -170,7 +169,7 @@ typedef struct
 } dedx_workspace;
 
 
-dedx_workspace * dedx_allocate_workspace(int count, int *err); // TODO: size_t for count
+dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err);
 void dedx_free_workspace(dedx_workspace * workspace, int *err);
 
 
@@ -184,7 +183,7 @@ typedef struct
 	int ion_a;             // nucleon number of projectile
 	int bragg_used;        // is 1 if braggs additivity rule was applied
 	int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
-	int elements_length;   // elements_length  --- number of unique elements in comp. // TODO: size_t
+	unsigned int elements_length;   // elements_length  --- number of unique elements in comp.
 	int * elements_id;     // elements_id      --- Z of each element
 	int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
 	char mstar_mode;

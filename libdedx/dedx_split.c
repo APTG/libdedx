@@ -16,7 +16,7 @@
 */
 #include <stdlib.h>
 #include "dedx_split.h"
-char **_dedx_split(char* string, char splitCaracter, int* items, int strLength)
+char **_dedx_split(char* string, char splitCaracter, unsigned int * items, unsigned int strLength)
 {
     int i = 0;
     int j = 0;

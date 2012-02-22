@@ -7,7 +7,7 @@ typedef struct
 {
     int target;
     int ion;
-    int length;
+    unsigned int length;
     float data[_DEDX_MAXELEMENTS];
 } stopping_data;
 

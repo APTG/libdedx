@@ -398,7 +398,7 @@ float _dedx_get_i_value(int target,int state, int * err)
 		*err = 201;
 	return pot;
 }
-void _dedx_get_composition(int target, float composition[][2], int * length, int *err)
+void _dedx_get_composition(int target, float composition[][2], unsigned int * length, int *err)
 {
 	*err = 0;
 	char file[] = "composition";

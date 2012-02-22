@@ -22,7 +22,7 @@ size_t _dedx_target_is_gas(int target,int *err);
 float _dedx_read_density(int id,int *err);
 //void _dedx_get_short_name(int id,char * name, int *err);
 float _dedx_get_i_value(int target,int state, int * err);
-void _dedx_get_composition(int target, float composition[][2], int * length, int *err);
+void _dedx_get_composition(int target, float composition[][2], unsigned int * length, int *err);
 
 float * _dedx_get_atima_data(int target,int *err);
 #endif // DEDX_FILE_ACCESS_H_INCLUDED
