@@ -20,10 +20,10 @@ int main()
   cfg->target = DEDX_WATER;
   cfg->ion = DEDX_PROTON;
 
-  dedx_load_config2(ws, cfg, &err);
+  dedx_load_config(ws, cfg, &err);
   printf("config loaded with err %i\n",err);
 
-  ste = dedx_get_stp2(ws,cfg,energy,&err);
+  ste = dedx_get_stp(ws,cfg,energy,&err);
 
   printf("dedx_cleanup\n");
   dedx_free_workspace(ws,&err);

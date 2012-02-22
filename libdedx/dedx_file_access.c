@@ -70,7 +70,7 @@ void _dedx_convert_to_binary(char * path, char * output,int *err)
         if(line[0] == '#')
         {
 
-            int length = 0;
+            unsigned int length = 0;
             memset(&data,0,_DEDX_MAXELEMENTS);
             temp = _dedx_split(line,':',&length,100);
             temp[0][0] = ' ';
@@ -224,7 +224,7 @@ float _dedx_read_effective_charge(int id,int *err)
 	}
 	char line[100];
 	char **temp = NULL;
-	int items = 0;
+	unsigned int items = 0;
 	char file[] = "effective_charge.dat";
 	char path[80];
 	strcpy(path,folder);
@@ -293,7 +293,7 @@ float _dedx_read_density(int id,int *err)
 	strcat(path,file);
 
 	FILE *fp = fopen(path,"r");
-	int items = 0;
+	unsigned int items = 0;
 	char **temp;
 
 	if(fp == NULL)
@@ -363,7 +363,7 @@ float _dedx_get_i_value(int target,int state, int * err)
 	char path[80];
 	char str[100];
 	char **temp;
-	int items = 0;
+	unsigned int items = 0;
 
 	strcpy(path,folder);
 	strcat(path,file);
@@ -407,7 +407,7 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int * le
 	*length = 0;
 	float f_temp;
 	FILE *fp;
-	int items;
+	unsigned int items;
 	char **temp;
 
 	strcpy(path,folder);
@@ -456,7 +456,7 @@ float * _dedx_get_atima_data(int target,int *err)
 	float *compos;
 
 	FILE *fp;
-	int items;
+	unsigned int items;
 	char **temp;
 
 	strcpy(path,folder);

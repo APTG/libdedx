@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
   cfg->program = prog;
   cfg->target = target;
   cfg->ion = z;
-  dedx_load_config2(ws,cfg,&err);  
+  dedx_load_config(ws,cfg,&err);  
 
   if (err != 0) {
     fprintf(stderr,"dedx_load_config, error %i:", err);
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
   }
 
   /* get stopping power */
-  stp = dedx_get_stp2(ws,cfg,energy,&err);
+  stp = dedx_get_stp(ws,cfg,energy,&err);
   if (err != 0) {
     fprintf(stderr,"dedx_read_energy, error %i:", err);
     dedx_get_error_code(str, err);      

@@ -46,13 +46,13 @@ double _dedx_adapt_stp(double energy, _dedx_tools_settings * set)
 {
 	int err = 0;
 	// TODO: i am sure sure if its cfg->ion_a or ion_A !!
-	return 1/dedx_get_stp2(set->ws,set->cfg,energy/(set->cfg->ion_a),&err);
+	return 1/dedx_get_stp(set->ws,set->cfg,energy/(set->cfg->ion_a),&err);
 }
 
 double _dedx_find_min_stp_func(double x,_dedx_tools_settings * set)
 {
 	int err = 0;
-	float stp = 1/dedx_get_stp2(set->ws, set->cfg,x,&err);
+	float stp = 1/dedx_get_stp(set->ws, set->cfg,x,&err);
 	if(err != 0)
 		return INFINITY;
 	return stp;
@@ -124,7 +124,7 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 	set.ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)
 		return -1;
-	dedx_load_config2(set.ws,config,err);
+	dedx_load_config(set.ws,config,err);
 	//	set.id = config->cfg_id;
 	set.cfg = config;
 	
@@ -148,7 +148,7 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 	while(fabs(x1-x2)>acc)
 	{
 		x_temp = (x1+x2)/2;
-		f_temp = dedx_get_stp2(set.ws, set.cfg, x_temp,err);
+		f_temp = dedx_get_stp(set.ws, set.cfg, x_temp,err);
 		
 		if(f_temp >= stp)
 		{
@@ -175,7 +175,7 @@ double dedx_get_csda(dedx_config * config,float energy,int *err)
 	dedx_workspace *ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)
 		return -1;
-	dedx_load_config2(ws,config,err);
+	dedx_load_config(ws,config,err);
 	if(*err != 0)
 		return -1;
 	set.cfg = config;

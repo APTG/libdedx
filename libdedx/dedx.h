@@ -197,9 +197,9 @@ typedef struct
 } dedx_config;
 
 
-int dedx_load_config2(dedx_workspace *ws, 
+int dedx_load_config(dedx_workspace *ws, 
 		dedx_config * config, int *err);
-float dedx_get_stp2(dedx_workspace * ws, 
+float dedx_get_stp(dedx_workspace * ws, 
 		dedx_config * config, float energy, int * err);
 
 void dedx_free_config(dedx_config * config, int *err);

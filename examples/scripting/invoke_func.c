@@ -61,7 +61,7 @@ int get_stp(data_item * config, data_item * energy, float * stp)
 	if(config->ws != NULL)
 		dedx_free_workspace(config->ws,&err);
 	config->ws = dedx_allocate_workspace(1,&err);
-	dedx_load_config2(config->ws,config->config_temp,&err);
+	dedx_load_config(config->ws,config->config_temp,&err);
 	if(err != 0)
 		return -1;
 	for(i = 0; i < energy->e_length; i++)

@@ -36,7 +36,7 @@ void dedx_loadICRU73_test()
 	cfg->program = DEDX_ICRU73_OLD;
 	cfg->ion = DEDX_LITHIUM;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,5,3,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -52,7 +52,7 @@ void dedx_loadICRU73_new_test()
 	cfg->program = DEDX_ICRU73;
 	cfg->ion = DEDX_LITHIUM;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,6,3,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -69,7 +69,7 @@ void dedx_loadBethe_test()
 	cfg->program = DEDX_BETHE;
 	cfg->ion = DEDX_HELIUM;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,100,2,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -85,7 +85,7 @@ void dedx_loadASTAR_test()
 	cfg->program = DEDX_ASTAR;
 	cfg->ion = DEDX_HELIUM;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,1,2,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -109,7 +109,7 @@ void dedx_loadPSTAR_test()
 	cfg->program = DEDX_PSTAR;
 	cfg->ion = DEDX_PROTON;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,2,1,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -125,7 +125,7 @@ void dedx_loadMSTAR_test()
 	cfg->program = DEDX_MSTAR;
 	cfg->ion = DEDX_LITHIUM;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,4,3,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -141,7 +141,7 @@ void dedx_loadIRCU49_PROTON_test()
 	cfg->program = DEDX_ICRU49;
 	cfg->ion = DEDX_PROTON;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,7,1,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);
@@ -157,7 +157,7 @@ void dedx_loadIRCU49_HELIUM_test()
 	cfg->program = DEDX_ICRU49;
 	cfg->ion = DEDX_HELIUM;
 	cfg->target = DEDX_WATER;
-	dedx_load_config2(ws,cfg,&err);
+	dedx_load_config(ws,cfg,&err);
 	//dedx_load_config(ws,7,2,276,&bragg,&err);
 	assert(err == 0);
 	free(cfg);

@@ -34,7 +34,7 @@ int main()
 
   /* default I-value */
   //cfg1 = dedx_load_config(ws, DEDX_BETHE, z, target, &bragg, &err);
-  dedx_load_config2(ws, cfg1, &err);
+  dedx_load_config(ws, cfg1, &err);
   if (err != 0){
     printf("load bethe config2 err %i\n",err);
     exit(-1);
@@ -47,13 +47,13 @@ int main()
 
   /* overriding I-value */ // TODO not implemented for compounds
   //cfg2 = dedx_load_bethe_config(ws, z, target, I, &err);
-  dedx_load_config2(ws,cfg2,&err);
+  dedx_load_config(ws,cfg2,&err);
   if (err != 0){
     printf("load bethe config1 err %i\n",err);
     exit(-1);
   }
 
-  ste = dedx_get_stp2(ws, cfg1,energy,&err);
+  ste = dedx_get_stp(ws, cfg1,energy,&err);
   if (err != 0){
     printf("cfg1: get energy err %i\n",err);
     exit(-1);
@@ -64,7 +64,7 @@ int main()
 	 dedx_get_i_value(target,&err), ste);
 
   printf("Override:\n");
-  ste = dedx_get_stp2(ws, cfg2, energy,&err);
+  ste = dedx_get_stp(ws, cfg2, energy,&err);
   if (err != 0){
     printf("cfg2: get energy err %i\n",err);
     exit(-1);

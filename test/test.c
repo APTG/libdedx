@@ -225,7 +225,7 @@ int testConfig(dedx_config * config, char * text, float energy)
 	float stp;
 	char err_str[100];
 	dedx_workspace *ws = dedx_allocate_workspace(1,&err);
-	dedx_load_config2(ws,config,&err);
+	dedx_load_config(ws,config,&err);
 	if(err != 0)
 	{
 		success = 0;

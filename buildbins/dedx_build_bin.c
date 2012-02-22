@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   for (i = 1; i<= max_tables; ++i) {
     cfg->program = prog_id[i];
     cfg->ion = z[i];
-    dedx_load_config2(ws,cfg,&err);
+    dedx_load_config(ws,cfg,&err);
     printf("Setup %i %s ... ",
 	cfg->program, dedx_get_program_name(cfg->program));
     

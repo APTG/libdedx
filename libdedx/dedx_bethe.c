@@ -36,12 +36,14 @@ float _dedx_calculate_bethe_energy(_dedx_bethe_coll_struct * ws, float energy, f
 	}
 	else
 	{
-		if(gold != NULL)
-			free(gold);
-		if(bet != NULL)
-			free(bet);
-		gold = calloc(1,sizeof(_dedx_gold_struct));
-		bet = calloc(1,sizeof(_dedx_bethe_struct));
+		if(ws->gold != NULL)
+			free(ws->gold);
+		if(ws->bet != NULL)
+			free(ws->bet);
+		ws->gold = calloc(1,sizeof(_dedx_gold_struct));
+		ws->bet = calloc(1,sizeof(_dedx_bethe_struct));
+		gold = ws->gold;
+		bet = ws->bet;
 	}
 	//float mass = 940*PA;
 

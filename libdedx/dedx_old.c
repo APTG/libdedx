@@ -50,7 +50,7 @@ float _dedx_get_min_energy_icru(int ion);
 float _dedx_get_max_energy_icru(int ion);
 
 int _dedx_check_ion(int prog, int ion);
-int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, int * err);
+int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, int * err);
 
 dedx_workspace * dedx_allocate_workspace(int count, int *err)
 {
@@ -128,12 +128,12 @@ float dedx_get_simple_stp(int program, int ion, int target, float energy, int * 
     cfg->target = target;
 
     //    dedx_load_config(workspace,program, ion, target, &use_bragg,err);
-    dedx_load_config2(workspace,cfg,err);
+    dedx_load_config(workspace,cfg,err);
     if(*err != 0)
     {
       return 0;
     }
-    ste = dedx_get_stp2(workspace,cfg, energy, err);
+    ste = dedx_get_stp(workspace,cfg, energy, err);
     free(cfg);
     free(workspace);
 
@@ -826,7 +826,7 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 int _dedx_set_names(dedx_config * config, int *err);
 
 
-int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err)
+int dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	int cfg_id;
 	_dedx_validate_config(config,err);
@@ -981,7 +981,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 		return -1;
 	}
 	//Load data
-	_dedx_find_data2(&data,config,energy,err);
+	_dedx_find_data(&data,config,energy,err);
 
 	if(*err != 0)
 	{
@@ -1018,7 +1018,7 @@ dedx_config * dedx_get_default_config()
 	config->mstar_mode = 'b';
 	return config;
 }
-int _dedx_find_data2(stopping_data * data,dedx_config * config,float * energy, int * err)
+int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, int * err)
 {
 	int prog = config->program;
 	int target = config->target;
@@ -1114,7 +1114,7 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 		config->target = targets[i];
 		if(config->elements_i_value != NULL)
 			config->i_value = config->elements_i_value[i];
-		_dedx_find_data2(&compound_data[i],config,energy,err);
+		_dedx_find_data(&compound_data[i],config,energy,err);
 		if(*err != 0)
 		{
 			free(compound_data);
@@ -1199,7 +1199,7 @@ int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
 	return 0;
 
 }
-float dedx_get_stp2(dedx_workspace * ws, dedx_config * config, float energy, int * err)
+float dedx_get_stp(dedx_workspace * ws, dedx_config * config, float energy, int * err)
 {	
 	int id = config->cfg_id;
 	//Check that the energy is inside the boundery
