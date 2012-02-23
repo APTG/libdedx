@@ -59,10 +59,20 @@ dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err)
 {
     int i = 0;
     dedx_workspace * temp = malloc(sizeof(dedx_workspace));
+	if(temp == NULL)
+	{
+		*err = 301;
+		return NULL;
+	}
     temp->loaded_data = malloc(count*sizeof(_dedx_lookup_data * ));
     for(i = 0; i < count; i++)
     {
         temp->loaded_data[i] = malloc(sizeof(_dedx_lookup_data));
+	if(temp->loaded_data[i] == NULL)
+	{
+		*err = 301;
+		return NULL;
+	}
     }
     temp->datasets = count;
     temp->active_datasets = 0;
@@ -170,6 +180,10 @@ void dedx_get_error_code(char *err_str, int err) {
 		case 207:
 			strcpy(err_str,"Ion is not supported for requested table.");
 			break;  
+		case 301:
+			strcpy(err_str,"Out of memory");
+			break;  
+
 		default:
 			strcpy(err_str,"No such error code.");
 			break;
@@ -431,12 +445,6 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 	return cfg; 
 }
 
-dedx_config * dedx_get_default_config()
-{
-	dedx_config *config = (dedx_config *)malloc(sizeof(dedx_config));
-	config->mstar_mode = 'b';
-	return config;
-}
 int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, int * err)
 {
 	int prog = config->program;
@@ -528,6 +536,11 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	int target;
 	stopping_data data;
 	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
+	if(compound_data == NULL)
+	{
+		*err = 301;
+		return -1;
+	}
 	weight = config->elements_mass_fraction;
 	//Backup i_value and target
 	i_value = config->i_value;
@@ -634,4 +647,34 @@ void dedx_free_config(dedx_config * config, int *err)
 			free(config->elements_i_value);
 		free(config);
 	}
+}
+
+float dedx_get_simple_stp(int ion, int target, float energy, int *err)
+{
+	dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
+	float stp;
+	config->target = target;
+	config->ion = ion;
+	config->program = DEDX_ICRU;
+	dedx_workspace *ws = dedx_allocate_workspace(1,err);
+	if(*err != 0)
+		return 0;
+	dedx_load_config(ws,config,err);
+	if(*err != 0)
+	{
+		dedx_free_config(config,err);
+		config = (dedx_config *)calloc(1,sizeof(dedx_config));
+		config->ion = ion;
+		config->target = target;
+		config->program = 100;
+		dedx_load_config(ws,config,err);
+		if(*err != 0)
+			return 0;
+	}	
+	stp = dedx_get_stp(ws,config,energy,err);
+	if(*err != 0)
+		return 0;
+	dedx_free_config(config,err);
+	dedx_free_workspace(ws,err);		
+	return stp;
 }

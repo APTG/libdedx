@@ -202,7 +202,7 @@ void dedx_load_config(dedx_workspace *ws,
 		dedx_config * config, int *err);
 float dedx_get_stp(dedx_workspace * ws, 
 		dedx_config * config, float energy, int * err);
-
+float dedx_get_simple_stp(int ion, int target, float energy, int *err);
 void dedx_free_config(dedx_config * config, int *err);
 /*
    dedx_config must be specified BEFORE calling dedx_load_config2()
