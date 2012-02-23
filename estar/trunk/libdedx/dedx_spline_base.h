@@ -1,6 +1,0 @@
-#ifndef DEDX_SPLINE_BASE_H_INCLUDED
-#define DEDX_SPLINE_BASE_H_INCLUDED
-
-#include "dedx.h"
-
-#endif // DEDX_SPLINE_BASE_H_INCLUDED
