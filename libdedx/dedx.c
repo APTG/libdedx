@@ -27,6 +27,7 @@
 #include "dedx_periodic_table.h"
 #include "dedx_program_const.h"
 #include "dedx_workspace.h"
+#include "dedx_validate.h"
 #include <math.h>
 int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, int * err);
 
@@ -47,6 +48,12 @@ float _dedx_get_max_energy_icru(int ion);
 
 int _dedx_check_ion(int prog, int ion);
 int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, int * err);
+
+int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err);
+int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err);
+int _dedx_load_bethe_2(stopping_data * data, dedx_config * config,float * energy, int * err);
+int _dedx_find_bragg_data_2(stopping_data * data, dedx_config *config, float * energy, int *err);
+int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err);
 
 dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err)
 {
@@ -212,7 +219,7 @@ const int * dedx_get_program_list(void) {
 }
 const int * dedx_get_material_list(int program) {
   /* returns a list of available materials, terminated with -1 */
-  if (program == DEDX_BETHE)
+  if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT)
     return dedx_program_available_materials[0];
   else
     return dedx_program_available_materials[program];
@@ -220,7 +227,7 @@ const int * dedx_get_material_list(int program) {
 
 const int * dedx_get_ion_list(int program) {
 	/* returns a list of available ions, terminated with -1 */
-  if (program == DEDX_BETHE) {  /* any ion, no restrictions */    
+  if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */    
     static int temp[113],i; 
     for (i=0;i<112;i++)
       temp[i]=i+1;
@@ -260,7 +267,10 @@ float dedx_get_min_energy(int program, int ion) {
 		case DEDX_ICRU:
 			energy_min = _dedx_get_min_energy_icru(ion);
 			break;
-		case DEDX_BETHE:
+		case DEDX_DEFAULT:
+			energy_min = 0.001;
+			break;   
+		case DEDX_BETHE_EXT00:
 			energy_min = 0.001;
 			break;   
 	}  
@@ -295,7 +305,10 @@ float dedx_get_max_energy(int program, int ion) {
 		case DEDX_ICRU:
 			energy_max = _dedx_get_max_energy_icru(ion);
 			break;
-		case DEDX_BETHE:
+		case DEDX_DEFAULT:
+			energy_max = 1000.0;
+			break;
+		case DEDX_BETHE_EXT00:
 			energy_max = 1000.0;
 			break;   
 	}  
@@ -341,7 +354,7 @@ int _dedx_check_ion(int prog, int ion) {
 	const int *ion_list;
 	int i = 0;
 
-	if (prog == DEDX_BETHE) {
+	if (prog >= DEDX_DEFAULT) {
 		if ((ion < 1) || (ion > 120))
 			return 0;
 		else
@@ -358,22 +371,8 @@ int _dedx_check_ion(int prog, int ion) {
 }
 
 
-//Experimental New API
-int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err);
-int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err);
-int _dedx_load_bethe_2(stopping_data * data, dedx_config * config,float * energy, int * err);
-int _dedx_find_bragg_data_2(stopping_data * data, dedx_config *config, float * energy, int *err);
-int _dedx_calculate_element_i_pot(dedx_config * config, int *err);
-int _dedx_validate_config(dedx_config * config,int *err);
-int _dedx_evaluate_i_pot(dedx_config * config, int *err);
-int _dedx_validate_rho(dedx_config * config, int *err);
-int _dedx_evaluate_compound(dedx_config * config,int *err);
-int _dedx_validate_state(dedx_config *config,int *err);
-int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err);
-int _dedx_set_names(dedx_config * config, int *err);
 
-
-int dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
+void dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	int cfg_id;
 	_dedx_validate_config(config,err);
@@ -382,134 +381,7 @@ int dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 	else
 		cfg_id = _dedx_load_config_clean(ws,config,err);
 	_dedx_set_names(config,err);
-	return cfg_id;
-}
-int _dedx_set_names(dedx_config * config, int *err)
-{
-	if(config->target != 0)
-		config->target_name = dedx_get_material_name(config->target);
-	
-	config->ion_name = dedx_get_ion_name(config->ion);
-	config->program_name = dedx_get_program_name(config->program);
-	return 0;
-}
-int _dedx_validate_rho(dedx_config * config, int *err)
-{
-	if(config->rho <= 0.0 && config->target != 0)	
-	{
-		config->rho = _dedx_read_density(config->target,err); 
-	}
-	return 0;
-}
-int _dedx_evaluate_i_pot(dedx_config * config, int *err)
-{
-	if(config->elements_i_value == NULL)
-	{
-		if(config->i_value == 0.0)
-		{
-			config->i_value = _dedx_get_i_value(config->target,config->compound_state,err);
-		}
-		if(*err != 0)
-			return -1;
-	}
-	if(config->elements_id != NULL && config->elements_i_value == NULL)
-	{
-		_dedx_calculate_element_i_pot(config,err);
-	}	
-	return 0;
-}
-int _dedx_evaluate_compound(dedx_config * config,int *err)
-{	
-	int i = 0;
-	if(config->target > 0 && config->target <= 99)
-	{
-		return 0;
-	}
-	config->bragg_used = 1;
-	if(config->elements_id == NULL)
-	{
-		unsigned int compos_len;
-		float composition[20][2];
-		_dedx_get_composition(config->target, composition, &compos_len, err);
-		if(*err != 0)
-			return -1;
-		if(compos_len == 0)
-		{
-			*err = 201;
-			return -1;
-		}
-		config->elements_id = (int *)malloc(sizeof(int)*compos_len);
-		config->elements_mass_fraction = (float *)malloc(sizeof(float)*compos_len);
-		for(i= 0; i < compos_len; i++)
-		{
-			config->elements_id[i] = (int)composition[i][0];
-			config->elements_mass_fraction[i] = composition[i][1];
-		}
-		config->elements_length = compos_len;
-	}
-	else if(config->elements_mass_fraction == NULL && config->elements_atoms != NULL)
-	{
-		int length = config->elements_length;
-		int * compos = config->elements_atoms;
-		float * density = malloc(sizeof(float)*length);
-		float * weight = malloc(sizeof(float)*length);
-		float f, sum = 0;
-		for(i = 0; i < length; i++)
-		{
-			f = _dedx_read_density(config->elements_id[i],err);
-			if(*err != 0)
-			{
-				free(density);
-				free(weight);
-				return -1;
-			}
-			density[i] = f;
-			sum += compos[i]*f;
-		}
-
-		for(i = 0; i < length; i++)
-		{
-			weight[i] = compos[i]*density[i]/sum;
-		}
-		free(density);
-		config->elements_mass_fraction = weight;
-	}
-	else
-	{
-		return -1;
-	}
-	return 0;
-}
-int _dedx_validate_config(dedx_config * config,int *err)
-{
-	_dedx_validate_rho(config,err);
-	if(config->program == DEDX_BETHE)
-	{
-		//Order is important
-		_dedx_evaluate_compound(config,err);
-		_dedx_validate_state(config,err);
-		_dedx_evaluate_i_pot(config,err);	
-	}
-	if(config->target == 0 && config->elements_id != NULL)
-	{
-		_dedx_evaluate_compound(config,err);
-	}
-	return 0;
-}
-int _dedx_validate_state(dedx_config *config,int *err)
-{
-	if(config->compound_state == DEDX_DEFAULT_STATE)
-	{
-		if(_dedx_target_is_gas(config->target,err))
-		{
-			config->compound_state = DEDX_GAS;		
-		}	
-		else
-		{
-			config->compound_state = DEDX_CONDENSED;
-		}	
-	}
-	return 0;
+	config->cfg_id = cfg_id;
 }
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 {
@@ -615,10 +487,14 @@ int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, in
 	{
 		ion_load = 2;
 	}
-	else  if(prog == DEDX_BETHE) //Load bethe data
+	else  if(prog == DEDX_BETHE_EXT00 || prog == DEDX_DEFAULT) //Load bethe data
 	{
-		_dedx_read_energy_data(energy,prog, err);
+		prog_load = 101;	
+		int prog_temp= config->program;
+		_dedx_read_energy_data(energy,prog_load, err);
+		config->program = prog_load;
 		_dedx_load_bethe_2(data,config, energy, err);
+		config->program = prog_temp;
 		return 0;
 	}
 	_dedx_read_binary_data(data, prog_load, ion_load, target_load, err);
@@ -705,7 +581,7 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	}
 	data->length = 122;
 	//Get energy grid.
-	_dedx_read_energy_data(energy,DEDX_BETHE, err);
+	_dedx_read_energy_data(energy,DEDX_BETHE_EXT00, err);
 	if(*err != 0)
 		return 0;
 	//Fill the data grid with values.
@@ -727,30 +603,7 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 }
 
 
-int _dedx_calculate_element_i_pot(dedx_config * config,int *err)
-{
-	int i;
-	float charge_avg = 0;
-	float avg_pot = 0;
-	float log_x,i_pot_x;
-	int target;
-	for(i = 0; i < config->elements_length; i++)
-	{
-		target = config->elements_id[i];
-		charge_avg += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err);
-		avg_pot += config->elements_mass_fraction[i]*target/_dedx_get_atom_mass(target,err)*log(_dedx_get_i_value(target,config->compound_state,err));
-	}
-	log_x = log(config->i_value);
-	log_x -= avg_pot/charge_avg;
-	i_pot_x = exp(log_x);
-	config->elements_i_value = (float *)malloc(sizeof(float)*config->elements_length);
-	for(i = 0; i < config->elements_length; i++)
-	{
-		config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i],config->compound_state,err)*i_pot_x;
-	}
-	return 0;
 
-}
 float dedx_get_stp(dedx_workspace * ws, dedx_config * config, float energy, int * err)
 {	
 	int id = config->cfg_id;

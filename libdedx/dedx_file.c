@@ -79,7 +79,7 @@ char * _dedx_get_energy_file(int program)
 	case 8:
 	    path = "icru_pstarEng";
 	    break;
-        case 100:
+        case 101:
             path = "betheEng";
             break;
         default:

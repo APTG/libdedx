@@ -2,10 +2,11 @@
 #define DEDX_H_INCLUDED
 
 #define _DEDX_MAXELEMENTS 150
+
 /* available data tables */
 enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
       DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
-      DEDX_ICRU, DEDX_BETHE=100};
+      DEDX_ICRU, DEDX_DEFAULT=100, DEDX_BETHE_EXT00};
 enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
 
 enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
@@ -197,7 +198,7 @@ typedef struct
 } dedx_config;
 
 
-int dedx_load_config(dedx_workspace *ws, 
+void dedx_load_config(dedx_workspace *ws, 
 		dedx_config * config, int *err);
 float dedx_get_stp(dedx_workspace * ws, 
 		dedx_config * config, float energy, int * err);

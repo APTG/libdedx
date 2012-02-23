@@ -15,7 +15,7 @@ const char dedx_program_table[110][20] = {
   "","","","","","","","","","",  // 70-79
   "","","","","","","","","","",  // 80-89
   "","","","","","","","","","",  // 90-99
-  "BETHE","","","","","","","","",""   // 100-109
+  "DEFAULT","BETHE_EXT00","","","","","","","",""   // 100-109
 };
 const char dedx_program_version_table[110][20] = {
   "(N/A)","1.2","1.2","ESTAR","3.12","2005/06","2005/06-REV","ICRU Report 49 D","","1.0", // 0 - 9
@@ -35,8 +35,8 @@ const int dedx_available_programs[20] = {
   DEDX_ASTAR, DEDX_PSTAR,
   DEDX_ESTAR, DEDX_MSTAR,
   DEDX_ICRU73_OLD, DEDX_ICRU73,
-  DEDX_ICRU49, DEDX_ICRU,
-  DEDX_BETHE, -1};
+  DEDX_ICRU49, DEDX_ICRU, DEDX_DEFAULT,
+  DEDX_BETHE_EXT00, -1};
 
 const int dedx_program_available_ions[110][20] = {
   // currently excluding BETHE, which is handled in dedx.c

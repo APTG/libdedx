@@ -29,7 +29,7 @@ int main()
 
   cfg1->target = target;
   cfg1->ion = z;
-  cfg1->program = DEDX_BETHE;
+  cfg1->program = DEDX_BETHE_EXT00;
   
 
   /* default I-value */
@@ -42,7 +42,7 @@ int main()
 
   cfg2->target = target;
   cfg2->ion = z;
-  cfg2->program = DEDX_BETHE;
+  cfg2->program = DEDX_BETHE_EXT00;
   cfg2->i_value = I;
 
   /* overriding I-value */ // TODO not implemented for compounds

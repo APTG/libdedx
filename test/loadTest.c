@@ -66,7 +66,7 @@ void dedx_loadBethe_test()
 	dedx_workspace *ws;
 	dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
 	ws = dedx_allocate_workspace(1,&err);
-	cfg->program = DEDX_BETHE;
+	cfg->program = DEDX_BETHE_EXT00;
 	cfg->ion = DEDX_HELIUM;
 	cfg->target = DEDX_WATER;
 	dedx_load_config(ws,cfg,&err);
