@@ -1,0 +1,831 @@
+
+             --- This is libdEdx ---
+
+0. License and disclaimer
+1. Introduction
+2. Data available
+3. Installation
+4. Use
+5. Release notes
+A.1 API
+A.2 Error codes
+A.3 List of known programs, projectiles and target materials.
+A.4 Additional notes
+
+-------------------------------------------------------------------------------
+0. License and disclaimer
+-------------------------------------------------------------------------------
+  libdEdx is licensed under GPL version 3
+  (c) Copyright 2010-2012 by
+    Jakob Toftegaard, <jakob.toftegaard@gmail.com>
+    Niels Bassler, <bassler@phys.au.dk>
+    for the Aarhus Particle Therapy Group 
+    http://www.phys.au.dk/aptg
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-------------------------------------------------------------------------------
+1. Introduction
+-------------------------------------------------------------------------------
+
+libdEdx is an easy to use library which provides electronic stopping powers of 
+fast charged particles. It is a collection of commonly known stopping power 
+tables and stopping-power routines. You can either you it as a library, by 
+including the <dedx.h> file and linking against the dedx library, or manually 
+access a value with the getdedx command.
+
+A web front end is available on http://dedx.au.dk
+
+-------------------------------------------------------------------------------
+2. Data available
+-------------------------------------------------------------------------------
+
+ASTAR:
+Energy range: 0.25 keV/u to 250 MeV/u
+Particles: only helium nuclei
+Targets: See astar_targets
+
+PSTAR:
+Energy range: 1 keV/u to 10 GeV/u
+Particles: only protons
+Targets: See pstar_and_astar_targets
+
+ESTAR:
+Energy range: 1 keV/u to 10 GeV/u
+Particles: only electrons
+Targets: See estar_targets
+
+ICRU:
+Energy range: 25 keV/u to 1 GeV/u
+Particles: See icru73_particle_targets
+Targets: See icru73_particle_targets
+
+BETHE: Bethe equation with Linhard-Scharff at lower energies.
+Energy range: ?
+Particles: Any
+Targets: Any
+
+For all data tables and equations it is possible to use Bragg's additivity rule,
+if a specific target is unavailable by default.
+ 
+-------------------------------------------------------------------------------
+3. Installation
+-------------------------------------------------------------------------------
+
+See the INSTALL file.
+
+-------------------------------------------------------------------------------
+4. Use
+-------------------------------------------------------------------------------
+
+UNITS: Energies are always in terms of MeV/amu, except for ESTAR, where the 
+Electron energy must be specified in terms of MeV. The resulting mass stopping 
+power is in MeV cm2/g.
+
+Stopping power values can be retrieved in two different ways: 
+	 1) a simple method for simple implementation, 
+	 2) a bit more complicated way, but more suitable for fast and 
+	    multithreaded applications.
+
+Method 1) involves two function calls:
+        
+        float dedx_get_simple_stp(int program, 
+	      			  int ion, 
+				  int target, 
+				  float energy, 
+				  int * err);
+
+The function returns the stopping power of the specific configuration.
+which releases the memory that is used.
+
+The program parameter specifies the data table to be used:
+
+1. ASTAR
+2. PSTAR
+3. ESTAR
+4. MSTAR
+5. ICRU73
+6. ICRU73_NEW    (icru table with errata)
+
+100.: Bethe equation.
+
+ion: is the Z value of the particle
+target: is the id of the target, the id follow the ICRU naming convention the 
+	id can be found in the respective target files for each program.
+energy: is the kinetic energy for the ion per nucleon (MeV/amu).
+*err: contains the error code and is 0 if no error was encountered. An 
+      explanation of the error codes can be found in the error_codes.txt file.
+
+This method is fast if you use this function with the same target material and 
+ion combination but with different energies. If you use different materials or ions, 
+it is recommended to use the "high-performance" method 2):
+
+  dedx_workspace *ws;
+  dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
+
+  ws = dedx_allocate_workspace(int datasets, int *err)
+
+datasets: is the number of combinations you want to be able to have loaded at 
+	  the same time.
+*err: (see above)
+      The function returns a struct of the type dedx_workspace *ws
+
+Next initialize your configuraion:
+
+     int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err);
+
+
+The function returns an integer with you have to store and use in the next 
+function. The *bragg integer returns true, if Braggs additivity rule had to be 
+applied if the compound is not found in the default list for that particular 
+table.) The program parameter specifies which data table to use:
+
+1. ASTAR
+2. PSTAR
+3. ESTAR
+4. MSTAR
+5. ICRU73
+
+ion: is the Z value of the particle
+target: is the id of the target, the id follows the ICRU naming convention. 
+	[TODO: make target_id.txt file.]
+
+You have to call dedx_load_config() for each target/ion combination. 
+
+Stopping power values are returned by:
+
+        float dedx_get_stp(dedx_workspace *ws, int cfg, float energy, int *err)
+
+id: is the integer load_config has returned.
+energy: kinetic energy of particle in MeV/u.
+
+When you are done with the library you have to run 
+
+        dedx_free_workspace(dedx_workspace *ws, int *err);
+
+to deallocate memory.
+
+Bragg additivity rule:
+Braggs additivity rule is applied automatically if you request a target material which is not in the list in that particular stopping power routine. However, you may want to apply it manually for an compound which is not even in the extensive list of predefined ICRU materials (see below). Instead of calling load_config you should call
+
+        cfg = dedx_load_compound(dedx_workspace *ws, int program, int ion, int * targets, int * compos, int length, int *err)
+
+The function return an integer with you have to remember to use with the dedx_get_stp() function.
+
+program, ion: is the same as above.
+targets: is a list of the targets there is in the compound
+compos: is a list of how many there of respective targets in the compound.
+length: is the length of 2 lists above.
+
+E.g.: if you want to load the ASTAR data for CO2 then 
+
+int program = 1;
+int ion = 2;
+int targets[] = {6,8};
+int compos[] = {1,2};
+int length = 2;
+
+-------------------------------------------------------------------------------
+5. Release notes
+-------------------------------------------------------------------------------
+Current version: 1.0.1 (TBD)
+
+Known limitations:
+ - ESTAR is not implemented
+ - WIN32/MINGW build not tested, this will be a UNIX/LINUX only release.
+ - Bethe function: I-value can only be set for elements, not compounds.
+
+-------------------------------------------------------------------------------
+A.1 API
+-------------------------------------------------------------------------------
+List of functions available in dedx.h:
+
+dedx_workspace dedx_allocate_workspace(int count, int *err);
+void  dedx_free_workspace(dedx_workspace *ws, int *err);
+void  dedx_free_config(dedx_config *config, int *err);
+void  dedx_get_composition(int target, float ** composition, int * comp_len, int *err);
+void  dedx_get_error_code(char *err_str, int err);
+char *dedx_get_ion_name(int ion);
+int * dedx_get_ion_list(int program);
+float dedx_get_i_value(int target, int *err);
+char *dedx_get_material_name(int material);
+int * dedx_get_material_list(int program);
+float dedx_get_max_energy(int program, int ion);
+float dedx_get_min_energy(int program, int ion);
+int * dedx_get_program_list(void);
+float dedx_get_stp(dedx_workspace *ws, int id, float energy, int * err);
+float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err);
+void  dedx_get_version(int *major, int *minor, int *patch, int *svn);
+int   dedx_load_config(dedx_workspace *ws, dedx_config *config, int * err);
+
+
+Descriptions of variables:
+ - int   *comp_len:	Length of the composition list
+ - int   *compos:	...(TODO)...
+ - float **composition: A 20 times 2 float array. The rows are the elements, first column is element number(ICRU) and secound column is the weight
+ - int   count:		Number of particle/target combinations to be initialized
+ - float energy: 	Energy in MeV/u (unless electrons)
+ - int   *err:		Error code
+ - char  *err_str:	String holding the error message
+ - int   id:		Current particle/target combination
+ - int   ion:		Primary particle ID, see appendix A.3
+ - int   *major:	Major version number
+ - int   material:	Material ID, see appendix A.3
+ - int   *minor:	Minor version number
+ - int   *patch:	Patch version number
+ - int   program: 	Program ID, see appendix A.3
+ - float pot:		Mean excitation potential (I-value) to be used
+ - int   *svn: 		SVN revision number of code.
+ - int   target: 	ICRU identifier for the target material, see appendix A.3
+ - int   *use_bragg: 	TRUE if Bragg-additivity rule had to be applied
+
+ - dedx_workspace *ws   Workspace stuct
+
+-------------------------------------------------------------------------------
+A.2 Error codes
+-------------------------------------------------------------------------------
+1-100 IO error
+101-200 Out of bounds errors
+201-300	invalid input
+
+1 Composition file compos.txt does not exist
+2 MSTAR file mstar_gas_states.dat does not exist
+3 MSTAR effective_charge.dat file does not exist
+4 Unable to access binary data file
+5 Unable to access binary energy file
+6 Unable to write to disk
+7 Unable to read energy file 
+8 Unable to read data file 
+9 Unable to read short_names file
+10 Unable to read composition file
+
+101 Energy out of bounds 
+
+201 Target is not in composition file
+202 Target and ion combination is not in data file
+203 ID does not exist
+204 Target is not an atomic element
+205 ESTAR is not implemented yet
+206 Ion is not supported for MSTAR
+207 Ion is not supported for requested table
+
+-------------------------------------------------------------------------------
+A.3 Additional lists
+-------------------------------------------------------------------------------
+List all known data tables and algorithms:
+   0 (N/A)
+   1 ASTAR
+   2 PSTAR
+   3 ESTAR (currently broken)
+   4 MSTAR
+   5 ICRU73_OLD
+   6 ICRU73
+   7 ICRU49
+   8 
+   9 
+ 100 BETHE_EXT00
+ 101 
+ 102 
+ 103 
+ 104 
+ 105 
+ 106 
+ 107 
+ 108 
+ 109 
+
+List all known ions:
+  1: HYDROGEN
+  2: HELIUM
+  3: LITHIUM
+  4: BERYLLIUM
+  5: BORON
+  6: CARBON
+  7: NITROGEN
+  8: OXYGEN
+  9: FLUORINE
+ 10: NEON
+ 11: SODIUM
+ 12: MAGNESIUM
+ 13: ALUMINUM
+ 14: SILICON
+ 15: PHOSPHORUS
+ 16: SULFUR
+ 17: CHLORINE
+ 18: ARGON
+ 19: POTASSIUM
+ 20: CALCIUM
+ 21: SCANDIUM
+ 22: TITANIUM
+ 23: VANADIUM
+ 24: CHROMIUM
+ 25: MANGANESE
+ 26: IRON
+ 27: COBALT
+ 28: NICKEL
+ 29: COPPER
+ 30: ZINC
+ 31: GALLIUM
+ 32: GERMANIUM
+ 33: ARSENIC
+ 34: SELENIUM
+ 35: BROMINE
+ 36: KRYPTON
+ 37: RUBIDIUM
+ 38: STRONTIUM
+ 39: YTTRIUM
+ 40: ZIRCONIUM
+ 41: NIOBIUM
+ 42: MOLYBDENUM
+ 43: TECHNETIUM
+ 44: RUTHENIUM
+ 45: RHODIUM
+ 46: PALLADIUM
+ 47: SILVER
+ 48: CADMIUM
+ 49: INDIUM
+ 50: TIN
+ 51: ANTIMONY
+ 52: TELLURIUM
+ 53: IODINE
+ 54: XENON
+ 55: CESIUM
+ 56: BARIUM
+ 57: LANTHANUM
+ 58: CERIUM
+ 59: PRASEODYMIUM
+ 60: NEODYMIUM
+ 61: PROMETHIUM
+ 62: SAMARIUM
+ 63: EUROPIUM
+ 64: GADOLINIUM
+ 65: TERBIUM
+ 66: DYSPROSIUM
+ 67: HOLMIUM
+ 68: ERBIUM
+ 69: THULIUM
+ 70: YTTERBIUM
+ 71: LUTETIUM
+ 72: HAFNIUM
+ 73: TANTALUM
+ 74: TUNGSTEN
+ 75: RHENIUM
+ 76: OSMIUM
+ 77: IRIDIUM
+ 78: PLATINUM
+ 79: GOLD
+ 80: MERCURY
+ 81: THALLIUM
+ 82: LEAD
+ 83: BISMUTH
+ 84: POLONIUM
+ 85: ASTATINE
+ 86: RADON
+ 87: FRANCIUM
+ 88: RADIUM
+ 89: ACTINIUM
+ 90: THORIUM
+ 91: PROTACTINIUM
+ 92: URANIUM
+ 93: NEPTUNIUM
+ 94: PLUTONIUM
+ 95: AMERICIUM
+ 96: CURIUM
+ 97: BERKELIUM
+ 98: CALIFORNIUM
+ 99: EINSTEINIUM
+100: FERMIUM
+101: MENDELEVIUM
+102: NOBELIUM
+103: LAWRENCIUM
+104: RUTHERFORDNIUM
+105: DUBNIUM
+106: SEABORGIUM
+107: BOHRIUM
+108: HASSIUM
+109: MEITNERIUM
+110: DARMSTADTIUM
+111: ROENTGENIUM
+112: COPERNICUM
+
+List all known target materials (following ICRU naming convention):
+  1: HYDROGEN
+  2: HELIUM
+  3: LITHIUM
+  4: BERYLLIUM
+  5: BORON
+  6: CARBON
+  7: NITROGEN
+  8: OXYGEN
+  9: FLUORINE
+ 10: NEON
+ 11: SODIUM
+ 12: MAGNESIUM
+ 13: ALUMINUM
+ 14: SILICON
+ 15: PHOSPHORUS
+ 16: SULFUR
+ 17: CHLORINE
+ 18: ARGON
+ 19: POTASSIUM
+ 20: CALCIUM
+ 21: SCANDIUM
+ 22: TITANIUM
+ 23: VANADIUM
+ 24: CHROMIUM
+ 25: MANGANESE
+ 26: IRON
+ 27: COBALT
+ 28: NICKEL
+ 29: COPPER
+ 30: ZINC
+ 31: GALLIUM
+ 32: GERMANIUM
+ 33: ARSENIC
+ 34: SELENIUM
+ 35: BROMINE
+ 36: KRYPTON
+ 37: RUBIDIUM
+ 38: STRONTIUM
+ 39: YTTRIUM
+ 40: ZIRCONIUM
+ 41: NIOBIUM
+ 42: MOLYBDENUM
+ 43: TECHNETIUM
+ 44: RUTHENIUM
+ 45: RHODIUM
+ 46: PALLADIUM
+ 47: SILVER
+ 48: CADMIUM
+ 49: INDIUM
+ 50: TIN
+ 51: ANTIMONY
+ 52: TELLURIUM
+ 53: IODINE
+ 54: XENON
+ 55: CESIUM
+ 56: BARIUM
+ 57: LANTHANUM
+ 58: CERIUM
+ 59: PRASEODYMIUM
+ 60: NEODYMIUM
+ 61: PROMETHIUM
+ 62: SAMARIUM
+ 63: EUROPIUM
+ 64: GADOLINIUM
+ 65: TERBIUM
+ 66: DYSPROSIUM
+ 67: HOLMIUM
+ 68: ERBIUM
+ 69: THULIUM
+ 70: YTTERBIUM
+ 71: LUTETIUM
+ 72: HAFNIUM
+ 73: TANTALUM
+ 74: TUNGSTEN
+ 75: RHENIUM
+ 76: OSMIUM
+ 77: IRIDIUM
+ 78: PLATINUM
+ 79: GOLD
+ 80: MERCURY
+ 81: THALLIUM
+ 82: LEAD
+ 83: BISMUTH
+ 84: POLONIUM
+ 85: ASTATINE
+ 86: RADON
+ 87: FRANCIUM
+ 88: RADIUM
+ 89: ACTINIUM
+ 90: THORIUM
+ 91: PROTACTINIUM
+ 92: URANIUM
+ 93: NEPTUNIUM
+ 94: PLUTONIUM
+ 95: AMERICIUM
+ 96: CURIUM
+ 97: BERKELIUM
+ 98: CALIFORNIUM
+ 99: A150_TISSUE_EQUIVALENT_PLASTIC
+100: ACETONE
+101: ACETYLENE
+102: ADENINE
+103: ADIPOSETISSUE_ICRP
+104: AIR
+105: ALANINE
+106: ALUMINUMOXIDE
+107: AMBER
+108: AMMONIA
+109: ANILINE
+110: ANTHRACENE
+111: B100
+112: BAKELITE
+113: BARIUMFLUORIDE
+114: BARIUMSULFATE
+115: BENZENE
+116: BERYLLIUMOXIDE
+117: BISMUTHGERMANIUMOXIDE
+118: BLOOD_ICRP
+119: BONE_COMPACT_ICRU
+120: BONE_CORTICAL_ICRP
+121: BORONCARBIDE
+122: BORONOXIDE
+123: BRAIN_ICRP
+124: BUTANE
+125: N_BUTYLALCOHOL
+126: C552
+127: CADMIUMTELLURIDE
+128: CADMIUMTUNGSTATE
+129: CALCIUMCARBONATE
+130: CALCIUMFLUORIDE
+131: CALCIUMOXIDE
+132: CALCIUMSULFATE
+133: CALCIUMTUNGSTATE
+134: CARBONDIOXIDE
+135: CARBONTETRACHLORIDE
+136: CELLULOSEACETATE_CELLOPHANE
+137: CELLULOSEACETATEBUTYRATE
+138: CELLULOSENITRATE
+139: CERICSULFATEDOSIMETERSOLUTION
+140: CESIUMFLUORIDE
+141: CESIUMIODIDE
+142: CHLOROBENZENE
+143: CHLOROFORM
+144: CONCRETE_PORTLAND
+145: CYCLOHEXANE
+146: DICHLOROBENZENE
+147: DICHLORODIETHYLETHER
+148: DICHLOROETHANE
+149: DIETHYLETHER
+150: N_N_DIMETHYLFORMAMIDE
+151: DIMETHYLSULFOXIDE
+152: ETHANE
+153: ETHYLALCOHOL
+154: ETHYLCELLULOSE
+155: ETHYLENE
+156: EYELENS_ICRP
+157: FERRICOXIDE
+158: FERROBORIDE
+159: FERROUSOXIDE
+160: FERROUSSULFATEDOSIMETERSOLUTION
+161: FREON_12
+162: FREON_12B2
+163: FREON_13
+164: FREON_13B1
+165: FREON_13I1
+166: GADOLINIUMOXYSULFIDE
+167: GALLIUMARSENIDE
+168: GELINPHOTOGRAPHICEMULSION
+169: GLASS_PYREX
+170: GLASS_LEAD
+171: GLASS_PLATE
+172: GLUCOSE
+173: GLUTAMINE
+174: GLYCEROL
+175: GUANINE
+176: GYPSUM_PLASTEROFPARIS
+177: N_HEPTANE
+178: N_HEXANE
+179: KAPTONPOLYIMIDEFILM
+180: LANTHANUMOXYBROMIDE
+181: LANTHANUMOXYSULFIDE
+182: LEADOXIDE
+183: LITHIUMAMIDE
+184: LITHIUMCARBONATE
+185: LITHIUMFLUORIDE
+186: LITHIUMHYDRIDE
+187: LITHIUMIODIDE
+188: LITHIUMOXIDE
+189: LITHIUMTETRABORATE
+190: LUNG_ICRP
+191: M3WAX
+192: MAGNESIUMCARBONATE
+193: MAGNESIUMFLUORIDE
+194: MAGNESIUMOXIDE
+195: MAGNESIUMTETRABORATE
+196: MERCURICIODIDE
+197: METHANE
+198: METHANOL
+199: MIXDWAX
+200: MS20TISSUESUBSTITUTE
+201: MUSCLE_SKELETAL
+202: MUSCLE_STRIATED
+203: MUSCLE_EQUIVALENTLIQUID_SUCROSE
+204: MUSCLE_EQUIVALENTLIQUID_NOSUCROSE
+205: NAPHTHALENE
+206: NITROBENZENE
+207: NITROUSOXIDE
+208: NYLON_DUPONTELVAMIDE8062
+209: NYLON_TYPE6AND6_6
+210: NYLON_TYPE6_10
+211: NYLON_TYPE11_RILSAN
+212: OCTANE_LIQUID
+213: PARAFFINWAX
+214: N_PENTANE
+215: PHOTOGRAPHICEMULSION
+216: PLASTICSCINTILLATOR_VINYLTOLUENEBASED
+217: PLUTONIUMDIOXIDE
+218: POLYACRYLONITRILE
+219: POLYCARBONATE_MAKROLON_LEXAN
+220: POLYCHLOROSTYRENE
+221: POLYETHYLENE
+222: MYLAR
+223: PMMA
+224: POLYOXYMETHYLENE
+225: POLYPROPYLENE
+226: POLYSTYRENE
+227: POLYTETRAFLUOROETHYLENE (TEFLON)
+228: POLYTRIFLUOROCHLOROETHYLENE
+229: POLYVINYLACETATE
+230: POLYVINYLALCOHOL
+231: POLYVINYLBUTYRAL
+232: POLYVINYLCHLORIDE
+233: SARAN
+234: POLYVINYLIDENEFLUORIDE
+235: POLYVINYLPYRROLIDONE
+236: POTASSIUMIODIDE
+237: POTASSIUMOXIDE
+238: PROPANE
+239: PROPANE_LIQUID
+240: N_PROPYLALCOHOL
+241: PYRIDINE
+242: RUBBER_BUTYL
+243: RUBBER_NATURAL
+244: RUBBER_NEOPRENE
+245: SILICONDIOXIDE
+246: SILVERBROMIDE
+247: SILVERCHLORIDE
+248: SILVERHALIDESINPHOTOGRAPHICEMULSION
+249: SILVERIODIDE
+250: SKIN_ICRP
+251: SODIUMCARBONATE
+252: SODIUMIODIDE
+253: SODIUMMONOXIDE
+254: SODIUMNITRATE
+255: STILBENE
+256: SUCROSE
+257: TERPHENYL
+258: TESTES_ICRP
+259: TETRACHLOROETHYLENE
+260: THALLIUMCHLORIDE
+261: TISSUE_SOFT_ICRP
+262: TISSUE_SOFT_ICRUFOUR_COMPONENT
+263: TISSUE_EQUIVALENTGAS_METHANEBASED
+264: TISSUE_EQUIVALENTGAS_PROPANEBASED
+265: TITANIUMDIOXIDE
+266: TOLUENE
+267: TRICHLOROETHYLENE
+268: TRIETHYLPHOSPHATE
+269: TUNGSTENHEXAFLUORIDE
+270: URANIUMDICARBIDE
+271: URANIUMMONOCARBIDE
+272: URANIUMOXIDE
+273: UREA
+274: VALINE
+275: VITONFLUOROELASTOMER
+276: WATER
+277: WATERVAPOR
+278: XYLENE
+906: GRAPHITE
+
+
+
+In your computer code, all materials and ions can also be accessed by their name
+via the DEDX_ prefix. However, there are occasionally small variations in the 
+naming scheme. Enums are defined in dedx.h, but are listed here for convenience:
+
+enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
+      DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
+      DEDX_ICRU, DEDX_BETHE=100};
+enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
+
+enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
+      DEDX_CARBON, DEDX_GRAPHITE=906, DEDX_NITROGEN=7, DEDX_OXYGEN,
+      DEDX_FLUORINE, DEDX_NEON, DEDX_SODIUM, DEDX_MAGNESIUM,
+      DEDX_ALUMINUM, DEDX_SILICON, DEDX_PHOSPHORUS, DEDX_SULFUR,
+      DEDX_CHLORINE, DEDX_ARGON, DEDX_POTASSIUM, DEDX_CALCIUM, DEDX_SCANDIUM,
+      DEDX_TITeANIUM, DEDX_VANADIUM, DEDX_CHROMIUM, DEDX_MANGANESE, DEDX_IRON,
+      DEDX_COBALT, DEDX_NICKEL, DEDX_COPPER, DEDX_ZINC, DEDX_GALLIUM,
+      DEDX_GERMANIUM, DEDX_ARSENIC, DEDX_SELENIUM, DEDX_BROMINE, DEDX_KRYPTON,
+      DEDX_RUBIDIUM, DEDX_STRONTIUM, DEDX_YTTRIUM, DEDX_ZIRCONIUM, DEDX_NIOBIUM,
+      DEDX_MOLYBDENUM, DEDX_TECHNETIUM, DEDX_RUTHENIUM, DEDX_RHODIUM,
+      DEDX_PALLADIUM, DEDX_SILVER, DEDX_CADMIUM, DEDX_INDIUM, DEDX_TIN,
+      DEDX_ANTIMONY, DEDX_TELLURIUM, DEDX_IODINE, DEDX_XENON, DEDX_CESIUM,
+      DEDX_BARIUM, DEDX_LANTHANUM, DEDX_CERIUM, DEDX_PRASEODYMIUM,
+      DEDX_NEODYMIUM, DEDX_PROMETHIUM, DEDX_SAMARIUM, DEDX_EUROPIUM,
+      DEDX_GADOLINIUM, DEDX_TERBIUM, DEDX_DYSPROSIUM, DEDX_HOLMIUM,
+      DEDX_ERBIUM, DEDX_THULIUM, DEDX_YTTERBIUM, DEDX_LUTETIUM, DEDX_HAFNIUM,
+      DEDX_TANTALUM, DEDX_TUNGSTEN, DEDX_RHENIUM, DEDX_OSMIUM, DEDX_IRIDIUM,
+      DEDX_PLATINUM, DEDX_GOLD, DEDX_MERCURY, DEDX_THALLIUM, DEDX_LEAD,
+      DEDX_BISMUTH, DEDX_POLONIUM, DEDX_ASTATINE, DEDX_RADON, DEDX_FRANCIUM,
+      DEDX_RADIUM, DEDX_ACTINIUM, DEDX_THORIUM, DEDX_PROTACTINIUM,
+      DEDX_URANIUM, DEDX_NEPTUNIUM, DEDX_PLUTONIUM, DEDX_AMERICIUM,
+      DEDX_CURIUM, DEDX_BERKELIUM, DEDX_CALIFORNIUM,
+      DEDX_A150_TISSUE_EQUIVALENT_PLASTIC, DEDX_ACETONE, DEDX_ACETYLENE,
+      DEDX_ADENINE, DEDX_ADIPOSE_TISSUE_ICRP, DEDX_AIR_DRY_NEAR_SEA_LEVEL,
+      DEDX_ALANINE, DEDX_ALUMINUMOXIDE, DEDX_AMBER, DEDX_AMMONIA, DEDX_ANILINE,
+      DEDX_ANTHRACENE, DEDX_B100, DEDX_BAKELITE, DEDX_BARIUM_FLUORIDE,
+      DEDX_BARIUM_SULFATE, DEDX_BENZENE, DEDX_BERYLLIUM_OXIDE,
+      DEDX_BISMUTH_GERMANIUM_OXIDE, DEDX_BLOOD_ICRP, DEDX_BONE_COMPACT_ICRU,
+      DEDX_BONE_CORTICAL_ICRP, DEDX_BORON_CARBIDE, DEDX_BORON_OXIDE,
+      DEDX_BRAIN_ICRP, DEDX_BUTANE, DEDX_N_BUTYLALCOHOL,
+      DEDX_C552_AIR_EQUIVALENT_PLASTIC, DEDX_CADMIUM_TELLURIDE,
+      DEDX_CADMIUM_TUNGSTATE, DEDX_CALCIUM_CARBONATE, DEDX_CALCIUM_FLUORIDE,
+      DEDX_CALCIUM_OXIDE, DEDX_CALCIUM_SULFATE, DEDX_CALCIUM_TUNGSTATE,
+      DEDX_CARBON_DIOXIDE, DEDX_CARBON_TETRACHLORIDE,
+      DEDX_CELLULOSE_ACETATE_CELLOPHANE, DEDX_CELLULOSE_ACETATE_BUTYRATE,
+      DEDX_CELLULOSE_NITRATE, DEDX_CERIC_SULFATE_DOSIMETER_SOLUTION,
+      DEDX_CESIUM_FLUORIDE, DEDX_CESIUM_IODIDE, DEDX_CHLORO_BENZENE,
+      DEDX_CHLOROFORM, DEDX_CONCRETE_PORTLAND, DEDX_CYCLOHEXANE,
+      DEDX_DICHLOROBENZENE, DEDX_DICHLORODIETHYL_ETHER, DEDX_DICHLOROETHANE,
+      DEDX_DIETHYLETHER, DEDX_N_N_DIMETHYL_FORMAMIDE, DEDX_DIMETHYL_SULFOXIDE,
+      DEDX_ETHANE, DEDX_ETHYL_ALCOHOL, DEDX_ETHYL_CELLULOSE, DEDX_ETHYLENE,
+      DEDX_EYE_LENS_ICRP, DEDX_FERRIC_OXIDE, DEDX_FERRO_BORIDE,
+      DEDX_FERROUS_OXIDE, DEDX_FERROUS_SULFATE_DOSIMETER_SOLUTION,
+      DEDX_FREON_12, DEDX_FREON_12B2, DEDX_FREON_13, DEDX_FREON_13B1,
+      DEDX_FREON_13I1, DEDX_GADOLINIUM_OXYSULFIDE, DEDX_GALLIUM_ARSENIDE,
+      DEDX_GEL_IN_PHOTOGRAPHIC_EMULSION, 
+      DEDX_GLASS_PYREX, DEDX_GLASS_LEAD, DEDX_GLASS_PLATE, /* 169,170,171 */
+      DEDX_GLUCOSE, DEDX_GLUTAMINE, DEDX_GLYCEROL,
+      DEDX_GUANINE, DEDX_GYPSUM_PLASTER_OF_PARIS, DEDX_N_HEPTANE, DEDX_N_HEXANE,
+      DEDX_KAPTON_POLYIMIDE_FILM, DEDX_LANTHANUM_OXYBROMIDE,
+      DEDX_LANTHANUM_OXYSULFIDE, DEDX_LEAD_OXIDE, DEDX_LITHIUM_AMIDE,
+      DEDX_LITHIUM_CARBONATE, DEDX_LITHIUM_FLUORIDE, DEDX_LITHIUM_HYDRIDE,
+      DEDX_LITHIUM_IODIDE, DEDX_LITHIUM_OXIDE, DEDX_LITHIUM_TETRABORATE,
+      DEDX_LUNG_ICRP, DEDX_M3_WAX, DEDX_MAGNESIUM_CARBONATE,
+      DEDX_MAGNESIUM_FLUORIDE, DEDX_MAGNESIUM_OXIDE, DEDX_MAGNESIUM_TETRABORATE,
+      DEDX_MERCURIC_IODIDE, DEDX_METHANE, DEDX_METHANOL, DEDX_MIX_D_WAX,
+      DEDX_MS20_TISSUE_SUBSTITUTE, DEDX_MUSCLE_SKELETAL, DEDX_MUSCLE_STRIATED,
+      DEDX_MUSCLE_EQUIVALENT_LIQUID_WITH_SUCROSE,
+      DEDX_MUSCLE_EQUIVALENT_LIQUID_WITHOUT_SUCROSE, DEDX_NAPHTHALENE,
+      DEDX_NITROBENZENE, DEDX_NITROUS_OXIDE, DEDX_NYLON_DUPONT_ELVAMIDE_8062,
+      DEDX_NYLON_TYPE_6_AND_6_6, DEDX_NYLON_TYPE_6_10,
+      DEDX_NYLON_TYPE_11_RILSAN, DEDX_OCTANE_LIQUID, DEDX_PARAFFIN_WAX,
+      DEDX_N_PENTANE, DEDX_PHOTOGRAPHIC_EMULSION,
+      DEDX_PLASTIC_SCINTILLATOR_VINYLTOLUENE_BASED, DEDX_PLUTONIUM_DIOXIDE,
+      DEDX_POLYACRYLONITRILE, DEDX_POLYCARBONATE_MAKROLON_LEXAN,
+      DEDX_POLYCHLOROSTYRENE, DEDX_POLYETHYLENE, DEDX_MYLAR,
+      DEDX_LUCITE_PERSPEX_PMMA, DEDX_POLYOXYMETHYLENE,
+      DEDX_POLYPROPYLENE, DEDX_POLYSTYRENE, DEDX_POLYTETRAFLUOROETHYLENE,
+      DEDX_POLYTRIFLUOROCHLOROETHYLENE, DEDX_POLYVINYL_ACETATE,
+      DEDX_POLYVINYL_ALCOHOL, DEDX_POLYVINYL_BUTYRAL, DEDX_POLYVINYL_CHLORIDE,
+      DEDX_POLYVINYLIDENE_CHLORIDE_SARAN, DEDX_POLYVINYLIDENE_FLUORIDE,
+      DEDX_POLYVINYL_PYRROLIDONE, DEDX_POTASSIUM_IODIDE, DEDX_POTASSIUM_OXIDE,
+      DEDX_PROPANE, DEDX_PROPANE_LIQUID, DEDX_N_PROPYL_ALCOHOL, DEDX_PYRIDINE,
+      DEDX_RUBBER_BUTYL, DEDX_RUBBER_NATURAL, DEDX_RUBBER_NEOPRENE,
+      DEDX_SILICON_DIOXIDE, DEDX_SILVER_BROMIDE, DEDX_SILVER_CHLORIDE,
+      DEDX_SILVER_HALIDES_IN_PHOTOGRAPHIC_EMULSION, DEDX_SILVER_IODIDE,
+      DEDX_SKIN_ICRP, DEDX_SODIUM_CARBONATE, DEDX_SODIUM_IODIDE,
+      DEDX_SODIUM_MONOXIDE, DEDX_SODIUM_NITRATE, DEDX_STILBENE,
+      DEDX_SUCROSE, DEDX_TERPHENYL, DEDX_TESTES_ICRP,
+      DEDX_TETRACHLOROETHYLENE, DEDX_THALLIUM_CHLORIDE, DEDX_TISSUE_SOFT_ICRP,
+      DEDX_TISSUE_SOFT_ICRU_FOUR_COMPONENT,
+      DEDX_TISSUE_EQUIVALENT_GAS_METHANE_BASED,
+      DEDX_TISSUE_EQUIVALENT_GAS_PROPANE_BASED, DEDX_TITANIUM_DIOXIDE,
+      DEDX_TOLUENE, DEDX_TRICHLOROETHYLENE, DEDX_TRIETHYL_PHOSPHATE,
+      DEDX_TUNGSTEN_HEXAFLUORIDE, DEDX_URANIUM_DICARBIDE,
+      DEDX_URANIUM_MONOCARBIDE, DEDX_URANIUM_OXIDE, DEDX_UREA, DEDX_VALINE,
+      DEDX_VITON_FLUOROELASTOMER, DEDX_WATER_LIQUID, DEDX_WATER_VAPOR,
+      DEDX_XYLENE};
+
+/* aliases */
+#define DEDX_PROTON     1
+#define DEDX_ELECTRON   1001
+#define DEDX_POSITRON   1002
+#define DEDX_PIMINUS    1003
+#define DEDX_PIPLUS     1004
+#define DEDX_PIZERO     1005
+#define DEDX_ANTIPROTON 1006
+
+#define DEDX_WATER    DEDX_WATER_LIQUID
+#define DEDX_AIR      DEDX_AIR_DRY_NEAR_SEA_LEVEL
+#define DEDX_PMMA     DEDX_LUCITE_PERSPEX_PMMA
+#define DEDX_PERSPEX  DEDX_LUCITE_PERSPEX_PMMA
+#define DEDX_LUCITE   DEDX_LUCITE_PERSPEX_PMMA
+#define DEDX_TEFLON   DEDX_POLYTETRAFLUOROETHYLENE
+#define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
+#define DEDX_CAESIUM  DEDX_CESIUM
+
+-------------------------------------------------------------------------------
+A.4 Additional notes
+-------------------------------------------------------------------------------
+
+To build a tarball:
+
+libdedx/build$ make package_source
+
+To build a deb package:
+
+libdedx/build cpack -G DEB

@@ -1,0 +1,31 @@
+Changes in version 1.0.1 (10 Jan 2011)
+
+- Fix missing dedx_build_bin.c in source package.
+- Fix install error due to missing ESTAR data.
+- Fix small error in dedx_get_verion
+
+Changes in version 1.0.0 (05 Jan 2011)
+
+- Added Bethe algorithm
+- Added more examples of how to use library
+- Added installer
+- Added inverse material and program tables
+- Added uninstaller
+- Added debain package as target
+- Added I-value lookup function for ESTAR compounds
+- Added I-value override function for elements (not possible for compounds)
+- Build process generates platform dependent binary data tables
+- Changed API to increase the logic, prefixed with dedx_
+- Improved getdedx as a fronend
+- Improved documentation in README
+- New and Old ICRU73 data table
+- Fixed Braggs additivity rule
+- Fixed MSTAR
+- Fixed PSTAR
+- Fixed ASTAR
+- Fixed many typos
+- Fixed namespace of all constants, prefixed with DEDX_
+
+Changes in version 0.10.0 (05 Nov 2010)
+
+- First prerelease for testing
