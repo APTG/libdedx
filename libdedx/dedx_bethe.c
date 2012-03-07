@@ -28,7 +28,6 @@ float _dedx_calculate_bethe_energy(_dedx_bethe_coll_struct * ws, float energy, f
 	_dedx_gold_struct * gold = ws->gold;
 	_dedx_bethe_struct * bet = ws->bet;
 	int err = 0;
-
 	if(gold != NULL && bet != NULL && (bet->PZ0 == PZ && bet->PA0 == PA && bet->TZ0 == TZ && bet->TA0 == TA && bet->rho == rho && bet->potentiale == Io_Pot))
 	{
 		dedx = _dedx_mm(energy*PA, *bet,*gold,&err);
@@ -65,7 +64,6 @@ float _dedx_calculate_bethe_energy(_dedx_bethe_coll_struct * ws, float energy, f
 	_dedx_gold_section(*bet,gold,&err);
 
 	dedx = _dedx_mm(energy*PA, *bet,*gold,&err);
-
 
 	return dedx;
 }
