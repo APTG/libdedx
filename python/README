@@ -1,0 +1,13 @@
+#install
+
+run
+python setup.py build
+as su
+python setup.py install
+
+#module name
+libdedx
+
+#functions
+get_simple_dedx(ion,target,energy)
+
