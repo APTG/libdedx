@@ -23,6 +23,8 @@ float _dedx_read_density(int id,int *err);
 //void _dedx_get_short_name(int id,char * name, int *err);
 float _dedx_get_i_value(int target,int state, int * err);
 void _dedx_get_composition(int target, float composition[][2], unsigned int * length, int *err);
+float _dedx_get_zag_value(int target, int *err);
 
 float * _dedx_get_atima_data(int target,int *err);
+void _dedx_get_estar_data(int target, int * nc, float * bd, unsigned int * items);
 #endif // DEDX_FILE_ACCESS_H_INCLUDED

@@ -8,7 +8,7 @@ set(dedx_data_bin data/ASTAR.bin data/astarEng.bin data/ICRU73.bin data/icru73En
 
 #include_directories(${CMAKEDEMO_SOURCE_DIR}/libdedx)
 
-add_library (dedx SHARED dedx_tools.c dedx_bethe.c  dedx.c  dedx_file_access.c  dedx_file.c  dedx_mpaul.c  dedx_mstar.c  dedx_spline.c  dedx_split.c  dedx_periodic_table.c tools/dedx_math.c dedx_validate.c)
+add_library (dedx SHARED dedx_tools.c dedx_bethe.c  dedx.c  dedx_file_access.c  dedx_file.c  dedx_mpaul.c  dedx_mstar.c  dedx_spline.c  dedx_split.c  dedx_periodic_table.c tools/dedx_math.c dedx_validate.c dedx_estar.c)
 # removed math_dedx.h
 # removed dedx_atima.c
 
