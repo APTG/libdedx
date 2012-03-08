@@ -1,7 +1,7 @@
 #include "Python.h"
 #include <dedx.h>
 
-static PyObject * get_simple_dedx(PyObject *self, PyObject *args)
+static PyObject * get_simple_stp(PyObject *self, PyObject *args)
 {
 	int ion,target,err;
 	float energy;
@@ -11,7 +11,7 @@ static PyObject * get_simple_dedx(PyObject *self, PyObject *args)
 	stp = dedx_get_simple_stp(ion,target,energy,&err);
 	return PyFloat_FromDouble((double)stp);
 }
-static PyObject * get_dedx(PyObject *self, PyObject *args)
+static PyObject * get_stp(PyObject *self, PyObject *args)
 {
 	int prog,ion,target,err;
 	float energy;
@@ -32,8 +32,8 @@ static PyObject * get_dedx(PyObject *self, PyObject *args)
 	return PyFloat_FromDouble((double)stp);
 }
 static PyMethodDef LibdedxMethods[] = {
-    {"get_simple_dedx",  get_simple_dedx, METH_VARARGS}, 
-    {"get_dedx",  get_dedx, METH_VARARGS}, 
+    {"get_simple_stp",  get_simple_stp, METH_VARARGS}, 
+    {"get_stp",  get_stp, METH_VARARGS}, 
     {NULL, NULL, 0, NULL}       
 };
 PyMODINIT_FUNC
