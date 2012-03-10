@@ -7,6 +7,7 @@ typedef struct{
 	PyObject_HEAD
 	dedx_config * config;
 	dedx_workspace *ws;
+	int err;
 
 } Libdedx;
 
@@ -24,38 +25,54 @@ Libdedx_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
 
 	Libdedx *self;
-	int err;
 	int program, ion, target;
 	static char *kwlist[] = {"program","ion","target"};
 	if (! PyArg_ParseTupleAndKeywords(args, kwds, "|lll", kwlist, &program, &ion, &target))
 	        return NULL;
 	self = (Libdedx *)type->tp_alloc(type, 0);
-	self->ws = dedx_allocate_workspace(1,&err);
+	self->ws = dedx_allocate_workspace(1,&(self->err));
+	if(self->err != 0)
+		return NULL;
 	self->config = (dedx_config *)calloc(1,sizeof(dedx_config));
 	dedx_config * config = self->config;
 	config->program = program;
 	config->ion = ion;
 	config->target = target;
-	dedx_load_config(self->ws,config,&err);
+	dedx_load_config(self->ws,config,&(self->err));
+	if(self->err != 0)
+		return NULL;
 	return (PyObject *)self;
 }
 
 static int
 Libdedx_init(Libdedx *self, PyObject *args, PyObject *kwds)
 {
-
 	return 0;
 }
 static PyObject *
 Libdedx_get_stp(Libdedx * self,PyObject * args)
 {
-	int err;
 	float energy,stp;
 	PyArg_ParseTuple(args, "f",&energy);
-	stp = dedx_get_stp(self->ws,self->config,energy,&err);
+	stp = dedx_get_stp(self->ws,self->config,energy,&(self->err));
+	if(self->err != 0)
+		return NULL;
 	return PyFloat_FromDouble((double)stp);
 }
-
+static PyObject * Libdedx_get_error(Libdedx * self)
+{
+	char * err = calloc(100,sizeof(char));
+	PyObject * out;
+	if(self->err == 0)
+		err = "No error";
+	else
+	{
+		dedx_get_error_code(err,self->err);
+	}
+	out = PyString_FromString(err);
+	free(err);
+	return out;
+}
 static PyMemberDef Libdedx_members[] = {
 	{NULL}  /* Sentinel */
 };
@@ -65,6 +82,8 @@ static PyMemberDef Libdedx_members[] = {
 static PyMethodDef Libdedx_methods[] = {
      {"get_stp", (PyCFunction)Libdedx_get_stp, METH_VARARGS,
      "Return stp"
+    },{"get_error", (PyCFunction)Libdedx_get_error, METH_NOARGS,
+     "Return error string"
     },
 	{NULL}  /* Sentinel */
 };
