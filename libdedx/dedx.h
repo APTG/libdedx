@@ -7,6 +7,7 @@
 enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
       DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
       DEDX_ICRU, DEDX_DEFAULT=100, DEDX_BETHE_EXT00};
+
 enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
 
 enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
@@ -162,8 +163,7 @@ typedef struct
 
 
 typedef struct
-{
-	_dedx_lookup_data ** loaded_data;
+{	_dedx_lookup_data ** loaded_data;
 	int datasets;
 	int active_datasets;
 	

@@ -72,7 +72,7 @@ Particles: See icru73_particle_targets
 Targets: See icru73_particle_targets
 
 BETHE: Bethe equation with Linhard-Scharff at lower energies.
-Energy range: ?
+Energy range: 1 keV/u to 1 GeV/u
 Particles: Any
 Targets: Any
 
@@ -98,27 +98,15 @@ Stopping power values can be retrieved in two different ways:
 	 2) a bit more complicated way, but more suitable for fast and 
 	    multithreaded applications.
 
-Method 1) involves two function calls:
+Method 1) involves a single function call:
         
-        float dedx_get_simple_stp(int program, 
-	      			  int ion, 
+        float dedx_get_simple_stp(int ion, 
 				  int target, 
 				  float energy, 
 				  int * err);
 
-The function returns the stopping power of the specific configuration.
-which releases the memory that is used.
-
-The program parameter specifies the data table to be used:
-
-1. ASTAR
-2. PSTAR
-3. ESTAR
-4. MSTAR
-5. ICRU73
-6. ICRU73_NEW    (icru table with errata)
-
-100.: Bethe equation.
+The function returns the stopping power of the specific configuration, 
+using the ICRU49 and ICRU73 data table if possible, else the BETHE_EXT00 table.
 
 ion: is the Z value of the particle
 target: is the id of the target, the id follow the ICRU naming convention the 
@@ -127,74 +115,118 @@ energy: is the kinetic energy for the ion per nucleon (MeV/amu).
 *err: contains the error code and is 0 if no error was encountered. An 
       explanation of the error codes can be found in the error_codes.txt file.
 
-This method is fast if you use this function with the same target material and 
-ion combination but with different energies. If you use different materials or ions, 
-it is recommended to use the "high-performance" method 2):
+Thus
+
+	a = dedx_get_simple_stp(DEDX_CARBON, DEDX_WATER, 100.0, &err);
+
+will store the mass stopping power of a 100 MeV/u carbon ion in a water target.
+
+A list of ions and target media is given in appendix A.3.
+
+
+Method 2) is though the proper method of using dedx if several stopping powers 
+are to be retrieved. It is (hopefully) thread-safe and was optimized to be fast.
+
+first memory for a workspace and a config struct must be allocated.
 
   dedx_workspace *ws;
   dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
 
   ws = dedx_allocate_workspace(int datasets, int *err)
 
-datasets: is the number of combinations you want to be able to have loaded at 
-	  the same time.
-*err: (see above)
-      The function returns a struct of the type dedx_workspace *ws
+The function returns a struct of the type dedx_workspace *ws
 
-Next initialize your configuraion:
+datasets: is the number of ion - target combinations you want to use at the same
+ time.
+*err: pointer to an integer holding an error code.
 
-     int dedx_load_config2(dedx_workspace *ws, dedx_config * config, int *err);
+Next you must initialize your configuration, by writing to the cfg struct.
 
+typedef struct
+{
+	int cfg_id;
+	int program;
+	int target;            // target can either be an element or a compound
+	int ion;               // id number of projectile
+	int ion_a;             // nucleon number of projectile
+	int bragg_used;        // is 1 if braggs additivity rule was applied
+	int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
+	unsigned int elements_length;   // elements_length  --- number of unique elements in comp.
+	int * elements_id;     // elements_id      --- Z of each element
+	int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
+	char mstar_mode;
+	float i_value;         // i_value   --- mean excitation potential of target 
+	float rho;
+	float * elements_mass_fraction;     // mass_fraction of each element
+	float * elements_i_value;           // i_value of each element
+	const char * target_name;
+	const char * ion_name;
+	const char * program_name;
+} dedx_config;
 
-The function returns an integer with you have to store and use in the next 
-function. The *bragg integer returns true, if Braggs additivity rule had to be 
-applied if the compound is not found in the default list for that particular 
-table.) The program parameter specifies which data table to use:
+Description of the elements:
+cfg_id        : configuration id, which is set by dedx_config. Don't touch.
+program       : must be specified by user, see appendix A.3
+target        : see appendix A.3. If another compound is requested which is not 
+	        in the list, then user must specify compound constituents by 
+		*elements_id and either *elements_mass_fraction or 
+		*elements_atoms.
+ion           : must be specified by user, see appendix A.3
+compound      : is set to TRUE by dedx_load_config(), if target was not found 
+	        in default list, and was generated from individual elements 
+		instead.
+compound_state : is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
+		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
+elements_length: number of unique elements in compound. Must be specified if
+		 target is undefined (DEDX_UNDEFINED)
+*elements_id   : Z of each constituent element, must be specified if target 
+	         is undefined
+*elements_atoms: number of atoms per comp. unit, must be specified if target 
+		 is undefined.
+mstar_mode     : if DEDX_DEFAULT, then 'b' method of MSTAR is used
+i_value        : if unspecified, then ICRU I-values are used for target 
+	         compound, if target is set, or if target is 0, then it is 
+		 calculated from the individual i-values set in 
+		 *elements_i_value.
+*elements_mass_fraction: must be specified if target  and elements_atoms is 
+			 left undefined
+*elements_i_value: if target is 0, then individual I-values of elements can 
+		   be specified here.
 
-1. ASTAR
-2. PSTAR
-3. ESTAR
-4. MSTAR
-5. ICRU73
+At least you should specify program, target and ion, i.e.
+   cfg->ion = DEDX_CARBON;
+   cfg->program = DEDX_ICRU;
+   cfg->target = DEDX_PMMA;
 
-ion: is the Z value of the particle
-target: is the id of the target, the id follows the ICRU naming convention. 
-	[TODO: make target_id.txt file.]
+and then load the config
+
+    void dedx_load_config(dedx_workspace *ws, 
+                          dedx_config *config, 
+                          int *err);
 
 You have to call dedx_load_config() for each target/ion combination. 
+If multiple combinations are used, you must allocate memory for each 
+*config element, and call dedx_load_config() for each configuration.
 
 Stopping power values are returned by:
 
-        float dedx_get_stp(dedx_workspace *ws, int cfg, float energy, int *err)
+        float dedx_get_stp(dedx_workspace *ws, 
+	                   int config, 
+			   float energy, 
+			   int *err)
 
-id: is the integer load_config has returned.
 energy: kinetic energy of particle in MeV/u.
 
 When you are done with the library you have to run 
 
         dedx_free_workspace(dedx_workspace *ws, int *err);
+	dedx_free_config(dedx_config * config, int *err);
 
 to deallocate memory.
 
 Bragg additivity rule:
-Braggs additivity rule is applied automatically if you request a target material which is not in the list in that particular stopping power routine. However, you may want to apply it manually for an compound which is not even in the extensive list of predefined ICRU materials (see below). Instead of calling load_config you should call
-
-        cfg = dedx_load_compound(dedx_workspace *ws, int program, int ion, int * targets, int * compos, int length, int *err)
-
-The function return an integer with you have to remember to use with the dedx_get_stp() function.
-
-program, ion: is the same as above.
-targets: is a list of the targets there is in the compound
-compos: is a list of how many there of respective targets in the compound.
-length: is the length of 2 lists above.
-
-E.g.: if you want to load the ASTAR data for CO2 then 
-
-int program = 1;
-int ion = 2;
-int targets[] = {6,8};
-int compos[] = {1,2};
-int length = 2;
+Braggs additivity rule is applied automatically if you request a target material
+ which is not in the list in that particular stopping power routine. 
 
 -------------------------------------------------------------------------------
 5. Release notes
@@ -211,47 +243,30 @@ A.1 API
 -------------------------------------------------------------------------------
 List of functions available in dedx.h:
 
-dedx_workspace dedx_allocate_workspace(int count, int *err);
-void  dedx_free_workspace(dedx_workspace *ws, int *err);
-void  dedx_free_config(dedx_config *config, int *err);
-void  dedx_get_composition(int target, float ** composition, int * comp_len, int *err);
-void  dedx_get_error_code(char *err_str, int err);
-char *dedx_get_ion_name(int ion);
-int * dedx_get_ion_list(int program);
-float dedx_get_i_value(int target, int *err);
-char *dedx_get_material_name(int material);
-int * dedx_get_material_list(int program);
-float dedx_get_max_energy(int program, int ion);
-float dedx_get_min_energy(int program, int ion);
-int * dedx_get_program_list(void);
-float dedx_get_stp(dedx_workspace *ws, int id, float energy, int * err);
-float dedx_get_simple_stp(int program, int ion, int target, float energy, int * err);
-void  dedx_get_version(int *major, int *minor, int *patch, int *svn);
-int   dedx_load_config(dedx_workspace *ws, dedx_config *config, int * err);
-
-
-Descriptions of variables:
- - int   *comp_len:	Length of the composition list
- - int   *compos:	...(TODO)...
- - float **composition: A 20 times 2 float array. The rows are the elements, first column is element number(ICRU) and secound column is the weight
- - int   count:		Number of particle/target combinations to be initialized
- - float energy: 	Energy in MeV/u (unless electrons)
- - int   *err:		Error code
- - char  *err_str:	String holding the error message
- - int   id:		Current particle/target combination
- - int   ion:		Primary particle ID, see appendix A.3
- - int   *major:	Major version number
- - int   material:	Material ID, see appendix A.3
- - int   *minor:	Minor version number
- - int   *patch:	Patch version number
- - int   program: 	Program ID, see appendix A.3
- - float pot:		Mean excitation potential (I-value) to be used
- - int   *svn: 		SVN revision number of code.
- - int   target: 	ICRU identifier for the target material, see appendix A.3
- - int   *use_bragg: 	TRUE if Bragg-additivity rule had to be applied
-
- - dedx_workspace *ws   Workspace stuct
-
+dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err);
+void             dedx_free_config(dedx_config *config, int *err);
+void             dedx_free_workspace(dedx_workspace *ws, int *err);
+void             dedx_get_composition(int target, float composition[][2], 
+	                          unsigned int * comp_len, int *err);
+void             dedx_get_error_code(char *err_str, int err);
+float            dedx_get_i_value(int target, int *err);
+const int *      dedx_get_ion_list(int program);
+const char *     dedx_get_ion_name(int ion);
+const int *      dedx_get_material_list(int program);
+const char *     dedx_get_material_name(int material);
+float            dedx_get_min_energy(int program, int ion);
+float            dedx_get_max_energy(int program, int ion);
+const int *      dedx_get_program_list(void);
+const char *     dedx_get_program_name(int program);
+const char *     dedx_get_program_version(int program);
+float            dedx_get_simple_stp(int ion, int target, float energy, 
+		                     int *err);
+float            dedx_get_stp(dedx_workspace *ws, 
+		              dedx_config *config, float energy, 
+			      int *err);
+void             dedx_get_version(int *major, int *minor, int *patch, int *svn);
+void             dedx_load_config(dedx_workspace *ws, 
+		                  dedx_config *config, int *err);
 -------------------------------------------------------------------------------
 A.2 Error codes
 -------------------------------------------------------------------------------
@@ -283,6 +298,8 @@ A.2 Error codes
 -------------------------------------------------------------------------------
 A.3 Additional lists
 -------------------------------------------------------------------------------
+All names can be prefixed with DEDX_
+
 List all known data tables and algorithms:
    0 (N/A)
    1 ASTAR
@@ -708,7 +725,8 @@ naming scheme. Enums are defined in dedx.h, but are listed here for convenience:
 
 enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
       DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
-      DEDX_ICRU, DEDX_BETHE=100};
+      DEDX_ICRU, DEDX_DEFAULT=100, DEDX_BETHE_EXT00};
+
 enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
 
 enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
