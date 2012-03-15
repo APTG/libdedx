@@ -11,3 +11,7 @@ libdedx
 #functions
 get_simple_dedx(ion,target,energy)
 
+# or
+
+a = libdedx.Libdedx(2,1,276)
+a.get_stp(200)
