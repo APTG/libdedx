@@ -9,8 +9,12 @@ enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
       DEDX_ICRU, DEDX_DEFAULT=100, DEDX_BETHE_EXT00};
 
 enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
+
 enum {DEDX_MSTAR_MODE_A='a',DEDX_MSTAR_MODE_B='b',DEDX_MSTAR_MODE_G='g',
-      DEDX_MSTAR_MODE_H='h',DEDX_MSTAR_MODE_C='c',DEDX_MSTAR_MODE_D='d'};
+      DEDX_MSTAR_MODE_H='h',DEDX_MSTAR_MODE_C='c',DEDX_MSTAR_MODE_D='d',
+      DEDX_MSTAR_MODE_DEFAULT='b' /* as recommended by Helmut Paul */
+};
+
 enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
       DEDX_CARBON, DEDX_GRAPHITE=906, DEDX_NITROGEN=7, DEDX_OXYGEN,
       DEDX_FLUORINE, DEDX_NEON, DEDX_SODIUM, DEDX_MAGNESIUM,
@@ -178,24 +182,24 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err);
 //Experimental New API
 typedef struct
 {
-	int cfg_id;
-	int program;
-	int target;            // target can either be an element or a compound
-	int ion;               // id number of projectile
-	int ion_a;             // nucleon number of projectile
-	int bragg_used;        // is 1 if braggs additivity rule was applied
-	int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
-	unsigned int elements_length;   // elements_length  --- number of unique elements in comp.
-	int * elements_id;     // elements_id      --- Z of each element
-	int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
-	char mstar_mode;
-	float i_value;         // i_value   --- mean excitation potential of target 
-	float rho;
-	float * elements_mass_fraction;     // mass_fraction of each element
-	float * elements_i_value;           // i_value of each element
-	const char * target_name;
-	const char * ion_name;
-	const char * program_name;
+  int cfg_id;
+  int program;
+  int target;            /* target can either be an element or a compound */
+  int ion;               /* id number of projectile */
+  int ion_a;             /* nucleon number of projectile */
+  int bragg_used;        /* is 1 if braggs additivity rule was applied */
+  int compound_state;    /* DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... */
+  unsigned int elements_length;   /* elements_length  --- number of unique elements in comp. */
+  int * elements_id;     /* elements_id      --- Z of each element */
+  int * elements_atoms;  /* elements_atoms   --- number of atoms per comp. unit */
+  char mstar_mode;       /* DEDX_MSTAR_MODE_DEFAULT, _A, _B, _C ... */
+  float i_value;         /* i_value   --- mean excitation potential of target  */
+  float rho;             /* density in g/cm^3 */
+  float * elements_mass_fraction;     /* mass_fraction of each element */
+  float * elements_i_value;           /* i_value of each element */
+  const char * target_name;
+  const char * ion_name;
+  const char * program_name;
 } dedx_config;
 
 
@@ -206,40 +210,31 @@ float dedx_get_stp(dedx_workspace * ws,
 float dedx_get_simple_stp(int ion, int target, float energy, int *err);
 void dedx_free_config(dedx_config * config, int *err);
 /*
-   dedx_config must be specified BEFORE calling dedx_load_config2()
+   dedx_config must be specified BEFORE calling dedx_load_config()
 
 cfg_id: configuration id, which is set by dedx_config. Don't touch.
 program: must have
 target: if NOT specified, then specify element_id
 ion: must have
-compound: is set to TRUE by dedx_load_config2(), 
-if target was not found in default list, 
-and was generated from individual elements instead.
-compound_use_own_potential: ? 
 compound_state: if DEDX_DEFAULT (0), then this val is set to 
 normal state of aggregation
-compound_length: must be specified if target is undefined (DEDX_UNDEFINED)
- *compound_targets: must be specified if target is undefined
- *compound_quantity: must be specified if target AND element_mass_fraction 
+elements_length: must be specified if target is undefined (DEDX_UNDEFINED)
+ *elements_id: must be specified if target is undefined
+ *elements_atoms: must be specified if target AND element_mass_fraction 
  are undefined
-mstar_mode: if DEDX_DEFAULT, then 'b' method of MSTAR is used
+mstar_mode: if DEDX_DEFAULT, then 'b' method of MSTAR is used, which was recommended by H. Paul
 i_value: if DEDX_DEFAULT, then ICRU I values are used for target compound, 
 if target is set, or if target is 0, then it is calculated from 
 the individual i-values set in elements_i_value.
+rho: density of material, used by BETHE-type algorithms (DEDX_BETHE_EXT00)
 elements_mass_fraction: must be specified if target=0 and elements_atoms = 0
 elements_i_value: if target is 0, then individual I-values of elements can 
 be specified here.
 
-Once dedx_load_config2() was invoked, dedx_config is out of scope, 
+Once dedx_load_config() was invoked, dedx_config is out of scope, 
 any changes to this structure will have no effect, except for cfg_id.
 The user can still use it to check applied I-values, element compositions 
 and states, etc.
-
-dedx_config * dedx_get_default_config();
  */
 
-/*
-   int _calculate_bethe_energi_test(int ion, int target, float pot, int *err);
-   int _calculate_bethe_energi_test2(int ion, int target, float * pot, int *err);
- */
 #endif // DEDX_H_INCLUDED

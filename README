@@ -2,6 +2,7 @@
              --- This is libdEdx ---
 
 0. License and disclaimer
+0.1 Acknowledgements
 1. Introduction
 2. Data available
 3. Installation
@@ -34,6 +35,14 @@ A.4 Additional notes
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-------------------------------------------------------------------------------
+0.1 Acknowledgements
+-------------------------------------------------------------------------------
+
+We are greatful for the support by Prof. Helmut Paul from the University of 
+Linz, Austria. 
+Niels Bassler acknowledges support by the Danish Cancer Society.
 
 -------------------------------------------------------------------------------
 1. Introduction
@@ -222,21 +231,80 @@ When you are done with the library you have to run
         dedx_free_workspace(dedx_workspace *ws, int *err);
 	dedx_free_config(dedx_config * config, int *err);
 
-to deallocate memory.
+to free the allocated memory.
 
-Bragg additivity rule:
+- Bragg additivity rule:
 Braggs additivity rule is applied automatically if you request a target material
  which is not in the list in that particular stopping power routine. 
+
+- Own compounds:
+You can setup your own compounds by specifying each element in the dedx_config 
+struct. Here is an example for water, set up by mass fraction:
+
+	config = (dedx_config *)calloc(1,sizeof(dedx_config));
+	config->prog = DEDX_ASTAR;
+	config->ion = DEDX_HELIUM;
+	config->elements_id = calloc(2,sizeof(int));
+	config->elements_id[0] = DEDX_HYDROGEN;
+	config->elements_id[1] = DEDX_OXYGEN;
+	config->elements_mass_fraction = calloc(2,sizeof(float));
+	config->elements_mass_fraction[0] = 0.13;
+	config->elements_mass_fraction[1] = 0.87;
+	config->elements_length = 2;
+
+Alternatively you can set it up by relative amount of elements:
+
+	config = (dedx_config *)calloc(1,sizeof(dedx_config));
+	config->prog = DEDX_BETHE_EXT00;
+	config->ion = DEDX_HELIUM;
+	config->elements_id = calloc(2,sizeof(int));
+	config->elements_id[0] = DEDX_HYDROGEN;
+	config->elements_id[1] = DEDX_OXYGEN;
+	config->elements_atoms = calloc(2,sizeof(int));
+	config->elements_atoms[0] = 2;
+	config->elements_atoms[1] = 1;
+	config->elements_length = 2;
+
+- Overriding I-value:
+Instead of using the default I value for a compound, determined by either the 
+predefined ICRU material list or Braggs additivity rule of the compound, you
+can specify the I-value manually for the BETHE-type algorithms:
+
+	config = (dedx_config *)calloc(1,sizeof(dedx_config));
+	config->prog = DEDX_BETHE_EXT00;
+	config->ion = DEDX_HELIUM;
+	config->i_value = 78.0;                  // new I-value in eV
+	config->elements_id = calloc(2,sizeof(int));
+	config->elements_id[0] = DEDX_HYDROGEN;
+	config->elements_id[1] = DEDX_OXYGEN;
+	config->elements_atoms = calloc(2,sizeof(int));
+	config->elements_atoms[0] = 2;
+	config->elements_atoms[1] = 1;
+	config->elements_length = 2;
+
 
 -------------------------------------------------------------------------------
 5. Release notes
 -------------------------------------------------------------------------------
-Current version: 1.0.1 (TBD)
+Current version: 1.2
+Changes:
+ - New API, which should be more stable for future enhancements
+ - I-values can be specified for compounds
+ - bound checking
+ - functions for compound data look-up, version number and energy bounds
+ - dedx_tools.h for inverse look-ups
+ - should be thread-safe
+ - bug fixes
+ - memory leak fixes
+Known limitations:
+ - ESTAR still not implemented.
 
+Version 1.0.1
 Known limitations:
  - ESTAR is not implemented
  - WIN32/MINGW build not tested, this will be a UNIX/LINUX only release.
  - Bethe function: I-value can only be set for elements, not compounds.
+
 
 -------------------------------------------------------------------------------
 A.1 API
