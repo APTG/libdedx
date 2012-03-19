@@ -9,10 +9,17 @@ int main(int argc, char *argv[])
   int i, err = 0;
   dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
   dedx_workspace *ws;
-  int max_tables = 9; // maximum number of tables to be loaded
 
+
+  /* skip estar 
+  int max_tables = 9; // maximum number of tables to be loaded
   int z[] =       {0,2,1,DEDX_ELECTRON,6,6,6,1,2,6  };
   int prog_id[] = {0,1,2,3            ,4,5,6,7,7,100};
+  */
+
+  int max_tables = 8; // maximum number of tables to be loaded
+  int z[] =       {0,2,1,6,6,6,1,2,6  };
+  int prog_id[] = {0,1,2,4,5,6,7,7,100};
 
   //  char str[100];
   char *str = (char *)malloc(100);
