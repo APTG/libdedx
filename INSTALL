@@ -28,3 +28,4 @@ Finally, as root, run:
 this will copy the binary tables and tables to the relevant places on your system.
 
 --- Python bindings --- 
+Per default CMAKE will install the python bindings for you. If it fails, you can still do so manually. Go to the python directory and consult the README file.

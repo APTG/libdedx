@@ -182,6 +182,7 @@ int main()
   config->elements_atoms[0] = 2;
   config->elements_atoms[1] = 1;
   config->elements_length = 2;
+  config->rho = 1.000;
   testConfig(config,"19 Test Bethe on own composition of water by atoms",1,1.058E+03 ,err_accept);
   free(config);
 
@@ -197,6 +198,7 @@ int main()
   config->elements_mass_fraction[0] = 0.13; // crash
   config->elements_mass_fraction[1] = 0.87;
   config->elements_length = 2;
+  config->rho = 1.000;
   testConfig(config,"20 Test Bethe on own composition of water by weight and I=78eV",1,1.058E+03,err_accept);
   free(config);
   
@@ -212,6 +214,7 @@ int main()
   config->elements_atoms[0] = 2;
   config->elements_atoms[1] = 1;
   config->elements_length = 2;
+  config->rho = 1.000;
   testConfig(config,"21 Test Bethe on own composition of water by atoms and own I value",1,1.058E+03,err_accept);
   free(config);
 
@@ -238,6 +241,7 @@ int main()
   config->elements_atoms[2] = 1;
   config->elements_atoms[3] = 2;
   config->elements_length = 4;
+  config->rho = 1.42;
   testConfig(config,"22 Test Bethe on own composition of alanine by atoms",1,2.578e+2,err_accept);
   free(config);
 
@@ -255,6 +259,7 @@ int main()
   config->elements_atoms[2] = 1;
   config->elements_atoms[3] = 2;
   config->elements_length = 4;
+  config->rho = 1.42;
   testConfig(config,"23 Test Bethe on own composition of alanine by atoms",1,6.906e+3,err_accept);
   free(config);
 
