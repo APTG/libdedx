@@ -19,6 +19,11 @@ int _dedx_validate_rho(dedx_config * config, int *err)
 	{
 		config->rho = _dedx_read_density(config->target,err); 
 	}
+	else if(config->rho <= 0.0 && config->target == 0 && config->program >= 100)
+	{
+		*err = 208;
+	}
+	
 	return 0;
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)

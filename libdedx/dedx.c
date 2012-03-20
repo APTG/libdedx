@@ -179,7 +179,9 @@ void dedx_get_error_code(char *err_str, int err) {
 			break;
 		case 207:
 			strcpy(err_str,"Ion is not supported for requested table.");
-			break;  
+			break; 
+		case 208:
+			strcpy(err_str,"Rho has to be specified with using Bethe with compound");
 		case 301:
 			strcpy(err_str,"Out of memory");
 			break;  
@@ -586,7 +588,7 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	PA = _dedx_get_atom_mass(config->ion,err);
 	TZ = _dedx_get_atom_charge(config->target,err);
 	TA = _dedx_get_atom_mass(config->target,err);
-	rho = _dedx_read_density(config->target,err);
+	rho = config->rho;
 	pot = _dedx_get_i_value(config->target,config->compound_state,err);
 	if(config->i_value != 0.0)
 	{
