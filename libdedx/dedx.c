@@ -181,7 +181,8 @@ void dedx_get_error_code(char *err_str, int err) {
 			strcpy(err_str,"Ion is not supported for requested table.");
 			break; 
 		case 208:
-			strcpy(err_str,"Rho has to be specified with using Bethe with compound");
+			strcpy(err_str,"Rho must be specified in this configuration.");
+			break;
 		case 301:
 			strcpy(err_str,"Out of memory");
 			break;  
@@ -392,6 +393,8 @@ void dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 {
 	int cfg_id;
 	_dedx_validate_config(config,err);
+	if(*err != 0)
+		return;
 	if(config->elements_id != NULL)
 		cfg_id = _dedx_load_compound(ws,config,err);
 	else

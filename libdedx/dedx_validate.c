@@ -108,6 +108,8 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 int _dedx_validate_config(dedx_config * config,int *err)
 {
 	_dedx_validate_rho(config,err);
+	if(*err != 0)
+		return -1;
 	if(config->program >= 100)
 	{
 		//Order is important
