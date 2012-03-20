@@ -296,6 +296,7 @@ Changes:
  - should be thread-safe
  - bug fixes
  - memory leak fixes
+ - Python bindings
 Known limitations:
  - ESTAR still not implemented.
 
@@ -362,7 +363,7 @@ A.2 Error codes
 205 ESTAR is not implemented yet
 206 Ion is not supported for MSTAR
 207 Ion is not supported for requested table
-
+208 Rho must be specified in this configuration.
 -------------------------------------------------------------------------------
 A.3 Additional lists
 -------------------------------------------------------------------------------
@@ -372,7 +373,7 @@ List all known data tables and algorithms:
    0 (N/A)
    1 ASTAR
    2 PSTAR
-   3 ESTAR (currently broken)
+   3 ESTAR (not implemented yet)
    4 MSTAR
    5 ICRU73_OLD
    6 ICRU73

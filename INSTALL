@@ -26,3 +26,5 @@ Finally, as root, run:
    6) ldconfig
 
 this will copy the binary tables and tables to the relevant places on your system.
+
+--- Python bindings --- 

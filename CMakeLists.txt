@@ -24,6 +24,16 @@ set (DEDX_VERSION_PATCH 0)
 include(FindSubversion)
 Subversion_WC_INFO(${PROJECT_SOURCE_DIR} MY)
 
+#Python bindings
+option(PYTHON_BINDINGS "Build Python bindings" ON)
+
+# Do we want to build the tests?
+#option(ENABLE_TESTS "Enable unit tests" ON)
+#if(ENABLE_TESTS)
+#  include(CTest)
+#  enable_testing()
+#  add_subdirectory(test)
+#endif()
 
 if (WIN32)
   set (DEDX_DATA_PATH "data/")
@@ -54,6 +64,9 @@ add_subdirectory(examples)
 add_subdirectory(libdedx)
 add_subdirectory(test)
 
+if(PYTHON_BINDINGS)
+  add_subdirectory(python)
+endif()
 
 
 # TODO: this is not working either:
