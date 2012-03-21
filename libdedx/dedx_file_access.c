@@ -319,7 +319,9 @@ float _dedx_read_density(int id,int *err)
 	}
 	fclose(fp);
 	if(density == 0.0)
+	{
 		*err = 201;
+	}
 	return density;
 
 }
@@ -395,7 +397,9 @@ float _dedx_get_i_value(int target,int state, int * err)
 	}
 	fclose(fp);
 	if(pot == 0.0)
+	{
 		*err = 201;
+	}
 	return pot;
 }
 void _dedx_get_composition(int target, float composition[][2], unsigned int * length, int *err)

@@ -433,6 +433,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 				return -1;
 			if(config->elements_length == 0)
 			{
+				printf("error \n");
 				*err = 201;
 				return -1;
 			}

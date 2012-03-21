@@ -28,7 +28,7 @@ int _dedx_validate_rho(dedx_config * config, int *err)
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 {
-	if(config->elements_i_value == NULL)
+	if(config->elements_i_value == NULL && config->target != 0)
 	{
 		if(config->i_value == 0.0)
 		{
@@ -36,6 +36,15 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 		}
 		if(*err != 0)
 			return -1;
+	}
+	else if(config->i_value == 0.0 && config->target == 0 && config->elements_i_value == NULL)
+	{
+		int i = 0;
+		config->elements_i_value = calloc(config->elements_length,sizeof(float));
+		for(i = 0; i < config->elements_length; i++)
+		{
+			config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i],config->compound_state,err);
+		}
 	}
 	if(config->elements_id != NULL && config->elements_i_value == NULL)
 	{

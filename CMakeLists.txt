@@ -25,7 +25,7 @@ include(FindSubversion)
 Subversion_WC_INFO(${PROJECT_SOURCE_DIR} MY)
 
 #Python bindings
-option(PYTHON_BINDINGS "Build Python bindings" ON)
+option(PYTHON_BINDINGS "Build Python bindings" OFF)
 
 # Do we want to build the tests?
 #option(ENABLE_TESTS "Enable unit tests" ON)
@@ -63,10 +63,12 @@ add_subdirectory(buildbins)
 add_subdirectory(examples)
 add_subdirectory(libdedx)
 add_subdirectory(test)
+add_subdirectory(python)
 
 if(PYTHON_BINDINGS)
   add_subdirectory(python)
 endif()
+
 
 
 # TODO: this is not working either:

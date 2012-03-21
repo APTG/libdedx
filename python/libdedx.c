@@ -26,8 +26,8 @@ Libdedx_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 	Libdedx *self;
 	int program, ion, target;
-	static char *kwlist[] = {"program","ion","target"};
-	if (! PyArg_ParseTupleAndKeywords(args, kwds, "|lll", kwlist, &program, &ion, &target))
+	static char *kwlist[] = {"program","ion","target",};
+	if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lll", kwlist, &program, &ion, &target))
 	        return NULL;
 	self = (Libdedx *)type->tp_alloc(type, 0);
 	self->ws = dedx_allocate_workspace(1,&(self->err));
