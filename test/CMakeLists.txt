@@ -1,8 +1,10 @@
 include_directories ("${PROJECT_SOURCE_DIR}")
 
-
 add_executable(loadTest loadTest.c)
+add_executable(test test.c)
+
 target_link_libraries (loadTest dedx m)
+target_link_libraries (test dedx m)
 
 # TODO: add testing suite
 ENABLE_TESTING()
