@@ -281,10 +281,16 @@ int main()
   config->program = DEDX_ASTAR;
   config->ion = DEDX_HELIUM;
   config->target = DEDX_WATER;
-  test_run(TEST_CSDA,config,"24 Test ASTAR CSDA in Water",100,10,err_accept);
-  test_run(TEST_ISTP,config,"25 Test ASTAR iSTP in Water",1.03381e+03,1,err_accept);
-  test_run(TEST_ICSDA,config,"26 Test ASTAR iCSDA in Water",10,100,err_accept);
+  config->ion_a = 4;
+  dedx_config temp;
+  memcpy(temp,config,sizeof(dedx_config));
+  test_run(TEST_CSDA,temp,"24 Test ASTAR CSDA in Water",100,7.760,err_accept);
+  memcpy(temp,config,sizeof(dedx_config));
+  test_run(TEST_ISTP,temp,"25 Test ASTAR iSTP in Water",1.03381e+03,1,err_accept);
+  memcpy(temp,config,sizeof(dedx_config));
+  test_run(TEST_ICSDA,temp,"26 Test ASTAR iCSDA in Water",7.760,100,err_accept);
   free(config);
+  free(temp);
 
 
   printf("--------------------------------------------------------------");
@@ -304,7 +310,7 @@ int test_run(int test, dedx_config * config, char * text,
   int err = 0;
   float test_result;
   char err_str[100];
-  dedx_workspace *ws = dedx_allocate_workspace(1,&err);
+  dedx_workspace *ws = dedx_allocate_workspace(2,&err);
 
   dedx_load_config(ws,config,&err);
   
@@ -315,19 +321,18 @@ int test_run(int test, dedx_config * config, char * text,
       printf("%s : %s\n",text,err_str);
       return err;
     }
-
   switch(test) {
   case TEST_STP:    
     test_result = dedx_get_stp(ws,config,input_value,&err);
     break;
   case TEST_CSDA:
-    test_result = dedx_get_csda(config,input_value,&err);
+    test_result = dedx_get_csda(ws,config,input_value,&err);
     break;
   case TEST_ISTP:
-    test_result = dedx_get_inverse_stp(config,input_value,1,&err); /* side = 1 */
+    test_result = dedx_get_inverse_stp(ws,config,input_value,1,&err); /* side = 1 */
     break;
   case TEST_ICSDA:
-    test_result = dedx_get_inverse_csda(config,input_value,&err);
+    test_result = dedx_get_inverse_csda(ws,config,input_value,&err);
     break;
   default:
     fprintf(stderr,"Invalid test no %i\n", test);
@@ -351,9 +356,7 @@ int test_run(int test, dedx_config * config, char * text,
 	   text,test_result,result);
     err_count++;
   } else
-    printf("%-70s : %.5e - %.5e... OK\n",
-	   text,test_result,result);
-
+    printf("%-70s : %.5e - %.5e... OK\n",text,test_result,result);
   dedx_free_workspace(ws,&err);
   return 0;	
 }

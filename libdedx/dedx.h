@@ -190,6 +190,7 @@ typedef struct
   int bragg_used;        /* is 1 if braggs additivity rule was applied */
   int compound_state;    /* DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... */
   unsigned int elements_length;   /* elements_length  --- number of unique elements in comp. */
+  unsigned int loaded;
   int * elements_id;     /* elements_id      --- Z of each element */
   int * elements_atoms;  /* elements_atoms   --- number of atoms per comp. unit */
   char mstar_mode;       /* DEDX_MSTAR_MODE_DEFAULT, _A, _B, _C ... */

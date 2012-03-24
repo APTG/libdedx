@@ -89,9 +89,13 @@ double _dedx_find_min(double (*func)(double x, _dedx_tools_settings * set),_dedx
 	}	
 	return (x[0]+x[1])/2;
 }
-double dedx_get_inverse_csda(dedx_config * config,float range,int *err)
+double dedx_get_inverse_csda(dedx_workspace *ws,dedx_config * config,float range,int *err)
 {
-
+	if(config->ion_a <= 0)
+	{
+		*err = 209;
+		return -1;
+	}
 	double acc = 1e-5;
 	double min = dedx_get_min_energy(config->program,config->ion);
 	double max = dedx_get_max_energy(config->program,config->ion);
@@ -102,7 +106,7 @@ double dedx_get_inverse_csda(dedx_config * config,float range,int *err)
 	while((max-min)>acc)
 	{
 		x_temp = (max+min)/2;
-		f_temp = dedx_get_csda(config,x_temp,err);
+		f_temp = dedx_get_csda(ws,config,x_temp,err);
 		if(*err != 0)
 			return -1;
 		
@@ -117,14 +121,19 @@ double dedx_get_inverse_csda(dedx_config * config,float range,int *err)
 	}
 	return (min+max)/2;
 }
-double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
+double dedx_get_inverse_stp(dedx_workspace * ws, dedx_config * config,float stp,int side,int *err)
 {
+	if(config->ion_a <= 0)
+	{
+		*err = 209;
+		return -1;
+	}
 	double acc = 1e-5;
 	_dedx_tools_settings set;
-	set.ws = dedx_allocate_workspace(1,err);
+	set.ws = ws;
 	if(*err != 0)
 		return -1;
-	dedx_load_config(set.ws,config,err);
+	dedx_load_config(ws,config,err);
 	//	set.id = config->cfg_id;
 	set.cfg = config;
 	
@@ -159,12 +168,16 @@ double dedx_get_inverse_stp(dedx_config * config,float stp,int side,int *err)
 			x1=x_temp;
 		}
 	}
-	dedx_free_workspace(set.ws,err);
 	//free(cfg); might be used later again
 	return (x1+x2)/2;
 }
-double dedx_get_csda(dedx_config * config,float energy,int *err)
+double dedx_get_csda(dedx_workspace *ws, dedx_config * config,float energy,int *err)
 {
+	if(config->ion_a <= 0)
+	{
+		*err = 209;
+		return -1;
+	}
 	double calculation_error = 0;
 	double acc = 1e-6;
 	double eps = 1e-6;
@@ -172,10 +185,10 @@ double dedx_get_csda(dedx_config * config,float energy,int *err)
 	double range = 0.0;
 	double A = config->ion_a;  // TODO: or nucleon number?
 
-	dedx_workspace *ws = dedx_allocate_workspace(1,err);
 	if(*err != 0)
 		return -1;
-	dedx_load_config(ws,config,err);
+	if(config->loaded == 0)
+		dedx_load_config(ws,config,err);
 	if(*err != 0)
 		return -1;
 	set.cfg = config;
@@ -183,6 +196,5 @@ double dedx_get_csda(dedx_config * config,float energy,int *err)
 	set.ws = ws;
 	range = _dedx_adapt(_dedx_adapt_stp,&set,dedx_get_min_energy(config->program,config->ion)*A,energy*A,
 			    acc,eps,&calculation_error);
-	dedx_free_workspace(ws,err);
 	return range;
 }

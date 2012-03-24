@@ -183,6 +183,9 @@ void dedx_get_error_code(char *err_str, int err) {
 		case 208:
 			strcpy(err_str,"Rho must be specified in this configuration.");
 			break;
+		case 209:
+			strcpy(err_str,"ion_a must be specified in this configuration.");
+			break;
 		case 301:
 			strcpy(err_str,"Out of memory");
 			break;  
@@ -401,6 +404,7 @@ void dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 		cfg_id = _dedx_load_config_clean(ws,config,err);
 	_dedx_set_names(config,err);
 	config->cfg_id = cfg_id;
+	config->loaded = 1;
 }
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 {
