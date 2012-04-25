@@ -286,12 +286,12 @@ float _dedx_read_density(int id,int *err)
 	float density;
 	density = 1.0;
 	char str[100];
-
+	char path[200];
+    	_dedx_set_folder();
+    	path[0] = '\0';
 	char file[] = "compos.txt";
-	char path[80];
 	strcpy(path,folder);
 	strcat(path,file);
-
 	FILE *fp = fopen(path,"r");
 	unsigned int items = 0;
 	char **temp;

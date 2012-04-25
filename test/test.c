@@ -2,6 +2,7 @@
 #include <dedx_tools.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 /* gcc -g -lm test.c -o test -Wall -ldedx -Wall */
@@ -282,7 +283,7 @@ int main()
   config->ion = DEDX_HELIUM;
   config->target = DEDX_WATER;
   config->ion_a = 4;
-  dedx_config temp;
+  dedx_config * temp = calloc(1,sizeof(dedx_config));
   memcpy(temp,config,sizeof(dedx_config));
   test_run(TEST_CSDA,temp,"24 Test ASTAR CSDA in Water",100,7.760,err_accept);
   memcpy(temp,config,sizeof(dedx_config));
