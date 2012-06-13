@@ -29,6 +29,7 @@
 #include "dedx_workspace.h"
 #include "dedx_validate.h"
 #include <math.h>
+
 int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, int * err);
 
 int _dedx_check_energy_bounds(_dedx_lookup_data * data, float energy);

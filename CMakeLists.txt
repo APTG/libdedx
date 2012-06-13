@@ -21,8 +21,13 @@ SET(CMAKE_FIND_ROOT_PATH /usr/bin)
 set (DEDX_VERSION_MAJOR 1)
 set (DEDX_VERSION_MINOR 2)
 set (DEDX_VERSION_PATCH 0)
+set (DEDX_WC_REVISION   0)
+# SVN will be 0 if not in Working Copy
 include(FindSubversion)
-Subversion_WC_INFO(${PROJECT_SOURCE_DIR} MY)
+if( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
+    Subversion_WC_INFO(${PROJECT_SOURCE_DIR} DEDX)
+endif()
+
 
 #Python bindings
 option(PYTHON_BINDINGS "Build Python bindings" ON)
