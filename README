@@ -190,7 +190,7 @@ compound_state : is assumed to be DEDX_DEFAULT_STATE, which means normal state o
 		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
 		In version 1.2 the only thing that will be affected by the state parameter is 
 		the Bethe function and only in the case where element_id are specified and element_i_value
-		are not. The difference are that the I-value are multiplied with 1.13 for the liquid and solid
+		are not. The difference are according to ICRU49 that the I-value are multiplied with 1.13 for the liquid and solid
 		phase except for the following element
 		Hydrogen:	19.2eV
 		Carbon:		81eV
