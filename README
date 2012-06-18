@@ -87,6 +87,8 @@ Targets: Any
 
 For all data tables and equations it is possible to use Bragg's additivity rule,
 if a specific target is unavailable by default.
+
+
  
 -------------------------------------------------------------------------------
 3. Installation
@@ -186,6 +188,9 @@ compound      : is set to TRUE by dedx_load_config(), if target was not found
 		instead.
 compound_state : is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
 		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
+		In version 1.2 the only thing that will be affected by the state parameter is 
+		the Bethe function. In version 1.2 the change are a slightly different I-value for 
+		Hydrogen, Carbon, Nitrogen and Oxygen, no other parameters and calculations methods are changed.
 elements_length: number of unique elements in compound. Must be specified if
 		 target is undefined (DEDX_UNDEFINED)
 *elements_id   : Z of each constituent element, must be specified if target 
@@ -216,6 +221,9 @@ and then load the config
 You have to call dedx_load_config() for each target/ion combination. 
 If multiple combinations are used, you must allocate memory for each 
 *config element, and call dedx_load_config() for each configuration.
+Since it there had been observed some misbehave of the library using
+malloc for allocating memory to the config struct, it is recommended 
+to use calloc or similar. 
 
 Stopping power values are returned by:
 
