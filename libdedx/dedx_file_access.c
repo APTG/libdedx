@@ -391,7 +391,11 @@ float _dedx_get_i_value(int target,int state, int * err)
 				}
 			}
 			else
+			{
 				pot = atof(temp[2]);
+				if(state == 2)
+					pot = pot*1.13;
+			}
 		}
 		_dedx_free_split_temp(temp);
 	}

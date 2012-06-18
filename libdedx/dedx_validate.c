@@ -32,7 +32,7 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 	{
 		if(config->i_value == 0.0)
 		{
-			config->i_value = _dedx_get_i_value(config->target,config->compound_state,err);
+			config->i_value = _dedx_get_i_value(config->target,1,err);
 		}
 		if(*err != 0)
 			return -1;
