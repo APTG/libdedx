@@ -90,10 +90,6 @@ add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 
-
-
-
-
 # PRE INSTALL:
 # remove old bin in data directory and  
 # have to run dedx_build_bin before installation

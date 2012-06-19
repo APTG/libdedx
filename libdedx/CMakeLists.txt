@@ -19,8 +19,9 @@ target_link_libraries (dedx m)
 #TODO : this does not work?
 #SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/data/*.bin")
 
-install (TARGETS dedx DESTINATION lib)
+
 install (FILES dedx.h dedx_tools.h DESTINATION include)
+install (TARGETS dedx DESTINATION lib)
 if(WIN32)
   install (FILES ${dedx_data_bin} DESTINATION data)
 else()

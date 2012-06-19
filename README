@@ -186,17 +186,19 @@ ion           : must be specified by user, see appendix A.3
 compound      : is set to TRUE by dedx_load_config(), if target was not found 
 	        in default list, and was generated from individual elements 
 		instead.
-compound_state : is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
+compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
 		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
-		In version 1.2 the only thing that will be affected by the state parameter is 
-		the Bethe function and only in the case where element_id are specified and element_i_value
-		are not. The difference according to ICRU49, are for elements which is naturally found in gas state, 
-		the I-value are multiplied with 1.13 to get the liquid/solid I-value phase, except for the following element
+		In version 1.2 the only thing that will be affected by the state 
+		parameter is the Bethe function and only in the case where 
+		element_id is specified and element_i_value is not. This difference 
+		applies for elements which is naturally found in gas state, 
+		following ICRU49 recommendations. The I-value is multiplied with 1.13 
+		to get the liquid/solid I-value phase, except for the following elements
 		Hydrogen:	19.2eV
 		Carbon:		81eV
 		Nitrogen:	82eV
 		Oxygen:		106eV
-		Flour		112eV
+		Fluor		112eV
 		Chlorine	180eV
 elements_length: number of unique elements in compound. Must be specified if
 		 target is undefined (DEDX_UNDEFINED)
