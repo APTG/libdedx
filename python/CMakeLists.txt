@@ -21,7 +21,27 @@ if(DO_PYTHON_BINDINGS)
   add_custom_command(
     TARGET python_bindings
     POST_BUILD
-    #  COMMAND echo Nb test1
+    
+    COMMAND echo "\\#!/usr/bin/python" > setup.py
+    COMMAND echo "from distutils.core import setup, Extension" >> setup.py
+    COMMAND echo "" >> setup.py
+    COMMAND echo "module1 = Extension\\(\\'libdedx\\'," >> setup.py
+    COMMAND echo "                    define_macros = [\\(\\'MAJOR_VERSION\\', \\'${DEDX_VERSION_MAJOR}\\'\\)," >> setup.py
+    COMMAND echo "                                     \\(\\'MINOR_VERSION\\', \\'${DEDX_VERSION_MINOR}\\'\\)]," >> setup.py
+    COMMAND echo "                    include_dirs = [\\'${PROJECT_SOURCE_DIR}/libdedx\\']," >> setup.py
+    COMMAND echo "                    libraries = [\\'dedx\\']," >> setup.py
+    COMMAND echo "                    library_dirs = [\\'${PROJECT_SOURCE_DIR}/libdedx\\']," >> setup.py
+    COMMAND echo "                    sources = [\\'libdedx.c\\']\\)" >> setup.py
+    COMMAND echo "setup \\(name = \\'libdedx\\'," >> setup.py
+    COMMAND echo "       version = \\'${DEDX_VERSION_MAJOR}.${DEDX_VERSION_MINOR}.${DEDX_VERSION_PATCH}-svn${DEDX_WC_REVISION}\\'," >> setup.py
+    COMMAND echo "       description = \\'Wrapper for stopping power library libdedx\\'," >> setup.py
+    COMMAND echo "       author = \\'Jakob Toftegaard\\'," >> setup.py
+    COMMAND echo "       author_email = \\'jakob.toftegaard@gmail.com\\'," >> setup.py
+    COMMAND echo "       url = \\'http://libdedx.sourceforge.net/\\'," >> setup.py
+    COMMAND echo "       long_description = \\'\\'," >> setup.py
+    COMMAND echo "       ext_modules = [module1]\\)" >> setup.py
+    COMMAND echo "" >> setup.py
+    
     COMMAND ${PYTHON_EXECUTABLE} setup.py build
     COMMENT "Build python bindings..."
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/python
