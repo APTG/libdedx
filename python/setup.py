@@ -6,7 +6,7 @@ module1 = Extension('libdedx',
                                      ('MINOR_VERSION', '2')],
                     include_dirs = ['/home/bassler/Projects/libdedx/trunk/libdedx'],
                     libraries = ['dedx'],
-                    library_dirs = ['/home/bassler/Projects/libdedx/trunk/libdedx'],
+                    library_dirs = ['/home/bassler/Projects/libdedx/trunk/build/libdedx'],
                     sources = ['libdedx.c'])
 setup (name = 'libdedx',
        version = '1.2.0-svn215',

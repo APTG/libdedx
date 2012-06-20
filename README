@@ -208,7 +208,7 @@ elements_length: number of unique elements in compound. Must be specified if
 		 is undefined.
 mstar_mode     : if DEDX_DEFAULT, then 'b' method of MSTAR is used
 i_value        : if unspecified, then ICRU I-values are used for target 
-	         compound, if target is set, or if target is 0, then it is 
+	         compound. If target is set, or if target is 0, then it is 
 		 calculated from the individual i-values set in 
 		 *elements_i_value.
 *elements_mass_fraction: must be specified if target  and elements_atoms is 

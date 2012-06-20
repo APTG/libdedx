@@ -30,7 +30,7 @@ if(DO_PYTHON_BINDINGS)
     COMMAND echo "                                     \\(\\'MINOR_VERSION\\', \\'${DEDX_VERSION_MINOR}\\'\\)]," >> setup.py
     COMMAND echo "                    include_dirs = [\\'${PROJECT_SOURCE_DIR}/libdedx\\']," >> setup.py
     COMMAND echo "                    libraries = [\\'dedx\\']," >> setup.py
-    COMMAND echo "                    library_dirs = [\\'${PROJECT_SOURCE_DIR}/libdedx\\']," >> setup.py
+    COMMAND echo "                    library_dirs = [\\'${PROJECT_BINARY_DIR}/libdedx\\']," >> setup.py
     COMMAND echo "                    sources = [\\'libdedx.c\\']\\)" >> setup.py
     COMMAND echo "setup \\(name = \\'libdedx\\'," >> setup.py
     COMMAND echo "       version = \\'${DEDX_VERSION_MAJOR}.${DEDX_VERSION_MINOR}.${DEDX_VERSION_PATCH}-svn${DEDX_WC_REVISION}\\'," >> setup.py
