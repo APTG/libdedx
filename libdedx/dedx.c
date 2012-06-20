@@ -598,7 +598,11 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	TZ = _dedx_get_atom_charge(config->target,err);
 	TA = _dedx_get_atom_mass(config->target,err);
 	rho = config->rho;
-	pot = _dedx_get_i_value(config->target,config->compound_state,err);
+	if(config->elements_i_value != NULL)
+		pot = _dedx_get_i_value(config->target,config->compound_state,err);
+	else
+		pot = _dedx_get_i_value(config->target,DEDX_GAS,err);
+
 	if(config->i_value != 0.0)
 	{
 		pot = config->i_value;
