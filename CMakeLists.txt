@@ -15,6 +15,8 @@ project (dedx C)
 #set(CMAKE_C_FLAGS -static)
 # øv bøv, låårtet vi'er 'æt :/
 
+SET(CMAKE_BUILD_TYPE DEBUG)
+
 SET(CMAKE_FIND_ROOT_PATH /usr/bin)
 
 # The version number.
