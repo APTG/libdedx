@@ -23,7 +23,6 @@ int _dedx_validate_rho(dedx_config * config, int *err)
 	{
 		*err = 208;
 	}
-	
 	return 0;
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
@@ -60,6 +59,8 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 		return 0;
 	}
 	config->bragg_used = 1;
+	_evaluate_compound_state_mstar(config,err);
+	
 	if(config->elements_id == NULL)
 	{
 		unsigned int compos_len;

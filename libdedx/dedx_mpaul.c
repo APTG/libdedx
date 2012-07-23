@@ -53,7 +53,7 @@ float _dedx_calculate_mspaul_coef(char  mode, int ion, int target, float energy)
 				  - 0.24591206 * pow(ion,1.5) +0.027726119 * pow(ion,2.0)
 				  - 0.00042121782 * pow(ion,2.5));
 
-	  c=  1.0  / (0.15607719 -0.0023161329 * pow(ion,2) * log(ion)
+	  c =  1.0  / (0.15607719 -0.0023161329 * pow(ion,2) * log(ion)
 			  + 0.0016853943 * pow(ion,2.5));
   }
   else if(mode == 'g' && z2 > 2)
