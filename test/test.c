@@ -179,8 +179,8 @@ int main()
   config->elements_id[0] = DEDX_HYDROGEN;
   config->elements_id[1] = DEDX_OXYGEN;
   config->elements_mass_fraction = calloc(2,sizeof(float));
-  config->elements_mass_fraction[0] = 0.13;
-  config->elements_mass_fraction[1] = 0.87;
+  config->elements_mass_fraction[0] = 0.1119;
+  config->elements_mass_fraction[1] = 0.8881;
   config->elements_length = 2;
   test_run(TEST_STP,config,"18 Test ASTAR He on own composition of water by weight",1,1.034E+03,err_accept);
   free(config);

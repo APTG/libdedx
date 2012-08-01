@@ -31,7 +31,7 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 	{
 		if(config->i_value == 0.0)
 		{
-			config->i_value = _dedx_get_i_value(config->target,1,err);
+			config->i_value = _dedx_get_i_value(config->target,config->compound_state,err);
 		}
 		if(*err != 0)
 			return -1;
@@ -59,8 +59,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 		return 0;
 	}
 	config->bragg_used = 1;
-	_evaluate_compound_state_mstar(config,err);
-	
+	//_evaluate_compound_state_mstar(config,err);	
 	if(config->elements_id == NULL)
 	{
 		unsigned int compos_len;
