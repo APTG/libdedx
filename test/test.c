@@ -168,7 +168,7 @@ int main()
   config->elements_atoms[0] = 2;
   config->elements_atoms[1] = 1;
   config->elements_length = 2;
-  test_run(TEST_STP,config,"17 Test ASTAR He on own composition of water by atoms",1,1.034E+03,err_accept);
+  test_run(TEST_STP,config,"17 Test ASTAR He on own composition of water by atoms",1,1.063E+03,err_accept);
   free(config);
 
   //ASTAR with own composition of water by weight
@@ -182,7 +182,7 @@ int main()
   config->elements_mass_fraction[0] = 0.1119;
   config->elements_mass_fraction[1] = 0.8881;
   config->elements_length = 2;
-  test_run(TEST_STP,config,"18 Test ASTAR He on own composition of water by weight",1,1.034E+03,err_accept);
+  test_run(TEST_STP,config,"18 Test ASTAR He on own composition of water by weight",1,1.063E+03,err_accept);
   free(config);
     
   //Bethe with own composition
@@ -197,7 +197,7 @@ int main()
   config->elements_atoms[1] = 1;
   config->elements_length = 2;
   config->rho = 1.000;
-  test_run(TEST_STP,config,"19 Test Bethe He on own composition of water by atoms",1,1.034E+03 ,err_accept);
+  test_run(TEST_STP,config,"19 Test Bethe He on own composition of water by atoms",1,1.049E+03 ,err_accept);
   free(config);
 
   //Bethe with own composition and own i value
@@ -209,11 +209,11 @@ int main()
   config->elements_id[0] = DEDX_HYDROGEN;
   config->elements_id[1] = DEDX_OXYGEN;
   config->elements_mass_fraction = calloc(2,sizeof(float));
-  config->elements_mass_fraction[0] = 0.13; // crash
-  config->elements_mass_fraction[1] = 0.87;
+  config->elements_mass_fraction[0] = 0.1119; 
+  config->elements_mass_fraction[1] = 0.8881;
   config->elements_length = 2;
   config->rho = 1.000;
-  test_run(TEST_STP,config,"20 Test Bethe He on own composition of water by weight and I=78eV",1,1.058E+03,err_accept);
+  test_run(TEST_STP,config,"20 Test Bethe He on own composition of water by weight and I=78eV",1,1.045E+03,err_accept);
   free(config);
   
   //Bethe with own composition and own i value
@@ -229,7 +229,7 @@ int main()
   config->elements_atoms[1] = 1;
   config->elements_length = 2;
   config->rho = 1.000;
-  test_run(TEST_STP,config,"21 Test Bethe He on own composition of water by atoms and I=78eV",1,1.058E+03,err_accept);
+  test_run(TEST_STP,config,"21 Test Bethe He on own composition of water by atoms and I=78eV",1,1.045E+03,err_accept);
   free(config);
 
   // alanine C3H7NO2
