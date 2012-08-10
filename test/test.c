@@ -19,15 +19,22 @@ int err_count = 0;
 
 int main()
 {
-  printf("--------------------------------------------------------------");
-  printf("--------------------------------------------------------------\n");
-  printf("%-70s : Calculated  - Expected       Conclusion\n","");
-  printf("--------------------------------------------------------------");
-  printf("--------------------------------------------------------------\n");
-
 
   float err_accept = 0.005; // accept 0.5 % deviation to either side
   dedx_config * config;
+
+  int vmajor,vminor,vpatch,vsvn;
+  dedx_get_version(&vmajor,&vminor,&vpatch,&vsvn);
+  printf("--------------------------------------------------------------");
+  printf("--------------------------------------------------------------\n");
+  printf("     libdEdx, version %i.%i.%i-svn%i",
+	 vmajor,vminor,vpatch,vsvn);
+  printf("%-36s : Calculated  - Expected       Conclusion\n",
+	 "");
+  printf("--------------------------------------------------------------");
+  printf("--------------------------------------------------------------\n");
+
+
   //Test ASTAR
   dedx_config * astar = (dedx_config *)calloc(1,sizeof(dedx_config));
   astar->program = DEDX_ASTAR;
@@ -313,6 +320,113 @@ int main()
   test_run(TEST_STP,config,"25 Test ICRU C on own composition of alanine by atoms",100,2.320e+2,err_accept);
   free(config);
 
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_ICRU;
+  config->ion = DEDX_CARBON;
+  config->elements_id = calloc(4,sizeof(int));
+  config->elements_id[0] = DEDX_HYDROGEN;
+  config->elements_id[1] = DEDX_CARBON;
+  config->elements_id[2] = DEDX_NITROGEN;
+  config->elements_id[3] = DEDX_OXYGEN;
+  config->elements_atoms = calloc(4,sizeof(int));
+  config->elements_atoms[0] = 7;
+  config->elements_atoms[1] = 3;
+  config->elements_atoms[2] = 1;
+  config->elements_atoms[3] = 2;
+  config->elements_length = 4;
+  test_run(TEST_STP,config,
+	   "26 Test ICRU C on own composition of alanine by atoms, no rho",
+	   100,2.320e+2,err_accept);
+  free(config);
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_ICRU;
+  config->ion = DEDX_CARBON;
+  config->elements_id = calloc(4,sizeof(int));
+  config->elements_id[0] = DEDX_HYDROGEN;
+  config->elements_id[1] = DEDX_CARBON;
+  config->elements_id[2] = DEDX_NITROGEN;
+  config->elements_id[3] = DEDX_OXYGEN;
+  config->elements_atoms = calloc(4,sizeof(int));
+  config->elements_atoms[0] = 7;
+  config->elements_atoms[1] = 3;
+  config->elements_atoms[2] = 1;
+  config->elements_atoms[3] = 2;
+  config->elements_length = 4;
+  config->rho = 1.23;
+  test_run(TEST_STP,config,
+	   "27 Test ICRU C on own composition of alanine by atoms, NPL rho",
+	   100,2.320e+2,err_accept);
+  free(config);
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_MSTAR;
+  config->ion = DEDX_CARBON;
+  config->elements_id = calloc(4,sizeof(int));
+  config->elements_id[0] = DEDX_HYDROGEN;
+  config->elements_id[1] = DEDX_CARBON;
+  config->elements_id[2] = DEDX_NITROGEN;
+  config->elements_id[3] = DEDX_OXYGEN;
+  config->elements_atoms = calloc(4,sizeof(int));
+  config->elements_atoms[0] = 7;
+  config->elements_atoms[1] = 3;
+  config->elements_atoms[2] = 1;
+  config->elements_atoms[3] = 2;
+  config->elements_length = 4;
+  test_run(TEST_STP,config,
+	   "28 Test MSTAR C on own composition of alanine by atoms, no rho",
+	   100,2.340e+2,err_accept);
+  free(config);
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_MSTAR;
+  config->ion = DEDX_CARBON;
+  config->elements_id = calloc(4,sizeof(int));
+  config->elements_id[0] = DEDX_HYDROGEN;
+  config->elements_id[1] = DEDX_CARBON;
+  config->elements_id[2] = DEDX_NITROGEN;
+  config->elements_id[3] = DEDX_OXYGEN;
+  config->elements_atoms = calloc(4,sizeof(int));
+  config->elements_atoms[0] = 7;
+  config->elements_atoms[1] = 3;
+  config->elements_atoms[2] = 1;
+  config->elements_atoms[3] = 2;
+  config->elements_length = 4;
+  config->rho = 1.23;
+  test_run(TEST_STP,config,
+	   "29 Test MSTAR C on own composition of alanine by atoms, NPL rho",
+	   100,2.340e+2,err_accept);
+  free(config);
+
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_MSTAR;
+  config->ion = DEDX_CARBON;
+  config->target = DEDX_ALANINE;
+  test_run(TEST_STP,config,
+	   "30 Test MSTAR C on DEDX_ALANINE",
+	   100,2.340e+2,err_accept);
+  free(config);
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_ICRU;
+  config->ion = DEDX_CARBON;
+  config->target = DEDX_ALANINE;
+  test_run(TEST_STP,config,
+	   "31 Test ICRU C on DEDX_ALANINE",
+	   100,2.320e+2,err_accept);
+  free(config);
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_BETHE_EXT00;
+  config->ion = DEDX_CARBON;
+  config->target = DEDX_ALANINE;
+  test_run(TEST_STP,config,
+	   "32 Test Bethe C on DEDX_ALANINE",
+	   100,2.320e+2,err_accept);
+  free(config);
+
   //Test ASTAR, tools
   config = (dedx_config *)calloc(1,sizeof(dedx_config));
   config->program = DEDX_ASTAR;
@@ -321,11 +435,11 @@ int main()
   config->ion_a = 4;
   dedx_config * temp = calloc(1,sizeof(dedx_config));
   memcpy(temp,config,sizeof(dedx_config));
-  test_run(TEST_CSDA,temp,"26 Test ASTAR He CSDA in Water",100,7.760,err_accept);
+  test_run(TEST_CSDA,temp,"31 Test ASTAR He CSDA in Water",100,7.760,err_accept);
   memcpy(temp,config,sizeof(dedx_config));
-  test_run(TEST_ISTP,temp,"27 Test ASTAR He iSTP in Water",1.03381e+03,1,err_accept);
+  test_run(TEST_ISTP,temp,"32 Test ASTAR He iSTP in Water",1.03381e+03,1,err_accept);
   memcpy(temp,config,sizeof(dedx_config));
-  test_run(TEST_ICSDA,temp,"28 Test ASTAR He iCSDA in Water",7.760,100,err_accept);
+  test_run(TEST_ICSDA,temp,"33 Test ASTAR He iCSDA in Water",7.760,100,err_accept);
   free(config);
   free(temp);
 
