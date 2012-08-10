@@ -38,12 +38,12 @@ void _evaluate_compound_state_mstar(dedx_config * config, int *err)
 	}
 }
 
-void _dedx_convert_energy_to_mstar(stopping_data * in, stopping_data * out,char state, float * energy)
+void _dedx_convert_energy_to_mstar(stopping_data * in, stopping_data * out,char state,dedx_config * config, float * energy)
 {
 	int err = 0;
 	if(state == 'a' || state == 'b')
 	{
-		if(_dedx_target_is_gas(in->target,&err))
+		if(config->compound_state)
 		{
 			if(state == 'a')
 				state = 'g';

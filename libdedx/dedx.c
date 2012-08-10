@@ -528,7 +528,7 @@ int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, in
 			mode = config->mstar_mode;
 		}
 		data->ion = config->ion;
-		_dedx_convert_energy_to_mstar(data,&out,mode,energy);
+		_dedx_convert_energy_to_mstar(data,&out,mode,config,energy);
 		memcpy(data,&out,sizeof(stopping_data));
 		data->ion = ion;
 	}	
