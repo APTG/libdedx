@@ -81,7 +81,7 @@ int main()
   test_stp(&counter,DEDX_ASTAR,DEDX_HELIUM,DEDX_ALANINE,250.0         ,1.526e1);
   spacer();
 
-  /* TEST MSTAR */
+  /* TEST MSTAR DEFAULT MODE (should be equal to b-mode*/
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_WATER,energy_grid[0],5.589e3);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_WATER,energy_grid[1],6.587e3);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.640e3);
@@ -94,12 +94,20 @@ int main()
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_PMMA,energy_grid[3],3.094e2);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_PMMA,energy_grid[4],7.762e1);
   //// ____ up to here values are finialized ____ /NB
+  /* all in 'd' mode, since it is Braggs rule for condensed matter */
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],1.111e3);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],1.111e3);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.111e2);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],1.111e1);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],1.111e1);
   spacer();
+
+  /* TEST MSTAR 'b' MODE */
+  spacer();
+
+  /* TEST MSTAR 'a' MODE */
+  spacer();
+
 
   /* TEST ICRU Protons */
   test_stp(&counter,DEDX_ICRU,DEDX_PROTON,DEDX_WATER,energy_grid[0],1.111e3);
