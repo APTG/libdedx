@@ -100,8 +100,8 @@ See the INSTALL file.
 4. Use
 -------------------------------------------------------------------------------
 
-UNITS: Energies are always in terms of MeV/amu, except for ESTAR, where the 
-Electron energy must be specified in terms of MeV. The resulting mass stopping 
+UNITS: Energies are always in terms of MeV/nucleon, except for ESTAR, where the
+electron energy must be specified in terms of MeV. The resulting mass stopping 
 power is in MeV cm2/g.
 
 Stopping power values can be retrieved in two different ways: 
@@ -122,7 +122,7 @@ using the ICRU49 and ICRU73 data table if possible, else the BETHE_EXT00 table.
 ion: is the Z value of the particle
 target: is the id of the target, the id follow the ICRU naming convention the 
 	id can be found in the respective target files for each program.
-energy: is the kinetic energy for the ion per nucleon (MeV/amu).
+energy: is the kinetic energy for the ion per nucleon (MeV/nucl).
 *err: contains the error code and is 0 if no error was encountered. An 
       explanation of the error codes can be found in the error_codes.txt file.
 
@@ -135,10 +135,9 @@ will store the mass stopping power of a 100 MeV/u carbon ion in a water target.
 A list of ions and target media is given in appendix A.3.
 
 
-Method 2) is though the proper method of using dedx if several stopping powers 
-are to be retrieved. It is (hopefully) thread-safe and was optimized to be fast.
+Method 2) is the proper method of using dedx if several stopping powers are to be  retrieved. It is (hopefully) thread-safe and was optimized to be fast.
 
-first memory for a workspace and a config struct must be allocated.
+First memory for a workspace and a config struct must be allocated.
 
   dedx_workspace *ws;
   dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
@@ -184,39 +183,61 @@ target        : see appendix A.3. If another compound is requested which is not
 		*elements_atoms.
 ion           : must be specified by user, see appendix A.3
 compound      : is set to TRUE by dedx_load_config(), if target was not found 
-	        in default list, and was generated from individual elements 
-		instead.
+	        in default list, but generated from individual elements instead.
 compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
 		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
-		In version 1.2 the only thing that will be affected by the state 
-		parameter is the Bethe function and only in the case where 
-		element_id is specified and element_i_value is not. This difference 
-		applies for elements which is naturally found in gas state, 
-		following ICRU49 recommendations. The I-value is multiplied with 1.13 
-		to get the liquid/solid I-value phase, except for the following elements
-		Hydrogen:	19.2eV
-		Carbon:		81eV
-		Nitrogen:	82eV
-		Oxygen:		106eV
-		Fluor		112eV
-		Chlorine	180eV
+		From version 1.2.1 the state parameter of the Bethe function will be
+                affected, but only in the case where element_id is specified and
+                element_i_value is not. This difference applies for elements which is 
+                naturally found in gas state, following ICRU49 recommendations. The
+                I-value is multiplied with 1.13 to get the liquid/solid I-value phase,
+                except for the following elements:
+		Hydrogen:	19.2 eV
+		Carbon:		81 eV
+		Nitrogen:	82 eV
+		Oxygen:		106 eV
+		Fluor		112 eV
+		Chlorine	180 eV
+
+		When using MSTAR read the mstar_mode function carefully too.
+		The compound_state will apply equally to all constituents, when working
+		with compounds.
+                
 elements_length: number of unique elements in compound. Must be specified if
 		 target is undefined (DEDX_UNDEFINED)
-*elements_id   : Z of each constituent element, must be specified if target 
+*elements_id  : Z of each constituent element, must be specified if target 
 	         is undefined
 *elements_atoms: number of atoms per comp. unit, must be specified if target 
 		 is undefined.
-mstar_mode     : if DEDX_DEFAULT, then 'b' method of MSTAR is used
+mstar_mode    : if DEDX_DEFAULT, then 'b' method of MSTAR is used, as recommended by
+	        by MSTAR author Helmut Paul. In case of an overspecified, or even 
+		contradicting system (e.g. DEDX_GAS was set in compound_state and
+		DEDX_MSTAR_MODE_D  mode requested), then libdEdx will follow 
+		mstar_mode and ignore the compound_state.
+
+                In case of MSTAR, the condensed modes 'c' or 'd' will be selected if
+		DEDX_CONDENSED is requested in compound_state. 'c' is the condensed
+		phase for the 'a' mode of MSTAR. 'd' is the same for the recommended
+		'b' mode of operation.
+		Similarly, if DEDX_GAS is requested, then 'g' or 'h' is attempted,
+		depending if 'a' or 'b' mode was requested. However, for Hydrogen and
+		Helium target, only the 'g' mode is allowed for DEDX_GAS in MSTAR. 
+		libdEdx will then also switch to 'g' in that case. Confusing? Yes.
+
 i_value        : if unspecified, then ICRU I-values are used for target 
 	         compound. If target is set, or if target is 0, then it is 
 		 calculated from the individual i-values set in 
-		 *elements_i_value.
+		 *elements_i_value, but only when the *elements_i_value are empty,
+		 i.e. freshly initialized.
 *elements_mass_fraction: must be specified if target  and elements_atoms is 
-			 left undefined
+			 left undefined. If both are specified, then only 
+			 elements_mass_fraction is considered, and element_atoms
+			 is ignored entirely.
 *elements_i_value: if target is 0, then individual I-values of elements can 
-		   be specified here.
+		   be specified here. If any values are found in 
+		   elements_i_value, then i_value is ignored.
 
-At least you should specify program, target and ion, i.e.
+As a minimum you should specify program, target and ion, i.e.
    cfg->ion = DEDX_CARBON;
    cfg->program = DEDX_ICRU;
    cfg->target = DEDX_PMMA;
@@ -227,12 +248,15 @@ and then load the config
                           dedx_config *config, 
                           int *err);
 
+which will initialize the remaining configure options which may be needed.
+The options can be probed by the user, but beware that some hold NULL pointers.
+
 You have to call dedx_load_config() for each target/ion combination. 
 If multiple combinations are used, you must allocate memory for each 
 *config element, and call dedx_load_config() for each configuration.
 Since it there had been observed some misbehave of the library using
 malloc for allocating memory to the config struct, it is recommended 
-to use calloc or similar. 
+to use calloc or similar.
 
 Stopping power values are returned by:
 
@@ -241,7 +265,7 @@ Stopping power values are returned by:
 			   float energy, 
 			   int *err)
 
-energy: kinetic energy of particle in MeV/u.
+energy: kinetic energy of particle in MeV/nucleon.
 
 When you are done with the library you have to run 
 
@@ -265,9 +289,12 @@ struct. Here is an example for water, set up by mass fraction:
 	config->elements_id[0] = DEDX_HYDROGEN;
 	config->elements_id[1] = DEDX_OXYGEN;
 	config->elements_mass_fraction = calloc(2,sizeof(float));
-	config->elements_mass_fraction[0] = 0.13;
-	config->elements_mass_fraction[1] = 0.87;
+	config->elements_mass_fraction[0] = 0.111894;
+	config->elements_mass_fraction[1] = 0.888106; 
 	config->elements_length = 2;
+
+Mass fractions are particularly useful if you want to use special
+isotopic compositions, instead of the natural compositions.
 
 Alternatively you can set it up by relative amount of elements:
 
@@ -281,6 +308,9 @@ Alternatively you can set it up by relative amount of elements:
 	config->elements_atoms[0] = 2;
 	config->elements_atoms[1] = 1;
 	config->elements_length = 2;
+
+Then libdEdx will use the natural isotope compositions, e.g. 12.0107 for natural 
+carbon which also contains C-13 and C-14.
 
 - Overriding I-value:
 Instead of using the default I value for a compound, determined by either the 
@@ -303,7 +333,14 @@ can specify the I-value manually for the BETHE-type algorithms:
 -------------------------------------------------------------------------------
 5. Release notes
 -------------------------------------------------------------------------------
-Current version: 1.2
+Version: 1.2.1
+Changes:
+ - several bugfixes regarding state of compound when using Bragg's rule.
+ - better testing of library
+ - completed the ICRU material list on which elements is on gas phase, see
+   Appendix 
+
+Version: 1.2
 Changes:
  - New API, which should be more stable for future enhancements
  - I-values can be specified for compounds
@@ -803,6 +840,36 @@ List all known target materials (following ICRU naming convention):
 278: XYLENE
 906: GRAPHITE
 
+List of elements and compounds which are on gas phase by default:
+  1: HYDROGEN
+  2: HELIUM
+  7: NITROGEN
+  8: OXYGEN
+  9: FLUORINE
+ 10: NEON
+ 17: CHLORINE
+ 18: ARGON
+ 36: KRYPTON
+ 54: XENON
+ 86: RADON
+101: ACETYLENE
+104: AIR
+108: AMMONIA
+124: BUTANE
+134: CARBONDIOXIDE
+152: ETHANE
+155: ETHYLENE
+161: FREON_12
+162: FREON_12B2
+163: FREON_13
+164: FREON_13B1
+165: FREON_13I1
+197: METHANE
+207: NITROUSOXIDE
+238: PROPANE
+263: TISSUE_EQUIVALENTGAS_METHANEBASED
+264: TISSUE_EQUIVALENTGAS_PROPANEBASED
+277: WATERVAPOR
 
 
 In your computer code, all materials and ions can also be accessed by their name
