@@ -90,7 +90,7 @@ int _dedx_evaluate_compound(dedx_config * config,int *err)
 		float f, sum = 0;
 		for(i = 0; i < length; i++)
 		{
-			f = _dedx_read_density(config->elements_id[i],err);
+			f = _dedx_get_atom_mass(config->elements_id[i],err);
 			if(*err != 0)
 			{
 				free(density);
