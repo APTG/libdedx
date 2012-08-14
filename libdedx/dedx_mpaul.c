@@ -36,7 +36,7 @@ float _dedx_calculate_mspaul_coef(char  mode, int ion, int target, float energy)
 
   if(mode == 'h' && z2 < 3)
   {
-	  return 0;
+	  mode = 'g';
   }
   if(mode == 'c' || mode == 'd')
   {
