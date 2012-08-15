@@ -176,14 +176,19 @@ typedef struct
 
 Description of the elements:
 cfg_id        : configuration id, which is set by dedx_config. Don't touch.
+
 program       : must be specified by user, see appendix A.3
+
 target        : see appendix A.3. If another compound is requested which is not 
 	        in the list, then user must specify compound constituents by 
 		*elements_id and either *elements_mass_fraction or 
 		*elements_atoms.
+
 ion           : must be specified by user, see appendix A.3
+
 compound      : is set to TRUE by dedx_load_config(), if target was not found 
 	        in default list, but generated from individual elements instead.
+
 compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
 		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
 		From version 1.2.1 the state parameter of the Bethe function will be
@@ -205,39 +210,81 @@ compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of
                 
 elements_length: number of unique elements in compound. Must be specified if
 		 target is undefined (DEDX_UNDEFINED)
+
 *elements_id  : Z of each constituent element, must be specified if target 
 	         is undefined
+
 *elements_atoms: number of atoms per comp. unit, must be specified if target 
 		 is undefined.
-mstar_mode    : if DEDX_DEFAULT, then 'b' method of MSTAR is used, as recommended by
+
+mstar_mode    : MSTAR features several modes of operation, depending on the state
+	        of the compound.
+
+		DEDX_MSTAR_MODE_A : will work for most compounds. Automatic selection
+				    of state, depending on the state table in the 
+				    appendix. This mode 'a' will select 'g' mode for
+				    gas phase and 'c' mode for condensed phase.
+		DEDX_MSTAR_MODE_B : recommended and default mode of operation.
+				    However, not all elements work. This mode 'b' 
+				    will select 'h' for gas and 'd' for condensed phase,
+				    depending on the state table in the appendix.
+		DEDX_MSTAR_MODE_C : Condensed phase for 'a' mode.
+		DEDX_MSTAR_MODE_D : Condensed phase for recommended 'b' mode.
+		DEDX_MSTAR_MODE_G : Gas phase for 'a' mode.
+		DEDX_MSTAR_MODE_H : Gas phase for recommended 'b' mode.
+
+
+	        if DEDX_DEFAULT, then 'b' method of MSTAR is used, as recommended by
 	        by MSTAR author Helmut Paul. In case of an overspecified, or even 
 		contradicting system (e.g. DEDX_GAS was set in compound_state and
 		DEDX_MSTAR_MODE_D  mode requested), then libdEdx will follow 
-		mstar_mode and ignore the compound_state.
+		mstar_mode and ignore compound_state.
 
-                In case of MSTAR, the condensed modes 'c' or 'd' will be selected if
+                The condensed modes 'c' or 'd' will be selected if
 		DEDX_CONDENSED is requested in compound_state. 'c' is the condensed
 		phase for the 'a' mode of MSTAR. 'd' is the same for the recommended
-		'b' mode of operation.
-		Similarly, if DEDX_GAS is requested, then 'g' or 'h' is attempted,
-		depending if 'a' or 'b' mode was requested. However, for Hydrogen and
-		Helium target, only the 'g' mode is allowed for DEDX_GAS in MSTAR. 
-		libdEdx will then also switch to 'g' in that case. Confusing? Yes.
+		'b' mode of operation. The value in mstar_mode will be updated
+		accordingly after dedx_load_config() was applied.
+		
+		The 'd' mode is not allowed on Hydrogen, Helium and Lithium. In that case
+		libdEdx will switch to 'c' mode. mstar_mode will NOT be updated in this 
+		case.
+		The reason is, that when 'd' was requested for a compound, then only
+		the elements Hydrogen, Helium and Lithium will be affected, leaving
+		all other elements in 'd' mode. 
+
+		If DEDX_GAS is requested, then 'g' or 'h' is attempted,
+		depending if 'a' or 'b' mode was requested, respectively. The value in
+		mstar_mode will be updated, accordingly after dedx_load_config() was
+		applied.
+
+		However, for Hydrogen and Helium target, only the 'g' mode is allowed 
+		for DEDX_GAS in MSTAR, i.e. 'h' mode is not allowed. 
+		libdEdx will then switch to 'g' in that case. mstar_mode will NOT be 
+		updated in this case. E.g. when working with a compound with 'h' 
+		requested, only Hydrogen and Helium will be calculated using 'g' mode,
+		and all other constituents remain in 'h' mode.
+		Confusing? Yes.
 
 i_value        : if unspecified, then ICRU I-values are used for target 
 	         compound. If target is set, or if target is 0, then it is 
 		 calculated from the individual i-values set in 
 		 *elements_i_value, but only when the *elements_i_value are empty,
 		 i.e. freshly initialized.
-*elements_mass_fraction: must be specified if target  and elements_atoms is 
+
+*elements_mass_fraction: must be specified if target and elements_atoms is 
 			 left undefined. If both are specified, then only 
 			 elements_mass_fraction is considered, and element_atoms
-			 is ignored entirely.
+			 is ignored entirely. Mass fraction is the summed atomic 
+			 mass of a constituing element, divided by the total 
+			 atomic mass of the compound.
+
 *elements_i_value: if target is 0, then individual I-values of elements can 
 		   be specified here. If any values are found in 
 		   elements_i_value, then i_value is ignored.
 
 As a minimum you should specify program, target and ion, i.e.
+
    cfg->ion = DEDX_CARBON;
    cfg->program = DEDX_ICRU;
    cfg->target = DEDX_PMMA;

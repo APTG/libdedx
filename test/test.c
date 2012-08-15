@@ -133,7 +133,7 @@ int main()
   config = (dedx_config *)calloc(1,sizeof(dedx_config));
   config->program = DEDX_MSTAR;
   config->ion = DEDX_CARBON;
-  config->target = DEDX_PMMA;
+  config->target = DEDX_ALANINE;
   config->mstar_mode = DEDX_MSTAR_MODE_C;
   test_cstp(&counter,config,"c mode",energy_grid[0],6.349e3);
   test_cstp(&counter,config,"c mode",energy_grid[1],6.538e3);
