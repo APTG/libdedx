@@ -20,6 +20,7 @@ int test_run(int test, dedx_config * config, char * text,
 void spacer(void);
 
 int err_count = 0;
+int err;
 
 int main()
 {
@@ -93,20 +94,57 @@ int main()
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_PMMA,energy_grid[2],1.599e3);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_PMMA,energy_grid[3],3.094e2);
   test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_PMMA,energy_grid[4],7.762e1);
-  //// ____ up to here values are finialized ____ /NB
-  /* all in 'd' mode, since it is Braggs rule for condensed matter */
-  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],1.111e1);
+  /* 'd' mode, since it is Braggs rule for condensed matter */
+  /* but 'd' is not allowed for hydrogen, falling back to a then,  */
+  /* at least this should be libdEdx default behaviour */
+  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],6.312e3);
+  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],6.533e3);
+  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.614e3);
+  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],3.105e2);
+  test_stp(&counter,DEDX_MSTAR,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],7.772e1);
   spacer();
 
-  /* TEST MSTAR 'b' MODE */
+
+  /* TEST MSTAR 'a' MODE, differences are especially at low E = 0.07 MeV/nucl */
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_MSTAR;
+  config->ion = DEDX_CARBON;
+  config->target = DEDX_WATER;
+  config->mstar_mode = DEDX_MSTAR_MODE_A;
+  test_cstp(&counter,config,"a mode",energy_grid[0],5.634e3);
+  test_cstp(&counter,config,"a mode",energy_grid[1],6.593e3);
+  test_cstp(&counter,config,"a mode",energy_grid[2],1.639e3);
+  test_cstp(&counter,config,"a mode",energy_grid[3],3.166e2);
+  test_cstp(&counter,config,"a mode",energy_grid[4],7.994e1);
+  dedx_free_config(config, &err);
+  
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_MSTAR;
+  config->ion = DEDX_CARBON;
+  config->target = DEDX_PMMA;
+  config->mstar_mode = DEDX_MSTAR_MODE_A;
+  test_cstp(&counter,config,"a mode",energy_grid[0],6.185e3);
+  test_cstp(&counter,config,"a mode",energy_grid[1],6.400e3);
+  test_cstp(&counter,config,"a mode",energy_grid[2],1.598e3);
+  test_cstp(&counter,config,"a mode",energy_grid[3],3.082e2);
+  test_cstp(&counter,config,"a mode",energy_grid[4],7.755e1);
+  dedx_free_config(config, &err);
+
+  config = (dedx_config *)calloc(1,sizeof(dedx_config));
+  config->program = DEDX_MSTAR;
+  config->ion = DEDX_CARBON;
+  config->target = DEDX_PMMA;
+  config->mstar_mode = DEDX_MSTAR_MODE_C;
+  test_cstp(&counter,config,"c mode",energy_grid[0],6.349e3);
+  test_cstp(&counter,config,"c mode",energy_grid[1],6.538e3);
+  test_cstp(&counter,config,"c mode",energy_grid[2],1.614e3);
+  test_cstp(&counter,config,"c mode",energy_grid[3],3.103e2);
+  test_cstp(&counter,config,"c mode",energy_grid[4],7.767e1);
+  dedx_free_config(config, &err);
   spacer();
 
-  /* TEST MSTAR 'a' MODE */
-  spacer();
+
+  /* -------- SO FAR SO GOOD ----------------------------------------------------- */
 
 
   /* TEST ICRU Protons */
@@ -676,7 +714,7 @@ int test_cstp(int *nr, dedx_config *config, char *str, float energy, float resul
 	  
   test_run(TEST_STP,config,temp,energy,result,err_accept);
   (*nr)++;
-  free(config);
+  //  free(config);
   return 0;
 }
 
