@@ -196,7 +196,7 @@ int main()
   test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_WATER,energy_grid[0],6.329e3);
   test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_WATER,energy_grid[1],6.884e3);
   test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.630e3);
-  test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.192e2);
+  test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.144e2);
   test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_WATER,energy_grid[4],7.968e1);
 
   test_stp(&counter,DEDX_ICRU,DEDX_CARBON,DEDX_PMMA,energy_grid[0],6.880e3);
@@ -261,7 +261,7 @@ int main()
   test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_WATER,energy_grid[0],6.329e3);
   test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_WATER,energy_grid[1],6.884e3);
   test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.630e3);
-  test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.192e2);
+  test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.144e2);
   test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_WATER,energy_grid[4],7.968e1);
 
   test_stp(&counter,DEDX_ICRU73,DEDX_CARBON,DEDX_PMMA,energy_grid[0],6.880e3);
@@ -741,7 +741,7 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
   config->program = program;
   config->ion = ion;
   config->target = target;
-  sprintf(temp, "%02i - %s %.3e MeV/u %s on %s",
+  sprintf(temp, "%3i - %s %.3e MeV/u %s on %s",
 	  *nr, 
 	  dedx_get_program_name(program),
 	  energy,
@@ -759,7 +759,7 @@ int test_cstp(int *nr, dedx_config *config, char *str, float energy, float resul
   char temp[80];
   float err_accept=5e-3;
 
-  sprintf(temp, "%02i - %s %.3e MeV/u %s on %s - %s",
+  sprintf(temp, "%3i - %s %.3e MeV/u %s on %s - %s",
 	  *nr, 
 	  dedx_get_program_name(config->program),
 	  energy,
@@ -840,6 +840,6 @@ void spacer(void){
 }
 
 void skip(int *nr) {
-  printf("%02i - skipped\n",*nr);
+  printf("%3i - Skipped\n",*nr);
   (*nr)++;
 }
