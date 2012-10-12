@@ -301,66 +301,70 @@ int main()
   spacer();
 
 
-  /* -------- SO FAR SO GOOD ----------------------------------------------------- */
-
   /* TEST BETHE_EXT00 protons */
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[4],1.111e1);
+  /* 166 - 180 */
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[0],7.336e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[1],2.692e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[2],4.597e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[3],8.821e0);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[4],2.202e0);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[4],1.111e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[0],7.318e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[1],2.663e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[2],4.515e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[3],8.640e0);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[4],2.153e0);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[4],1.111e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[0],7.523e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[1],2.688e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[2],4.538e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[3],8.670e0);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[4],2.162e0);
+  spacer();
+
+  /* TEST BETHE_EXT00 Helium ions */
+  /* 181 - 195 */
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[0],2.053e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[1],1.056e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[2],1.839e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[3],3.529e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[4],8.808e0);
+
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[0],2.012e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[1],1.045e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[2],1.806e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[3],3.456e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[4],8.614e0);
+
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[0],2.055e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[1],1.055e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[2],1.815e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[3],3.468e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[4],8.648e0);
   spacer();
 
   /* TEST BETHE_EXT00 Carbon ions */
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[4],1.111e1);
+  /* 196 - 210 */ 
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[0],5.226e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[1],7.439e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.642e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.175e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[4],7.927e1);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[4],1.111e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[0],5.097e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[1],7.359e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[2],1.613e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[3],3.110e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[4],7.752e1);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],1.111e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.111e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],1.111e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],1.111e1);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],5.143e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],7.418e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.621e3);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],3.121e2);
+  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],7.783e1);
   spacer();
 
-  //Test ASTAR
-  config = (dedx_config *)calloc(1,sizeof(dedx_config));
-  config->program = DEDX_ASTAR;
-  config->ion = DEDX_HELIUM;
-  config->target = DEDX_WATER;
-  test_cstp(&counter,config,"foobar",250.0,2.145e0);
-
-
-
-
-  //Test Bethe on Hydrogen
-  config = (dedx_config *)calloc(1,sizeof(dedx_config));
-  config->program = DEDX_BETHE_EXT00;
-  config->ion = DEDX_CARBON;
-  config->target = DEDX_HYDROGEN;
-  test_run(TEST_STP,config,"07 Test Bethe C on Hydrogen",1,1.948E+04,err_accept);
-  free(config);
-
+  /* -------- SO FAR SO GOOD ----------------------------------------------------- */
   //Test Bethe on Water With intern I value
   config = (dedx_config *)calloc(1,sizeof(dedx_config));
   config->program = DEDX_BETHE_EXT00;
