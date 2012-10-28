@@ -20,3 +20,4 @@ Not listed by priority.
 * implement CTEST framework
 * RPM target
 * Add man pages
+* consider moving all data files into header files
