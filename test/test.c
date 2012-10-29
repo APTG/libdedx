@@ -506,32 +506,30 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
   test_run(TEST_STP,config,temp,energy,result,err_accept);
 
 
-  if (program==DEDX_BETHE_EXT00) {
-
-    if (target==DEDX_WATER) {
-      printf("i: %f %f %f          ", config->i_value,
-	     config->elements_i_value[0],
-	     config->elements_i_value[1]
-	     );
-    }
-
-    if (target==DEDX_PMMA) {
-      printf("i: %f %f %f %f       ", config->i_value,
-	     config->elements_i_value[0],
-	     config->elements_i_value[1],
-	     config->elements_i_value[2]
-	     );
-    }
-    if (target==DEDX_ALANINE) {
-      printf("i: %f %f %f %f %f [%i]   ", config->i_value,
-	     config->elements_i_value[0],
-	     config->elements_i_value[1],
-	     config->elements_i_value[2],
-	     config->elements_i_value[3],
-	     config->elements_length
-	     );
-    }
-  }
+  /* if (program==DEDX_BETHE_EXT00) { */
+  /*   if (target==DEDX_WATER) { */
+  /*     printf("i: %f %f %f          ", config->i_value, */
+  /* 	     config->elements_i_value[0], */
+  /* 	     config->elements_i_value[1] */
+  /* 	     ); */
+  /*   } */
+  /*   if (target==DEDX_PMMA) { */
+  /*     printf("i: %f %f %f %f       ", config->i_value, */
+  /* 	     config->elements_i_value[0], */
+  /* 	     config->elements_i_value[1], */
+  /* 	     config->elements_i_value[2] */
+  /* 	     ); */
+  /*   } */
+  /*   if (target==DEDX_ALANINE) { */
+  /*     printf("i: %f %f %f %f %f [%i]   ", config->i_value, */
+  /* 	     config->elements_i_value[0], */
+  /* 	     config->elements_i_value[1], */
+  /* 	     config->elements_i_value[2], */
+  /* 	     config->elements_i_value[3], */
+  /* 	     config->elements_length */
+  /* 	     ); */
+  /*   } */
+  /* } */
 
   (*nr)++;
   free(config);
@@ -559,7 +557,8 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->elements_atoms[1] = 1;
       config->elements_length = 2;
       config->elements_i_value = calloc(2,sizeof(float));
-      config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
+      config->elements_i_value[0] = 19.2; 
+      config->elements_i_value[1] = 106.0; 
       // TODO: is it sufficient to only specify one value?
       // this should be mentioned in the README
       config->rho = 1.000;
@@ -575,7 +574,9 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->elements_atoms[1] = 5;
       config->elements_atoms[2] = 2;
       config->elements_i_value = calloc(3,sizeof(float));
-      config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
+      config->elements_i_value[0] = 19.2; 
+      config->elements_i_value[1] = 81.0; 
+      config->elements_i_value[2] = 106.0;
       // C: 81.0 eV, O: 106.0 eV.
       config->elements_length = 3;
       config->rho = 1.190;

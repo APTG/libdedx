@@ -478,6 +478,9 @@ A.2 Error codes
 206 Ion is not supported for MSTAR
 207 Ion is not supported for requested table
 208 Rho must be specified in this configuration.
+209 Mass of ion (ion_a) must be specified in this configuration.
+210 I value must be larger than zero.
+
 -------------------------------------------------------------------------------
 A.3 Additional lists
 -------------------------------------------------------------------------------
