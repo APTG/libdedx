@@ -463,6 +463,8 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
   config->program = program;
   config->ion = ion;
   config->target = target;
+  config->elements_i_value = calloc(4,sizeof(float)); 
+  // this will force libdEdx to use default I-values per element, which is what SH12A also does.
   sprintf(temp, "%3i - %s %.3e MeV/u %s on %s",
 	  *nr, 
 	  dedx_get_program_name(program),
@@ -474,21 +476,21 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
 
 
  /*  if (target==DEDX_WATER) { */
- /*    printf("i: %f %f %f          ", config->i_value,  */
+ /*    printf("i: %f %f %f          ", config->i_value, */
  /* 	   config->elements_i_value[0], */
  /* 	   config->elements_i_value[1] */
  /* 	   ); */
  /*  } */
 
  /* if (target==DEDX_PMMA) { */
- /*    printf("i: %f %f %f %f       ", config->i_value,  */
+ /*    printf("i: %f %f %f %f       ", config->i_value, */
  /* 	   config->elements_i_value[0], */
  /* 	   config->elements_i_value[1], */
- /* 	   config->elements_i_value[2]	   */
+ /* 	   config->elements_i_value[2] */
  /* 	   ); */
  /* } */
  /* if (target==DEDX_ALANINE) { */
- /*    printf("i: %f %f %f %f %f    ", config->i_value,  */
+ /*    printf("i: %f %f %f %f %f    ", config->i_value, */
  /* 	   config->elements_i_value[0], */
  /* 	   config->elements_i_value[1], */
  /* 	   config->elements_i_value[2], */
@@ -514,7 +516,7 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
   switch(target)
     {
     case DEDX_WATER:
-      config->compound_state = DEDX_CONDENSED;
+      //config->compound_state = DEDX_CONDENSED; does not make sense if I values are specified manually
       config->elements_id = calloc(2,sizeof(int));
       config->elements_id[0] = DEDX_HYDROGEN;
       config->elements_id[1] = DEDX_OXYGEN;
@@ -529,7 +531,7 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->rho = 1.000;
       break;
     case DEDX_PMMA:
-      config->compound_state = DEDX_CONDENSED;
+      //config->compound_state = DEDX_CONDENSED;
       config->elements_id = calloc(3,sizeof(int));
       config->elements_id[0] = DEDX_HYDROGEN;
       config->elements_id[1] = DEDX_CARBON;
@@ -540,11 +542,11 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->elements_atoms[2] = 2;
       config->elements_i_value = calloc(3,sizeof(float));
       config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
+      // C: 81.0 eV, O: 106.0 eV.
       config->elements_length = 3;
       config->rho = 1.190;
       break;
     case DEDX_ALANINE:
-      config->compound_state = DEDX_CONDENSED;
       config->elements_id = calloc(4,sizeof(int));
       config->elements_id[0] = DEDX_HYDROGEN;
       config->elements_id[1] = DEDX_CARBON;
@@ -556,10 +558,11 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->elements_atoms[2] = 1;
       config->elements_atoms[3] = 2;
       config->elements_i_value = calloc(4,sizeof(float));
-      config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
-      config->elements_i_value[1] = 81.0;
-      config->elements_i_value[2] = 82.0; 
-      config->elements_i_value[3] = 106.0; 
+      /* from shieldhit12a_r370_dedxtable.dat where default accidentaly was gas-phase alanine */
+      config->elements_i_value[0] = 19.2; // override libdEdx defaults
+      config->elements_i_value[1] = 78.0; // --"--
+      config->elements_i_value[2] = 82.0; // --"--
+      config->elements_i_value[3] = 95.0; // --"--
       config->elements_length = 4;
       config->rho = 1.230;
       break;
