@@ -187,6 +187,9 @@ void dedx_get_error_code(char *err_str, int err) {
 		case 209:
 			strcpy(err_str,"ion_a must be specified in this configuration.");
 			break;
+		case 210:
+			strcpy(err_str,"I value must be larger than zero.");
+			break;
 		case 301:
 			strcpy(err_str,"Out of memory");
 			break;  
@@ -423,6 +426,7 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config * config, int *err)
 		*err = 207;
 		return -1;
 	}
+	config->_temp_i_value = config->i_value;
 	//Load data
 	_dedx_find_data(&data,config,energy,err);
 
@@ -560,7 +564,14 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	{
 		config->target = targets[i];
 		if(config->elements_i_value != NULL)
-			config->i_value = config->elements_i_value[i];
+		{
+			config->_temp_i_value = config->elements_i_value[i];
+			if(config->elements_i_value[i] <= 0.0)
+			{
+				*err = 210;
+				return -1; 
+			} 	
+		}	
 		_dedx_find_data(&compound_data[i],config,energy,err);
 		if(*err != 0)
 		{
@@ -598,12 +609,7 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 	TZ = _dedx_get_atom_charge(config->target,err);
 	TA = _dedx_get_atom_mass(config->target,err);
 	rho = config->rho;
-	pot = _dedx_get_i_value(config->target,config->compound_state,err);
-
-	if(config->i_value != 0.0)
-	{
-		pot = config->i_value;
-	}
+	pot = config->_temp_i_value;
 	data->length = 122;
 	//Get energy grid.
 	_dedx_read_energy_data(energy,DEDX_BETHE_EXT00, err);

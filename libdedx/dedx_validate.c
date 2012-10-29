@@ -27,6 +27,7 @@ int _dedx_validate_rho(dedx_config * config, int *err)
 }
 int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 {
+	int i;
 	if(config->elements_i_value == NULL && config->target != 0)
 	{
 		if(config->i_value == 0.0)
@@ -38,7 +39,6 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 	}
 	else if(config->i_value == 0.0 && config->target == 0 && config->elements_i_value == NULL)
 	{
-		int i = 0;
 		config->elements_i_value = calloc(config->elements_length,sizeof(float));
 		for(i = 0; i < config->elements_length; i++)
 		{
@@ -48,6 +48,16 @@ int _dedx_evaluate_i_pot(dedx_config * config, int *err)
 	if(config->elements_id != NULL && config->elements_i_value == NULL)
 	{
 		_dedx_calculate_element_i_pot(config,err);
+	}
+	if(config->elements_i_value != NULL && config->i_value == 0.0)
+	{
+		float charge_avg = 0.0;
+		for(i = 0; i < config->elements_length; i++)
+		{
+			config->i_value += config->elements_mass_fraction[i]*log(config->elements_i_value[i])*config->elements_id[i]/_dedx_get_atom_mass(config->elements_id[i],err);
+			charge_avg += config->elements_mass_fraction[i]*config->elements_id[i]/_dedx_get_atom_mass(config->elements_id[i],err);
+		}
+		config->i_value = exp(config->i_value/charge_avg);
 	}	
 	return 0;
 }
