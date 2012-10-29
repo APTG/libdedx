@@ -368,65 +368,65 @@ int main()
 
   /* TEST BETHE_EXT00 new I protons */
   /* 211 - 225 */
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[0],7.336e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[1],2.692e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[2],4.597e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[3],8.821e0);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[4],2.202e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[0],7.336e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[1],2.692e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[2],4.597e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[3],8.821e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_WATER,energy_grid[4],2.202e0);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[0],7.318e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[1],2.663e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[2],4.515e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[3],8.640e0);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[4],2.153e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[0],7.318e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[1],2.663e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[2],4.515e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[3],8.640e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_PMMA,energy_grid[4],2.153e0);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[0],7.523e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[1],2.688e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[2],4.538e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[3],8.670e0);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[4],2.162e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[0],7.523e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[1],2.688e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[2],4.538e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[3],8.670e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_PROTON,DEDX_ALANINE,energy_grid[4],2.162e0);
   spacer();
 
   /* TEST BETHE_EXT00 new I Helium ions */
   /* 226 - 240 */
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[0],2.053e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[1],1.056e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[2],1.839e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[3],3.529e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[4],8.808e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[0],2.053e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[1],1.056e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[2],1.839e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[3],3.529e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_WATER,energy_grid[4],8.808e0);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[0],2.012e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[1],1.045e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[2],1.806e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[3],3.456e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[4],8.614e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[0],2.012e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[1],1.045e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[2],1.806e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[3],3.456e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_PMMA,energy_grid[4],8.614e0);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[0],2.055e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[1],1.055e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[2],1.815e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[3],3.468e1);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[4],8.648e0);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[0],2.055e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[1],1.055e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[2],1.815e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[3],3.468e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_HELIUM,DEDX_ALANINE,energy_grid[4],8.648e0);
   spacer();
 
   /* TEST BETHE_EXT00 new I Carbon ions */
   /* 241 - 255 */ 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[0],5.226e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[1],7.439e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.642e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.175e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[4],7.927e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[0],5.226e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[1],7.439e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[2],1.642e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[3],3.175e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_WATER,energy_grid[4],7.927e1);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[0],5.097e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[1],7.359e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[2],1.613e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[3],3.110e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[4],7.752e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[0],5.097e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[1],7.359e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[2],1.613e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[3],3.110e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_PMMA,energy_grid[4],7.752e1);
 
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],5.143e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],7.418e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.621e3);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],3.121e2);
-  test_stp(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],7.783e1);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[0],5.143e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[1],7.418e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[2],1.621e3);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[3],3.121e2);
+  test_stp_i(&counter,DEDX_BETHE_EXT00,DEDX_CARBON,DEDX_ALANINE,energy_grid[4],7.783e1);
   spacer();
 
 
@@ -471,6 +471,32 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
 	  dedx_get_material_name(target));
 	  
   test_run(TEST_STP,config,temp,energy,result,err_accept);
+
+
+ /*  if (target==DEDX_WATER) { */
+ /*    printf("i: %f %f %f          ", config->i_value,  */
+ /* 	   config->elements_i_value[0], */
+ /* 	   config->elements_i_value[1] */
+ /* 	   ); */
+ /*  } */
+
+ /* if (target==DEDX_PMMA) { */
+ /*    printf("i: %f %f %f %f       ", config->i_value,  */
+ /* 	   config->elements_i_value[0], */
+ /* 	   config->elements_i_value[1], */
+ /* 	   config->elements_i_value[2]	   */
+ /* 	   ); */
+ /* } */
+ /* if (target==DEDX_ALANINE) { */
+ /*    printf("i: %f %f %f %f %f    ", config->i_value,  */
+ /* 	   config->elements_i_value[0], */
+ /* 	   config->elements_i_value[1], */
+ /* 	   config->elements_i_value[2], */
+ /* 	   config->elements_i_value[3] */
+ /* 	   ); */
+ /* } */
+
+
   (*nr)++;
   free(config);
   return 0;
@@ -488,6 +514,7 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
   switch(target)
     {
     case DEDX_WATER:
+      config->compound_state = DEDX_CONDENSED;
       config->elements_id = calloc(2,sizeof(int));
       config->elements_id[0] = DEDX_HYDROGEN;
       config->elements_id[1] = DEDX_OXYGEN;
@@ -495,24 +522,29 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->elements_atoms[0] = 2;
       config->elements_atoms[1] = 1;
       config->elements_length = 2;
-      config->elements_i_value = calloc(2,sizeof(int));
+      config->elements_i_value = calloc(2,sizeof(float));
       config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
+      // TODO: is it sufficient to only specify one value?
+      // this should be mentioned in the README
       config->rho = 1.000;
       break;
     case DEDX_PMMA:
+      config->compound_state = DEDX_CONDENSED;
       config->elements_id = calloc(3,sizeof(int));
       config->elements_id[0] = DEDX_HYDROGEN;
       config->elements_id[1] = DEDX_CARBON;
-      config->elements_id[3] = DEDX_OXYGEN;
+      config->elements_id[2] = DEDX_OXYGEN;
       config->elements_atoms = calloc(3,sizeof(int));
       config->elements_atoms[0] = 8;
       config->elements_atoms[1] = 5;
       config->elements_atoms[2] = 2;
-      config->elements_i_value = calloc(3,sizeof(int));
+      config->elements_i_value = calloc(3,sizeof(float));
       config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
       config->elements_length = 3;
+      config->rho = 1.190;
       break;
     case DEDX_ALANINE:
+      config->compound_state = DEDX_CONDENSED;
       config->elements_id = calloc(4,sizeof(int));
       config->elements_id[0] = DEDX_HYDROGEN;
       config->elements_id[1] = DEDX_CARBON;
@@ -523,9 +555,13 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
       config->elements_atoms[1] = 3;
       config->elements_atoms[2] = 1;
       config->elements_atoms[3] = 2;
-      config->elements_i_value = calloc(4,sizeof(int));
+      config->elements_i_value = calloc(4,sizeof(float));
       config->elements_i_value[0] = 19.2; // override default val of 21.8 for compounds
+      config->elements_i_value[1] = 81.0;
+      config->elements_i_value[2] = 82.0; 
+      config->elements_i_value[3] = 106.0; 
       config->elements_length = 4;
+      config->rho = 1.230;
       break;
     default:
       fprintf(stderr,"error: bad target\n");
@@ -540,6 +576,8 @@ int test_stp_i(int *nr, int program, int ion, int target, float energy, float re
 	  dedx_get_material_name(target));
   
   test_run(TEST_STP,config,temp,energy,result,err_accept);
+  // TODO: could be nice if these could be probed
+  // printf("i: %f   ",config->i_value);
   (*nr)++;
   free(config);
   return 0;
