@@ -80,14 +80,14 @@ Energy range: 25 keV/u to 1 GeV/u
 Particles: See icru73_particle_targets
 Targets: See icru73_particle_targets
 
-BETHE: Bethe equation with Linhard-Scharff at lower energies.
+BETHE_EXT00: Bethe equation with Linhard-Scharff at lower energies. BETHE_EXT00 is optimized for particle therapy, i.e. works well at lower energies and lighter particles and targets. It is not recommended for heavy targets and heavy/fast ions. BETHE_EXT00 is the same algorithm used in SHIELD-HIT12A, but default I-values may vary.
+
 Energy range: 1 keV/u to 1 GeV/u
-Particles: Any
-Targets: Any
+Particles: Any, but will be most correct at light ions
+Targets: Any, but will be most correct at light targets
 
 For all data tables and equations it is possible to use Bragg's additivity rule,
 if a specific target is unavailable by default.
-
 
  
 -------------------------------------------------------------------------------
@@ -191,19 +191,30 @@ compound      : is set to TRUE by dedx_load_config(), if target was not found
 
 compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
 		aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
-		From version 1.2.1 the state parameter of the Bethe function will be
-                affected, but only in the case where element_id is specified and
-                element_i_value is not. This difference applies for elements which is 
-                naturally found in gas state, following ICRU49 recommendations. The
-                I-value is multiplied with 1.13 to get the liquid/solid I-value phase,
-                except for the following elements:
-		Hydrogen:	19.2 eV
+		From version 1.2.1 the state parameter (i.e. the I-values) 
+		of the Bethe function will be affected, but only in the case 
+		where element_id is specified and element_i_value is not. 
+		This difference applies for elements which is naturally found
+		in gas state, following ICRU49 recommendations. The I-value is 
+		multiplied with 1.13 to get the liquid/solid I-value phase,
+                except for the following elements, where these I-values are used in 
+		condensed phase:
+
+		Hydrogen:	21.8 eV
 		Carbon:		81 eV
 		Nitrogen:	82 eV
 		Oxygen:		106 eV
 		Fluor		112 eV
 		Chlorine	180 eV
 
+		ICRU49 is ambiguous here, since it also recommends to use 19.2 eV for
+		liquids	in table 2.11, which contradicts 21.8 eV from table 2.8. 
+		Moreover oxygen is stated as 95.0 eV in table 2.8 and 97 eV for gasses 
+		in table 2.11. Here, table 2.8 is used in case of ambiguous values,
+		since libdEdx does not discriminate between the I-values of elements 
+		and atomic constituents in compounds. If other values are needed they 
+		can be specified with the *elements_i_value parameter.
+		
 		When using MSTAR read the mstar_mode function carefully too.
 		The compound_state will apply equally to all constituents, when working
 		with compounds.
@@ -270,7 +281,7 @@ i_value        : if unspecified, then ICRU I-values are used for target
 	         compound. If target is set, or if target is 0, then it is 
 		 calculated from the individual i-values set in 
 		 *elements_i_value, but only when the *elements_i_value are empty,
-		 i.e. freshly initialized.
+		 i.e. uninitialized.
 
 *elements_mass_fraction: must be specified if target and elements_atoms is 
 			 left undefined. If both are specified, then only 
@@ -281,7 +292,9 @@ i_value        : if unspecified, then ICRU I-values are used for target
 
 *elements_i_value: if target is 0, then individual I-values of elements can 
 		   be specified here. If any values are found in 
-		   elements_i_value, then i_value is ignored.
+		   *elements_i_value, then i_value is ignored. Zero is not allowed. If any
+		   of the I-values are specified, then they must be specified for all 
+		   elements.
 
 As a minimum you should specify program, target and ion, i.e.
 

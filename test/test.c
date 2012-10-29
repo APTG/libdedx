@@ -463,8 +463,39 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
   config->program = program;
   config->ion = ion;
   config->target = target;
-  config->elements_i_value = calloc(4,sizeof(float)); 
-  // this will force libdEdx to use default I-values per element, which is what SH12A also does.
+
+  if (program==DEDX_BETHE_EXT00) {
+  switch(target)
+    {
+    case DEDX_WATER:
+      config->elements_i_value = calloc(2,sizeof(float));
+      config->elements_i_value[0] = 21.8; 
+      config->elements_i_value[1] = 106.0; 
+      config->rho = 1.000;
+      break;
+    case DEDX_PMMA:
+      config->elements_i_value = calloc(2,sizeof(float));
+      config->elements_i_value[0] = 21.8; 
+      config->elements_i_value[1] = 81.0; 
+      config->elements_i_value[2] = 106.0; 
+      config->elements_length = 3;
+      config->rho = 1.190;
+      break;
+    case DEDX_ALANINE:
+      config->elements_i_value = calloc(4,sizeof(float));
+      config->elements_i_value[0] = 21.8; // override libdEdx defaults
+      config->elements_i_value[1] = 81.0; // --"--
+      config->elements_i_value[2] = 82.0; // --"--
+      config->elements_i_value[3] = 106.0; // --"--
+      config->elements_length = 4;
+      config->rho = 1.230;
+      break;
+    default:
+      fprintf(stderr,"error: bad target\n");
+      exit(-1);
+    }
+  }
+
   sprintf(temp, "%3i - %s %.3e MeV/u %s on %s",
 	  *nr, 
 	  dedx_get_program_name(program),
@@ -475,29 +506,32 @@ int test_stp(int *nr, int program, int ion, int target, float energy, float resu
   test_run(TEST_STP,config,temp,energy,result,err_accept);
 
 
- /*  if (target==DEDX_WATER) { */
- /*    printf("i: %f %f %f          ", config->i_value, */
- /* 	   config->elements_i_value[0], */
- /* 	   config->elements_i_value[1] */
- /* 	   ); */
- /*  } */
+  if (program==DEDX_BETHE_EXT00) {
 
- /* if (target==DEDX_PMMA) { */
- /*    printf("i: %f %f %f %f       ", config->i_value, */
- /* 	   config->elements_i_value[0], */
- /* 	   config->elements_i_value[1], */
- /* 	   config->elements_i_value[2] */
- /* 	   ); */
- /* } */
- /* if (target==DEDX_ALANINE) { */
- /*    printf("i: %f %f %f %f %f    ", config->i_value, */
- /* 	   config->elements_i_value[0], */
- /* 	   config->elements_i_value[1], */
- /* 	   config->elements_i_value[2], */
- /* 	   config->elements_i_value[3] */
- /* 	   ); */
- /* } */
+    if (target==DEDX_WATER) {
+      printf("i: %f %f %f          ", config->i_value,
+	     config->elements_i_value[0],
+	     config->elements_i_value[1]
+	     );
+    }
 
+    if (target==DEDX_PMMA) {
+      printf("i: %f %f %f %f       ", config->i_value,
+	     config->elements_i_value[0],
+	     config->elements_i_value[1],
+	     config->elements_i_value[2]
+	     );
+    }
+    if (target==DEDX_ALANINE) {
+      printf("i: %f %f %f %f %f [%i]   ", config->i_value,
+	     config->elements_i_value[0],
+	     config->elements_i_value[1],
+	     config->elements_i_value[2],
+	     config->elements_i_value[3],
+	     config->elements_length
+	     );
+    }
+  }
 
   (*nr)++;
   free(config);

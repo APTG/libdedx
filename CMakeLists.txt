@@ -22,7 +22,7 @@ SET(CMAKE_FIND_ROOT_PATH /usr/bin)
 # The version number.
 set (DEDX_VERSION_MAJOR 1)
 set (DEDX_VERSION_MINOR 2)
-set (DEDX_VERSION_PATCH 0)
+set (DEDX_VERSION_PATCH 1)
 set (DEDX_WC_REVISION   0)
 # SVN will be 0 if not in Working Copy
 include(FindSubversion)
