@@ -34,11 +34,12 @@ void _evaluate_compound_state_mstar(dedx_config * config, int *err)
 			config->mstar_mode = 'd';
 
 	}
+	*err = 0;
 }
 
 void _dedx_convert_energy_to_mstar(stopping_data * in, stopping_data * out,char state,dedx_config * config, float * energy)
 {
-	int err = 0;
+  //	int err = 0;
 	if(state == 'a' || state == 'b')
 	{
 		if(config->compound_state)

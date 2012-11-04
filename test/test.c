@@ -28,11 +28,11 @@ int err;
 int main()
 {
 
-  float err_accept = 0.005; // accept 0.5 % deviation to either side
+  //float err_accept = 0.005; // accept 0.5 % deviation to either side
   dedx_config * config;
 
   int vmajor,vminor,vpatch,vsvn;
-  int i,counter = 1;
+  int counter = 1;
   float energy_grid[] = {0.07,1,10,78,1000};
 
   dedx_get_version(&vmajor,&vminor,&vpatch,&vsvn);

@@ -59,6 +59,8 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err)
 {
     int i = 0;
+    *err = 0;
+
     dedx_workspace * temp = malloc(sizeof(dedx_workspace));
 	if(temp == NULL)
 	{
@@ -82,6 +84,8 @@ dedx_workspace * dedx_allocate_workspace(unsigned int count, int *err)
 void dedx_free_workspace(dedx_workspace * workspace, int *err)
 {
 	int i = 0;
+	*err = 0;
+
 	for(i = 0; i < workspace->datasets; i++)
 	{
 		free(workspace->loaded_data[i]);
@@ -92,6 +96,8 @@ void dedx_free_workspace(dedx_workspace * workspace, int *err)
 int _dedx_load_data(dedx_workspace * ws, stopping_data * data, float * energy, int prog, int * err)
 {
     int active_dataset = ws->active_datasets;
+    *err = 0;
+
     _dedx_calculate_coefficients(ws->loaded_data[active_dataset]->base, energy, data->data, data->length);
     ws->loaded_data[active_dataset]->acc.cache = 0;
     ws->loaded_data[active_dataset]->n = data->length;
@@ -469,6 +475,9 @@ int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, in
 	int prog_load = prog;
 	int ion_load = ion;
 	int target_load = target;
+	
+	*err = 0;
+
 	if(prog == DEDX_ICRU){
 		if(ion == 1){
 			prog_load = _DEDX_0008;
@@ -540,7 +549,6 @@ int _dedx_find_data(stopping_data * data,dedx_config * config,float * energy, in
 }
 int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 {
-	*err = 0;
 	int i = 0;
 	int j = 0;
 	int length = config->elements_length;
@@ -551,6 +559,9 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 	int target;
 	stopping_data data;
 	stopping_data * compound_data = malloc(sizeof(stopping_data)*length);
+
+	*err = 0;
+
 	if(compound_data == NULL)
 	{
 		*err = 301;
@@ -597,7 +608,8 @@ int _dedx_load_compound(dedx_workspace * ws, dedx_config * config, int * err)
 
 int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energy, int * err)
 {
-	int i = 0;	
+	int i = 0;
+	*err = 0;
 	if(config->target > 99)
 	{
 		*err = 202;
@@ -630,6 +642,7 @@ int _dedx_load_bethe_2(stopping_data * data, dedx_config * config, float * energ
 }
 int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy, int * err)
 {
+        *err = 0;
 	return 0;
 }
 
@@ -638,6 +651,7 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 float dedx_get_stp(dedx_workspace * ws, dedx_config * config, float energy, int * err)
 {	
 	int id = config->cfg_id;
+	*err = 0;
 	//Check that the energy is inside the boundery
 	if((*err = _dedx_check_energy_bounds(ws->loaded_data[id],energy)) != 0)
 		return 0;
@@ -665,6 +679,7 @@ void dedx_free_config(dedx_config * config, int *err)
 			free(config->elements_i_value);
 		free(config);
 	}
+	*err = 0;
 }
 
 float dedx_get_simple_stp(int ion, int target, float energy, int *err)
