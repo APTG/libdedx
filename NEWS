@@ -1,3 +1,12 @@
+Changes in version 1.2.1 (9 Nov 2012)
+- MSTAR: Fix errors on custom compounds, #32
+- MSTAR: mode changed from h to g for hydrogen and helium
+- MSTAR: Fix error on Li target
+- Fix gas/condensed list for materials
+- README: updated and more verbose
+- test.c: updated
+- several other bug fixes
+
 Changes in version 1.2.0 (21 Jun 2012)
 - New API
 - Many bug fixes
@@ -9,13 +18,11 @@ Changes in version 1.2.0 (21 Jun 2012)
 - I-values can be overridden
 
 Changes in version 1.0.1 (10 Jan 2011)
-
 - Fix missing dedx_build_bin.c in source package.
 - Fix install error due to missing ESTAR data.
 - Fix small error in dedx_get_verion
 
 Changes in version 1.0.0 (05 Jan 2011)
-
 - Added Bethe algorithm
 - Added more examples of how to use library
 - Added installer
@@ -37,5 +44,4 @@ Changes in version 1.0.0 (05 Jan 2011)
 - Fixed namespace of all constants, prefixed with DEDX_
 
 Changes in version 0.10.0 (05 Nov 2010)
-
 - First prerelease for testing
