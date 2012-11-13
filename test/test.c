@@ -53,7 +53,7 @@ int main()
   test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_WATER,energy_grid[4],2.211e0);
 
   test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_PMMA,energy_grid[0],9.319e2);
-  test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_PMMA,energy_grid[1],2.520e2);
+  test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_PMMA,energy_grid[1],2.530e2);
   test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_PMMA,energy_grid[2],4.450e1);
   test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_PMMA,energy_grid[3],8.558e0);
   test_stp(&counter,DEDX_PSTAR,DEDX_PROTON,DEDX_PMMA,energy_grid[4],2.145e0);
