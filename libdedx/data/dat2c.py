@@ -7,7 +7,7 @@
 
 import numpy as np
 
-def write2d(_data, _name, _bsize, _nsize): #
+def write2d(_data, _name, _bsize, _nsize,_type="float"): #
     i = 1
     j = 0
     k = 1
@@ -33,7 +33,10 @@ def write2d(_data, _name, _bsize, _nsize): #
         if j >= _bsize:
             # check if end of data
             if k >= _size:
-                print ("%8.5e}" %x) # foobar
+                if _type == "float":
+                    print ("%8.5e}" %x) # foobar
+                if _type == "int" :
+                    print ("%3i}" %x) #
                 print "};"
                 return
 
@@ -43,7 +46,10 @@ def write2d(_data, _name, _bsize, _nsize): #
             i = 0
         else:
         # print the data
-            print ("%8.5e," %x), # foobar
+            if _type == "float":
+                print ("%8.5e," %x), # foobar
+            if _type == "int" :
+                print ("%3i" %x), #                
         j += 1
 
         # check if end of data
@@ -60,7 +66,7 @@ def write2d(_data, _name, _bsize, _nsize): #
         i += 1
 
 
-def write1d(_data, _name, _bsize): # 
+def write1d(_data, _name, _bsize, _type="float"): # 
 
     # _data:  linear data array
     # _name:  name of varioable
@@ -79,12 +85,18 @@ def write1d(_data, _name, _bsize): #
 
         # check if end of block
         if j >= _bsize:
-            print ("%8.5e};" %x) # foobar
+            if _type == "float":
+                print ("%8.5e};" %x) # foobar
+            if _type == "int":
+                print ("%3i};" %x) # foobar
             print ""
             return
         else:
         # print the data
-            print ("%8.5e," %x), # foobar
+            if _type == "int":
+                print ("%3i," %x), # foobar
+            if _type == "float":
+                print ("%8.5e," %x), # foobar
         j += 1
 
 
@@ -144,5 +156,45 @@ def write1d(_data, _name, _bsize): #
 #write2d(data,"static const float icru_astar",122,74)
    
 ### BETHE energy grid (what is this used for anyway?)  ###
-data = np.loadtxt("betheEng.dat")
-write1d(data[1:],"static const float bethe_energy",122)
+#data = np.loadtxt("betheEng.dat")
+#write1d(data[1:],"static const float bethe_energy",122)
+
+### COMPOSITION ###
+data  = [] # array holding ICRU compound ID
+nele  = [] # number of elements for corresponding compound
+cindx = [] # array index for compound
+cdata_elem = [] # long array with all elements, pointer cindx needed to access
+cdata_frac = [] # long array with all fractions, pointer cindx needed to access
+
+
+lines = open("composition",'r').readlines()
+i = 0
+j = 0
+
+for line in lines:
+    if line[0] == "#":
+        data.append(int(line[1:]))
+        i = 0
+        cindx.append(j) # start index of each new element
+
+        
+
+    if line[0] == "\n":
+        nele.append(i)
+
+
+    if (line[0].isdigit()):        
+        i += 1
+        j += 1
+        cdata_elem.append(int(line.split(":")[0]))
+        cdata_frac.append(float(line.split(":")[1]))
+
+# need to manually add the last element since CR is missing at end of file.
+nele.append(i)
+
+write1d(data,"static const int _dedx_compos_list", len(data), "int")
+write1d(nele,"static const int _dedx_compos_nele", len(nele), "int")
+write1d(cindx,"static const int _dedx_compos_cindx", len(nele), "int")
+write1d(cdata_elem,"static const int _dedx_compos_elem", len(cdata_elem), "int")
+write1d(cdata_frac,"static const float _dedx_compos_frac", len(cdata_frac), "float")
+
