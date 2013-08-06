@@ -8,21 +8,21 @@ main: $(obj)
 
 all:
 	main
-	
+
 exec:
 	./dedx2trip
 	cat ./output/report.txt
-	
+
 clean:
 	rm -f $(obj)  report.txt core*
 	clear
-	
+
 plot:	
 	cp ./output/trip_out.dedx ./testing/trip_out.dedx
 	./testing/testprocedure
 	clear
 
-	
+
 clean-plot:
 	rm -f ./testing/plot.plt ./testing/plot.pdf
-		
+
