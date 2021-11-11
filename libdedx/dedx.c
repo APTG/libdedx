@@ -408,7 +408,7 @@ int _dedx_check_ion(int prog, int ion) {
 			return 1;
 	}
 
-	dedx_get_ion_list(ion_list, prog);
+	dedx_get_ion_list(prog, ion_list);
 	while (ion_list[i] != -1) {
 		if (ion_list[i] == ion)      
 			return 1;
