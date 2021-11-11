@@ -243,29 +243,46 @@ float dedx_get_i_value(int target, int *err)
 	return _dedx_get_i_value(target,DEDX_GAS,err);
 }
 
-const int * dedx_get_program_list(void) {
-	/* returns a list of available programs, terminated with -1 */
-	return dedx_available_programs;
-}
-const int * dedx_get_material_list(int program) {
-  /* returns a list of available materials, terminated with -1 */
-  if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT)
-    return dedx_program_available_materials[0];
-  else
-    return dedx_program_available_materials[program];
+void dedx_get_program_list(int *program_list) {
+    int i = 0;
+    while(dedx_available_programs[i] != -1){
+        program_list[i] = dedx_available_programs[i];
+        i++;
+    }
+    program_list[i] = -1;
 }
 
-const int * dedx_get_ion_list(int program) {
-	/* returns a list of available ions, terminated with -1 */
-  if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */    
-    static int temp[113],i; 
-    for (i=0;i<112;i++)
-      temp[i]=i+1;
-    temp[112]=-1; // stopper
-    return temp;  // TODO: Hey Jakob, er det her lovligt eller et nyt mem leak?
-  }
-  else
-    return dedx_program_available_ions[program];
+void dedx_get_material_list(int *material_list, int program) {
+    int i = 0;
+    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {
+        while(dedx_program_available_materials[program][i] != -1){
+            material_list[i] = dedx_program_available_materials[0][i];
+            i++;
+        }
+    }
+    else {
+        while(dedx_program_available_materials[program][i] != -1){
+            material_list[i] = dedx_program_available_materials[program][i];
+            i++;
+        }
+    }
+    material_list[i] = -1;
+}
+void dedx_get_ion_list(int * ion_list, int program) {
+    int i = 0;
+    /* returns a list of available ions, terminated with -1 */
+    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */
+        for (i=0;i<112;i++)
+            ion_list[i]=i+1;
+        ion_list[112]=-1; // stopper
+    }
+    else {
+        while(dedx_program_available_ions[program][i] != -1){
+            ion_list[i] = dedx_program_available_ions[program][i];
+            i++;
+        }
+        ion_list[i] = -1;
+    }
 }
 
 float dedx_get_min_energy(int program, int ion) {
@@ -391,7 +408,7 @@ int _dedx_check_ion(int prog, int ion) {
 			return 1;
 	}
 
-	ion_list = dedx_get_ion_list(prog);
+	dedx_get_ion_list(ion_list, prog);
 	while (ion_list[i] != -1) {
 		if (ion_list[i] == ion)      
 			return 1;
