@@ -134,8 +134,8 @@ void dedx_get_composition(int target, float composition[][2],
 float dedx_get_i_value(int target, int *err);
 
 void  dedx_get_program_list(int * program_list);
-void dedx_get_material_list(int * material_list, int program);
-void dedx_get_ion_list(int * ion_list, int program);
+void dedx_get_material_list(int program, int * material_list);
+void dedx_get_ion_list(int program, int * ion_list);
 float dedx_get_min_energy(int program, int ion);
 float dedx_get_max_energy(int program, int ion);
 typedef struct

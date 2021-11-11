@@ -252,7 +252,7 @@ void dedx_get_program_list(int *program_list) {
     program_list[i] = -1;
 }
 
-void dedx_get_material_list(int *material_list, int program) {
+void dedx_get_material_list(int program, int *material_list) {
     int i = 0;
     if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {
         while(dedx_program_available_materials[program][i] != -1){
@@ -268,7 +268,7 @@ void dedx_get_material_list(int *material_list, int program) {
     }
     material_list[i] = -1;
 }
-void dedx_get_ion_list(int * ion_list, int program) {
+void dedx_get_ion_list(int program, int * ion_list) {
     int i = 0;
     /* returns a list of available ions, terminated with -1 */
     if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */
