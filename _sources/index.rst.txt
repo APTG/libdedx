@@ -366,3 +366,37 @@ carbon which also contains C-13 and C-14.
 	config->elements_atoms[1] = 1;
 	config->elements_length = 2;
 
+****************
+5. Release notes
+****************
+
+Version: 1.2.1
+==============
+
+Changes:
+ - several bug fixes regarding the state of the compound when using Bragg's rule.
+ - better testing of library
+ - completed the ICRU material list on which elements is on the gas phase, see
+   Appendix 
+
+Version: 1.2
+============
+Changes:
+ - New API, which should be more stable for future enhancements
+ - I-values can be specified for compounds
+ - bound checking
+ - functions for compound data look-up, version number and energy bounds
+ - dedx_tools.h for inverse look-ups
+ - should be thread-safe
+ - bug fixes
+ - memory leak fixes
+ - Python bindings
+Known limitations:
+ - ESTAR is still not implemented.
+
+Version 1.0.1
+=============
+Known limitations:
+ - ESTAR is not implemented
+ - WIN32/MINGW build not tested, this will be a UNIX/LINUX only release.
+ - Bethe function: I-value can only be set for elements, not compounds.

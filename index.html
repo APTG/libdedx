@@ -42,6 +42,13 @@
 <li><p><a class="reference internal" href="#data-available" id="id4">2. Data available</a></p></li>
 <li><p><a class="reference internal" href="#installation" id="id5">3. Installation</a></p></li>
 <li><p><a class="reference internal" href="#use" id="id6">4. Use</a></p></li>
+<li><p><a class="reference internal" href="#release-notes" id="id7">5. Release notes</a></p>
+<ul>
+<li><p><a class="reference internal" href="#version-1-2-1" id="id8">Version: 1.2.1</a></p></li>
+<li><p><a class="reference internal" href="#version-1-2" id="id9">Version: 1.2</a></p></li>
+<li><p><a class="reference internal" href="#version-1-0-1" id="id10">Version 1.0.1</a></p></li>
+</ul>
+</li>
 </ul>
 </div>
 <section id="license-and-disclaimer">
@@ -455,6 +462,53 @@ can specify the I-value manually for the BETHE-type algorithms:</p></li>
 <span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
 </pre></div>
 </div>
+</section>
+<section id="release-notes">
+<h2>5. Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
+<section id="version-1-2-1">
+<h3>Version: 1.2.1<a class="headerlink" href="#version-1-2-1" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Changes:</dt><dd><ul class="simple">
+<li><p>several bug fixes regarding the state of the compound when using Bragg’s rule.</p></li>
+<li><p>better testing of library</p></li>
+<li><p>completed the ICRU material list on which elements is on the gas phase, see
+Appendix</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-1-2">
+<h3>Version: 1.2<a class="headerlink" href="#version-1-2" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Changes:</dt><dd><ul class="simple">
+<li><p>New API, which should be more stable for future enhancements</p></li>
+<li><p>I-values can be specified for compounds</p></li>
+<li><p>bound checking</p></li>
+<li><p>functions for compound data look-up, version number and energy bounds</p></li>
+<li><p>dedx_tools.h for inverse look-ups</p></li>
+<li><p>should be thread-safe</p></li>
+<li><p>bug fixes</p></li>
+<li><p>memory leak fixes</p></li>
+<li><p>Python bindings</p></li>
+</ul>
+</dd>
+<dt>Known limitations:</dt><dd><ul class="simple">
+<li><p>ESTAR is still not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-1-0-1">
+<h3>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Known limitations:</dt><dd><ul class="simple">
+<li><p>ESTAR is not implemented</p></li>
+<li><p>WIN32/MINGW build not tested, this will be a UNIX/LINUX only release.</p></li>
+<li><p>Bethe function: I-value can only be set for elements, not compounds.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 </section>
 </section>
 
