@@ -49,6 +49,10 @@
 <li><p><a class="reference internal" href="#version-1-0-1" id="id10">Version 1.0.1</a></p></li>
 </ul>
 </li>
+<li><p><a class="reference internal" href="#a-1-api" id="id11">A.1 API</a></p></li>
+<li><p><a class="reference internal" href="#a-2-error-codes" id="id12">A.2 Error codes</a></p></li>
+<li><p><a class="reference internal" href="#a-3-additional-lists" id="id13">A.3 Additional lists</a></p></li>
+<li><p><a class="reference internal" href="#a-4-additional-notes" id="id14">A.4 Additional notes</a></p></li>
 </ul>
 </div>
 <section id="license-and-disclaimer">
@@ -510,9 +514,8 @@ Appendix</p></li>
 </dl>
 </section>
 </section>
-</section>
 <section id="a-1-api">
-<h1>A.1 API<a class="headerlink" href="#a-1-api" title="Permalink to this headline">¶</a></h1>
+<h2>A.1 API<a class="headerlink" href="#a-1-api" title="Permalink to this headline">¶</a></h2>
 <p>List of functions available in dedx.h:</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span> <span class="o">*</span> <span class="nf">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
 <span class="kt">void</span>             <span class="nf">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
@@ -542,7 +545,7 @@ Appendix</p></li>
 </div>
 </section>
 <section id="a-2-error-codes">
-<h1>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Permalink to this headline">¶</a></h1>
+<h2>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>1-100 IO error</p></li>
 <li><p>101-200 Out of bounds errors</p></li>
@@ -571,8 +574,8 @@ Appendix</p></li>
 </ul>
 </section>
 <section id="a-3-additional-lists">
-<h1>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Permalink to this headline">¶</a></h1>
-<p>All names can be prefixed with <a href="#id11"><span class="problematic" id="id12">DEDX_</span></a></p>
+<h2>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Permalink to this headline">¶</a></h2>
+<p>All names can be prefixed with <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code></p>
 <p>List all known data tables and algorithms:</p>
 <div class="line-block">
 <div class="line-block">
@@ -1157,7 +1160,7 @@ via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span
 </div>
 </section>
 <section id="a-4-additional-notes">
-<h1>A.4 Additional notes<a class="headerlink" href="#a-4-additional-notes" title="Permalink to this headline">¶</a></h1>
+<h2>A.4 Additional notes<a class="headerlink" href="#a-4-additional-notes" title="Permalink to this headline">¶</a></h2>
 <p>To build a tarball:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>libdedx/build$ make package_source
 </pre></div>
@@ -1166,6 +1169,7 @@ via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>libdedx/build cpack -G DEB
 </pre></div>
 </div>
+</section>
 </section>
 
 
