@@ -2,6 +2,8 @@
 This is libdEdx
 ===============
 
+.. contents:: Table of Contents
+
 *************************
 0. License and disclaimer
 *************************
