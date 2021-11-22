@@ -77,3 +77,20 @@ A web front end is available on http://dedx.au.dk
    :Targets: Any, but will be most correct at light targets
 
 For all data tables and equations, it is possible to use Bragg's additivity rule, if a specific target is unavailable by default.
+
+***************
+3. Installation
+***************
+
+See the INSTALL file.
+
+******
+4. Use
+******
+
+UNITS: Energies are always in terms of MeV/nucleon, except for ESTAR, where the electron energy must be specified in terms of MeV. The resulting mass stopping power is in MeV cm2/g.
+
+Stopping power values can be retrieved in two different ways: 
+
+1. a simple method for simple implementation, 
+2. a bit more complicated way, but more suitable for fast and multithreaded applications.
