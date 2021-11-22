@@ -1,3 +1,0 @@
-These are the files making stopping power table in TRiP98 readable format from libdEdx
-
-dedx2trip produces the new files using ranges.h, which calculates the CSDA-range by using the integration found in adapt.
