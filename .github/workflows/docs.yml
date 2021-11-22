@@ -1,4 +1,4 @@
-name: Github Pages
+name: Automated actions
 
 on: [push]
 
@@ -15,6 +15,10 @@ jobs:
       with:
         documentation_path: docs/source
     - name: Push changes to gh-pages branch
+      # this action is being triggered:
+      #  - on master branch
+      #  - on release tags (named v*)
+      #if: "github.ref == 'refs/heads/master' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
