@@ -511,6 +511,36 @@ Appendix</p></li>
 </section>
 </section>
 </section>
+<section id="a-1-api">
+<h1>A.1 API<a class="headerlink" href="#a-1-api" title="Permalink to this headline">¶</a></h1>
+<p>List of functions available in dedx.h:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span> <span class="o">*</span> <span class="nf">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span>             <span class="nf">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span>             <span class="nf">dedx_free_workspace</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span>             <span class="nf">dedx_get_composition</span><span class="p">(</span><span class="kt">int</span> <span class="n">target</span><span class="p">,</span> <span class="kt">float</span> <span class="n">composition</span><span class="p">[][</span><span class="mi">2</span><span class="p">],</span>
+                          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">comp_len</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span>             <span class="nf">dedx_get_error_code</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">err_str</span><span class="p">,</span> <span class="kt">int</span> <span class="n">err</span><span class="p">);</span>
+<span class="kt">float</span>            <span class="nf">dedx_get_i_value</span><span class="p">(</span><span class="kt">int</span> <span class="n">target</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span>      <span class="nf">dedx_get_ion_list</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_ion_name</span><span class="p">(</span><span class="kt">int</span> <span class="n">ion</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span>      <span class="nf">dedx_get_material_list</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_material_name</span><span class="p">(</span><span class="kt">int</span> <span class="n">material</span><span class="p">);</span>
+<span class="kt">float</span>            <span class="nf">dedx_get_min_energy</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ion</span><span class="p">);</span>
+<span class="kt">float</span>            <span class="nf">dedx_get_max_energy</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ion</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span>      <span class="nf">dedx_get_program_list</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_program_name</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_program_version</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
+<span class="kt">float</span>            <span class="nf">dedx_get_simple_stp</span><span class="p">(</span><span class="kt">int</span> <span class="n">ion</span><span class="p">,</span> <span class="kt">int</span> <span class="n">target</span><span class="p">,</span> <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span>
+                                   <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">float</span>            <span class="nf">dedx_get_stp</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span>
+                            <span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span>
+                            <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span>             <span class="nf">dedx_get_version</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">major</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">minor</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">patch</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">svn</span><span class="p">);</span>
+<span class="kt">void</span>             <span class="nf">dedx_load_config</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span>
+                                <span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 
 
           </div>
