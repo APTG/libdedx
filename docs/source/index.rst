@@ -2,8 +2,8 @@
 This is libdEdx
 ===============
 
-.. contents::
-   :local: Table of Contents
+.. contents:: Table of Contents
+   :local: 
    :backlinks: none
 
 
