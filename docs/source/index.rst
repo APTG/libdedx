@@ -401,9 +401,9 @@ Known limitations:
  - WIN32/MINGW build not tested, this will be a UNIX/LINUX only release.
  - Bethe function: I-value can only be set for elements, not compounds.
 
-=======
+*******
 A.1 API
-=======
+*******
 
 List of functions available in dedx.h:
 
@@ -434,9 +434,9 @@ List of functions available in dedx.h:
   void             dedx_load_config(dedx_workspace *ws, 
 		                  dedx_config *config, int *err);
 
-===============
+***************
 A.2 Error codes
-===============
+***************
 
 - 1-100 IO error
 - 101-200 Out of bounds errors
@@ -466,10 +466,10 @@ A.2 Error codes
 - 209 Mass of ion (ion_a) must be specified in this configuration.
 - 210 I value must be larger than zero.
 
-====================
+********************
 A.3 Additional lists
-====================
-All names can be prefixed with DEDX_
+********************
+All names can be prefixed with ``DEDX_``
 
 List all known data tables and algorithms:
 
@@ -1044,9 +1044,9 @@ via the ``DEDX_`` prefix. However, there are occasionally small variations in th
   #define DEDX_CAESIUM  DEDX_CESIUM
 
 
-====================
+********************
 A.4 Additional notes
-====================
+********************
 
 
 To build a tarball:
