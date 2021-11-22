@@ -1,0 +1,4 @@
+tasks:
+  - init: |
+      pip install sphinx
+      pip install -r docs/source/requirements.txt
