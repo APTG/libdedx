@@ -1003,6 +1003,169 @@ Appendix</p></li>
 <div class="line">278: XYLENE</div>
 <div class="line">906: GRAPHITE</div>
 </div>
+<p>List of elements and compounds which are on gas phase by default:</p>
+<div class="line-block">
+<div class="line-block">
+<div class="line-block">
+<div class="line">1: HYDROGEN</div>
+<div class="line">2: HELIUM</div>
+<div class="line">7: NITROGEN</div>
+<div class="line">8: OXYGEN</div>
+<div class="line">9: FLUORINE</div>
+</div>
+<div class="line">10: NEON</div>
+<div class="line">17: CHLORINE</div>
+<div class="line">18: ARGON</div>
+<div class="line">36: KRYPTON</div>
+<div class="line">54: XENON</div>
+<div class="line">86: RADON</div>
+</div>
+<div class="line">101: ACETYLENE</div>
+<div class="line">104: AIR</div>
+<div class="line">108: AMMONIA</div>
+<div class="line">124: BUTANE</div>
+<div class="line">134: CARBONDIOXIDE</div>
+<div class="line">152: ETHANE</div>
+<div class="line">155: ETHYLENE</div>
+<div class="line">161: FREON_12</div>
+<div class="line">162: FREON_12B2</div>
+<div class="line">163: FREON_13</div>
+<div class="line">164: FREON_13B1</div>
+<div class="line">165: FREON_13I1</div>
+<div class="line">197: METHANE</div>
+<div class="line">207: NITROUSOXIDE</div>
+<div class="line">238: PROPANE</div>
+<div class="line">263: TISSUE_EQUIVALENTGAS_METHANEBASED</div>
+<div class="line">264: TISSUE_EQUIVALENTGAS_PROPANEBASED</div>
+<div class="line">277: WATERVAPOR</div>
+</div>
+<p>In your computer code, all materials and ions can also be accessed by their name
+via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code> prefix. However, there are occasionally small variations in the naming scheme. Enums are defined in <code class="docutils literal notranslate"><span class="pre">dedx.h</span></code>, but are listed here for convenience:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_ASTAR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">DEDX_PSTAR</span><span class="p">,</span> <span class="n">DEDX_ESTAR</span><span class="p">,</span>
+      <span class="n">DEDX_MSTAR</span><span class="p">,</span> <span class="n">DEDX_ICRU73_OLD</span><span class="p">,</span> <span class="n">DEDX_ICRU73</span><span class="p">,</span> <span class="n">DEDX_ICRU49</span><span class="p">,</span> <span class="n">_DEDX_0008</span><span class="p">,</span>
+      <span class="n">DEDX_ICRU</span><span class="p">,</span> <span class="n">DEDX_DEFAULT</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">};</span>
+
+<span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_DEFAULT_STATE</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">DEDX_GAS</span><span class="p">,</span><span class="n">DEDX_CONDENSED</span><span class="p">};</span>
+
+<span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_HYDROGEN</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">DEDX_HELIUM</span><span class="p">,</span> <span class="n">DEDX_LITHIUM</span><span class="p">,</span> <span class="n">DEDX_BERYLLIUM</span><span class="p">,</span> <span class="n">DEDX_BORON</span><span class="p">,</span>
+      <span class="n">DEDX_CARBON</span><span class="p">,</span> <span class="n">DEDX_GRAPHITE</span><span class="o">=</span><span class="mi">906</span><span class="p">,</span> <span class="n">DEDX_NITROGEN</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">DEDX_OXYGEN</span><span class="p">,</span>
+      <span class="n">DEDX_FLUORINE</span><span class="p">,</span> <span class="n">DEDX_NEON</span><span class="p">,</span> <span class="n">DEDX_SODIUM</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM</span><span class="p">,</span>
+      <span class="n">DEDX_ALUMINUM</span><span class="p">,</span> <span class="n">DEDX_SILICON</span><span class="p">,</span> <span class="n">DEDX_PHOSPHORUS</span><span class="p">,</span> <span class="n">DEDX_SULFUR</span><span class="p">,</span>
+      <span class="n">DEDX_CHLORINE</span><span class="p">,</span> <span class="n">DEDX_ARGON</span><span class="p">,</span> <span class="n">DEDX_POTASSIUM</span><span class="p">,</span> <span class="n">DEDX_CALCIUM</span><span class="p">,</span> <span class="n">DEDX_SCANDIUM</span><span class="p">,</span>
+      <span class="n">DEDX_TITeANIUM</span><span class="p">,</span> <span class="n">DEDX_VANADIUM</span><span class="p">,</span> <span class="n">DEDX_CHROMIUM</span><span class="p">,</span> <span class="n">DEDX_MANGANESE</span><span class="p">,</span> <span class="n">DEDX_IRON</span><span class="p">,</span>
+      <span class="n">DEDX_COBALT</span><span class="p">,</span> <span class="n">DEDX_NICKEL</span><span class="p">,</span> <span class="n">DEDX_COPPER</span><span class="p">,</span> <span class="n">DEDX_ZINC</span><span class="p">,</span> <span class="n">DEDX_GALLIUM</span><span class="p">,</span>
+      <span class="n">DEDX_GERMANIUM</span><span class="p">,</span> <span class="n">DEDX_ARSENIC</span><span class="p">,</span> <span class="n">DEDX_SELENIUM</span><span class="p">,</span> <span class="n">DEDX_BROMINE</span><span class="p">,</span> <span class="n">DEDX_KRYPTON</span><span class="p">,</span>
+      <span class="n">DEDX_RUBIDIUM</span><span class="p">,</span> <span class="n">DEDX_STRONTIUM</span><span class="p">,</span> <span class="n">DEDX_YTTRIUM</span><span class="p">,</span> <span class="n">DEDX_ZIRCONIUM</span><span class="p">,</span> <span class="n">DEDX_NIOBIUM</span><span class="p">,</span>
+      <span class="n">DEDX_MOLYBDENUM</span><span class="p">,</span> <span class="n">DEDX_TECHNETIUM</span><span class="p">,</span> <span class="n">DEDX_RUTHENIUM</span><span class="p">,</span> <span class="n">DEDX_RHODIUM</span><span class="p">,</span>
+      <span class="n">DEDX_PALLADIUM</span><span class="p">,</span> <span class="n">DEDX_SILVER</span><span class="p">,</span> <span class="n">DEDX_CADMIUM</span><span class="p">,</span> <span class="n">DEDX_INDIUM</span><span class="p">,</span> <span class="n">DEDX_TIN</span><span class="p">,</span>
+      <span class="n">DEDX_ANTIMONY</span><span class="p">,</span> <span class="n">DEDX_TELLURIUM</span><span class="p">,</span> <span class="n">DEDX_IODINE</span><span class="p">,</span> <span class="n">DEDX_XENON</span><span class="p">,</span> <span class="n">DEDX_CESIUM</span><span class="p">,</span>
+      <span class="n">DEDX_BARIUM</span><span class="p">,</span> <span class="n">DEDX_LANTHANUM</span><span class="p">,</span> <span class="n">DEDX_CERIUM</span><span class="p">,</span> <span class="n">DEDX_PRASEODYMIUM</span><span class="p">,</span>
+      <span class="n">DEDX_NEODYMIUM</span><span class="p">,</span> <span class="n">DEDX_PROMETHIUM</span><span class="p">,</span> <span class="n">DEDX_SAMARIUM</span><span class="p">,</span> <span class="n">DEDX_EUROPIUM</span><span class="p">,</span>
+      <span class="n">DEDX_GADOLINIUM</span><span class="p">,</span> <span class="n">DEDX_TERBIUM</span><span class="p">,</span> <span class="n">DEDX_DYSPROSIUM</span><span class="p">,</span> <span class="n">DEDX_HOLMIUM</span><span class="p">,</span>
+      <span class="n">DEDX_ERBIUM</span><span class="p">,</span> <span class="n">DEDX_THULIUM</span><span class="p">,</span> <span class="n">DEDX_YTTERBIUM</span><span class="p">,</span> <span class="n">DEDX_LUTETIUM</span><span class="p">,</span> <span class="n">DEDX_HAFNIUM</span><span class="p">,</span>
+      <span class="n">DEDX_TANTALUM</span><span class="p">,</span> <span class="n">DEDX_TUNGSTEN</span><span class="p">,</span> <span class="n">DEDX_RHENIUM</span><span class="p">,</span> <span class="n">DEDX_OSMIUM</span><span class="p">,</span> <span class="n">DEDX_IRIDIUM</span><span class="p">,</span>
+      <span class="n">DEDX_PLATINUM</span><span class="p">,</span> <span class="n">DEDX_GOLD</span><span class="p">,</span> <span class="n">DEDX_MERCURY</span><span class="p">,</span> <span class="n">DEDX_THALLIUM</span><span class="p">,</span> <span class="n">DEDX_LEAD</span><span class="p">,</span>
+      <span class="n">DEDX_BISMUTH</span><span class="p">,</span> <span class="n">DEDX_POLONIUM</span><span class="p">,</span> <span class="n">DEDX_ASTATINE</span><span class="p">,</span> <span class="n">DEDX_RADON</span><span class="p">,</span> <span class="n">DEDX_FRANCIUM</span><span class="p">,</span>
+      <span class="n">DEDX_RADIUM</span><span class="p">,</span> <span class="n">DEDX_ACTINIUM</span><span class="p">,</span> <span class="n">DEDX_THORIUM</span><span class="p">,</span> <span class="n">DEDX_PROTACTINIUM</span><span class="p">,</span>
+      <span class="n">DEDX_URANIUM</span><span class="p">,</span> <span class="n">DEDX_NEPTUNIUM</span><span class="p">,</span> <span class="n">DEDX_PLUTONIUM</span><span class="p">,</span> <span class="n">DEDX_AMERICIUM</span><span class="p">,</span>
+      <span class="n">DEDX_CURIUM</span><span class="p">,</span> <span class="n">DEDX_BERKELIUM</span><span class="p">,</span> <span class="n">DEDX_CALIFORNIUM</span><span class="p">,</span>
+      <span class="n">DEDX_A150_TISSUE_EQUIVALENT_PLASTIC</span><span class="p">,</span> <span class="n">DEDX_ACETONE</span><span class="p">,</span> <span class="n">DEDX_ACETYLENE</span><span class="p">,</span>
+      <span class="n">DEDX_ADENINE</span><span class="p">,</span> <span class="n">DEDX_ADIPOSE_TISSUE_ICRP</span><span class="p">,</span> <span class="n">DEDX_AIR_DRY_NEAR_SEA_LEVEL</span><span class="p">,</span>
+      <span class="n">DEDX_ALANINE</span><span class="p">,</span> <span class="n">DEDX_ALUMINUMOXIDE</span><span class="p">,</span> <span class="n">DEDX_AMBER</span><span class="p">,</span> <span class="n">DEDX_AMMONIA</span><span class="p">,</span> <span class="n">DEDX_ANILINE</span><span class="p">,</span>
+      <span class="n">DEDX_ANTHRACENE</span><span class="p">,</span> <span class="n">DEDX_B100</span><span class="p">,</span> <span class="n">DEDX_BAKELITE</span><span class="p">,</span> <span class="n">DEDX_BARIUM_FLUORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_BARIUM_SULFATE</span><span class="p">,</span> <span class="n">DEDX_BENZENE</span><span class="p">,</span> <span class="n">DEDX_BERYLLIUM_OXIDE</span><span class="p">,</span>
+      <span class="n">DEDX_BISMUTH_GERMANIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_BLOOD_ICRP</span><span class="p">,</span> <span class="n">DEDX_BONE_COMPACT_ICRU</span><span class="p">,</span>
+      <span class="n">DEDX_BONE_CORTICAL_ICRP</span><span class="p">,</span> <span class="n">DEDX_BORON_CARBIDE</span><span class="p">,</span> <span class="n">DEDX_BORON_OXIDE</span><span class="p">,</span>
+      <span class="n">DEDX_BRAIN_ICRP</span><span class="p">,</span> <span class="n">DEDX_BUTANE</span><span class="p">,</span> <span class="n">DEDX_N_BUTYLALCOHOL</span><span class="p">,</span>
+      <span class="n">DEDX_C552_AIR_EQUIVALENT_PLASTIC</span><span class="p">,</span> <span class="n">DEDX_CADMIUM_TELLURIDE</span><span class="p">,</span>
+      <span class="n">DEDX_CADMIUM_TUNGSTATE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_CARBONATE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_FLUORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_CALCIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_SULFATE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_TUNGSTATE</span><span class="p">,</span>
+      <span class="n">DEDX_CARBON_DIOXIDE</span><span class="p">,</span> <span class="n">DEDX_CARBON_TETRACHLORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_CELLULOSE_ACETATE_CELLOPHANE</span><span class="p">,</span> <span class="n">DEDX_CELLULOSE_ACETATE_BUTYRATE</span><span class="p">,</span>
+      <span class="n">DEDX_CELLULOSE_NITRATE</span><span class="p">,</span> <span class="n">DEDX_CERIC_SULFATE_DOSIMETER_SOLUTION</span><span class="p">,</span>
+      <span class="n">DEDX_CESIUM_FLUORIDE</span><span class="p">,</span> <span class="n">DEDX_CESIUM_IODIDE</span><span class="p">,</span> <span class="n">DEDX_CHLORO_BENZENE</span><span class="p">,</span>
+      <span class="n">DEDX_CHLOROFORM</span><span class="p">,</span> <span class="n">DEDX_CONCRETE_PORTLAND</span><span class="p">,</span> <span class="n">DEDX_CYCLOHEXANE</span><span class="p">,</span>
+      <span class="n">DEDX_DICHLOROBENZENE</span><span class="p">,</span> <span class="n">DEDX_DICHLORODIETHYL_ETHER</span><span class="p">,</span> <span class="n">DEDX_DICHLOROETHANE</span><span class="p">,</span>
+      <span class="n">DEDX_DIETHYLETHER</span><span class="p">,</span> <span class="n">DEDX_N_N_DIMETHYL_FORMAMIDE</span><span class="p">,</span> <span class="n">DEDX_DIMETHYL_SULFOXIDE</span><span class="p">,</span>
+      <span class="n">DEDX_ETHANE</span><span class="p">,</span> <span class="n">DEDX_ETHYL_ALCOHOL</span><span class="p">,</span> <span class="n">DEDX_ETHYL_CELLULOSE</span><span class="p">,</span> <span class="n">DEDX_ETHYLENE</span><span class="p">,</span>
+      <span class="n">DEDX_EYE_LENS_ICRP</span><span class="p">,</span> <span class="n">DEDX_FERRIC_OXIDE</span><span class="p">,</span> <span class="n">DEDX_FERRO_BORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_FERROUS_OXIDE</span><span class="p">,</span> <span class="n">DEDX_FERROUS_SULFATE_DOSIMETER_SOLUTION</span><span class="p">,</span>
+      <span class="n">DEDX_FREON_12</span><span class="p">,</span> <span class="n">DEDX_FREON_12B2</span><span class="p">,</span> <span class="n">DEDX_FREON_13</span><span class="p">,</span> <span class="n">DEDX_FREON_13B1</span><span class="p">,</span>
+      <span class="n">DEDX_FREON_13I1</span><span class="p">,</span> <span class="n">DEDX_GADOLINIUM_OXYSULFIDE</span><span class="p">,</span> <span class="n">DEDX_GALLIUM_ARSENIDE</span><span class="p">,</span>
+      <span class="n">DEDX_GEL_IN_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span>
+      <span class="n">DEDX_GLASS_PYREX</span><span class="p">,</span> <span class="n">DEDX_GLASS_LEAD</span><span class="p">,</span> <span class="n">DEDX_GLASS_PLATE</span><span class="p">,</span> <span class="cm">/* 169,170,171 */</span>
+      <span class="n">DEDX_GLUCOSE</span><span class="p">,</span> <span class="n">DEDX_GLUTAMINE</span><span class="p">,</span> <span class="n">DEDX_GLYCEROL</span><span class="p">,</span>
+      <span class="n">DEDX_GUANINE</span><span class="p">,</span> <span class="n">DEDX_GYPSUM_PLASTER_OF_PARIS</span><span class="p">,</span> <span class="n">DEDX_N_HEPTANE</span><span class="p">,</span> <span class="n">DEDX_N_HEXANE</span><span class="p">,</span>
+      <span class="n">DEDX_KAPTON_POLYIMIDE_FILM</span><span class="p">,</span> <span class="n">DEDX_LANTHANUM_OXYBROMIDE</span><span class="p">,</span>
+      <span class="n">DEDX_LANTHANUM_OXYSULFIDE</span><span class="p">,</span> <span class="n">DEDX_LEAD_OXIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_AMIDE</span><span class="p">,</span>
+      <span class="n">DEDX_LITHIUM_CARBONATE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_FLUORIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_HYDRIDE</span><span class="p">,</span>
+      <span class="n">DEDX_LITHIUM_IODIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_TETRABORATE</span><span class="p">,</span>
+      <span class="n">DEDX_LUNG_ICRP</span><span class="p">,</span> <span class="n">DEDX_M3_WAX</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM_CARBONATE</span><span class="p">,</span>
+      <span class="n">DEDX_MAGNESIUM_FLUORIDE</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM_TETRABORATE</span><span class="p">,</span>
+      <span class="n">DEDX_MERCURIC_IODIDE</span><span class="p">,</span> <span class="n">DEDX_METHANE</span><span class="p">,</span> <span class="n">DEDX_METHANOL</span><span class="p">,</span> <span class="n">DEDX_MIX_D_WAX</span><span class="p">,</span>
+      <span class="n">DEDX_MS20_TISSUE_SUBSTITUTE</span><span class="p">,</span> <span class="n">DEDX_MUSCLE_SKELETAL</span><span class="p">,</span> <span class="n">DEDX_MUSCLE_STRIATED</span><span class="p">,</span>
+      <span class="n">DEDX_MUSCLE_EQUIVALENT_LIQUID_WITH_SUCROSE</span><span class="p">,</span>
+      <span class="n">DEDX_MUSCLE_EQUIVALENT_LIQUID_WITHOUT_SUCROSE</span><span class="p">,</span> <span class="n">DEDX_NAPHTHALENE</span><span class="p">,</span>
+      <span class="n">DEDX_NITROBENZENE</span><span class="p">,</span> <span class="n">DEDX_NITROUS_OXIDE</span><span class="p">,</span> <span class="n">DEDX_NYLON_DUPONT_ELVAMIDE_8062</span><span class="p">,</span>
+      <span class="n">DEDX_NYLON_TYPE_6_AND_6_6</span><span class="p">,</span> <span class="n">DEDX_NYLON_TYPE_6_10</span><span class="p">,</span>
+      <span class="n">DEDX_NYLON_TYPE_11_RILSAN</span><span class="p">,</span> <span class="n">DEDX_OCTANE_LIQUID</span><span class="p">,</span> <span class="n">DEDX_PARAFFIN_WAX</span><span class="p">,</span>
+      <span class="n">DEDX_N_PENTANE</span><span class="p">,</span> <span class="n">DEDX_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span>
+      <span class="n">DEDX_PLASTIC_SCINTILLATOR_VINYLTOLUENE_BASED</span><span class="p">,</span> <span class="n">DEDX_PLUTONIUM_DIOXIDE</span><span class="p">,</span>
+      <span class="n">DEDX_POLYACRYLONITRILE</span><span class="p">,</span> <span class="n">DEDX_POLYCARBONATE_MAKROLON_LEXAN</span><span class="p">,</span>
+      <span class="n">DEDX_POLYCHLOROSTYRENE</span><span class="p">,</span> <span class="n">DEDX_POLYETHYLENE</span><span class="p">,</span> <span class="n">DEDX_MYLAR</span><span class="p">,</span>
+      <span class="n">DEDX_LUCITE_PERSPEX_PMMA</span><span class="p">,</span> <span class="n">DEDX_POLYOXYMETHYLENE</span><span class="p">,</span>
+      <span class="n">DEDX_POLYPROPYLENE</span><span class="p">,</span> <span class="n">DEDX_POLYSTYRENE</span><span class="p">,</span> <span class="n">DEDX_POLYTETRAFLUOROETHYLENE</span><span class="p">,</span>
+      <span class="n">DEDX_POLYTRIFLUOROCHLOROETHYLENE</span><span class="p">,</span> <span class="n">DEDX_POLYVINYL_ACETATE</span><span class="p">,</span>
+      <span class="n">DEDX_POLYVINYL_ALCOHOL</span><span class="p">,</span> <span class="n">DEDX_POLYVINYL_BUTYRAL</span><span class="p">,</span> <span class="n">DEDX_POLYVINYL_CHLORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_POLYVINYLIDENE_CHLORIDE_SARAN</span><span class="p">,</span> <span class="n">DEDX_POLYVINYLIDENE_FLUORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_POLYVINYL_PYRROLIDONE</span><span class="p">,</span> <span class="n">DEDX_POTASSIUM_IODIDE</span><span class="p">,</span> <span class="n">DEDX_POTASSIUM_OXIDE</span><span class="p">,</span>
+      <span class="n">DEDX_PROPANE</span><span class="p">,</span> <span class="n">DEDX_PROPANE_LIQUID</span><span class="p">,</span> <span class="n">DEDX_N_PROPYL_ALCOHOL</span><span class="p">,</span> <span class="n">DEDX_PYRIDINE</span><span class="p">,</span>
+      <span class="n">DEDX_RUBBER_BUTYL</span><span class="p">,</span> <span class="n">DEDX_RUBBER_NATURAL</span><span class="p">,</span> <span class="n">DEDX_RUBBER_NEOPRENE</span><span class="p">,</span>
+      <span class="n">DEDX_SILICON_DIOXIDE</span><span class="p">,</span> <span class="n">DEDX_SILVER_BROMIDE</span><span class="p">,</span> <span class="n">DEDX_SILVER_CHLORIDE</span><span class="p">,</span>
+      <span class="n">DEDX_SILVER_HALIDES_IN_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span> <span class="n">DEDX_SILVER_IODIDE</span><span class="p">,</span>
+      <span class="n">DEDX_SKIN_ICRP</span><span class="p">,</span> <span class="n">DEDX_SODIUM_CARBONATE</span><span class="p">,</span> <span class="n">DEDX_SODIUM_IODIDE</span><span class="p">,</span>
+      <span class="n">DEDX_SODIUM_MONOXIDE</span><span class="p">,</span> <span class="n">DEDX_SODIUM_NITRATE</span><span class="p">,</span> <span class="n">DEDX_STILBENE</span><span class="p">,</span>
+      <span class="n">DEDX_SUCROSE</span><span class="p">,</span> <span class="n">DEDX_TERPHENYL</span><span class="p">,</span> <span class="n">DEDX_TESTES_ICRP</span><span class="p">,</span>
+      <span class="n">DEDX_TETRACHLOROETHYLENE</span><span class="p">,</span> <span class="n">DEDX_THALLIUM_CHLORIDE</span><span class="p">,</span> <span class="n">DEDX_TISSUE_SOFT_ICRP</span><span class="p">,</span>
+      <span class="n">DEDX_TISSUE_SOFT_ICRU_FOUR_COMPONENT</span><span class="p">,</span>
+      <span class="n">DEDX_TISSUE_EQUIVALENT_GAS_METHANE_BASED</span><span class="p">,</span>
+      <span class="n">DEDX_TISSUE_EQUIVALENT_GAS_PROPANE_BASED</span><span class="p">,</span> <span class="n">DEDX_TITANIUM_DIOXIDE</span><span class="p">,</span>
+      <span class="n">DEDX_TOLUENE</span><span class="p">,</span> <span class="n">DEDX_TRICHLOROETHYLENE</span><span class="p">,</span> <span class="n">DEDX_TRIETHYL_PHOSPHATE</span><span class="p">,</span>
+      <span class="n">DEDX_TUNGSTEN_HEXAFLUORIDE</span><span class="p">,</span> <span class="n">DEDX_URANIUM_DICARBIDE</span><span class="p">,</span>
+      <span class="n">DEDX_URANIUM_MONOCARBIDE</span><span class="p">,</span> <span class="n">DEDX_URANIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_UREA</span><span class="p">,</span> <span class="n">DEDX_VALINE</span><span class="p">,</span>
+      <span class="n">DEDX_VITON_FLUOROELASTOMER</span><span class="p">,</span> <span class="n">DEDX_WATER_LIQUID</span><span class="p">,</span> <span class="n">DEDX_WATER_VAPOR</span><span class="p">,</span>
+      <span class="n">DEDX_XYLENE</span><span class="p">};</span>
+
+<span class="cm">/* aliases */</span>
+<span class="cp">#define DEDX_PROTON     1</span>
+<span class="cp">#define DEDX_ELECTRON   1001</span>
+<span class="cp">#define DEDX_POSITRON   1002</span>
+<span class="cp">#define DEDX_PIMINUS    1003</span>
+<span class="cp">#define DEDX_PIPLUS     1004</span>
+<span class="cp">#define DEDX_PIZERO     1005</span>
+<span class="cp">#define DEDX_ANTIPROTON 1006</span>
+
+<span class="cp">#define DEDX_WATER    DEDX_WATER_LIQUID</span>
+<span class="cp">#define DEDX_AIR      DEDX_AIR_DRY_NEAR_SEA_LEVEL</span>
+<span class="cp">#define DEDX_PMMA     DEDX_LUCITE_PERSPEX_PMMA</span>
+<span class="cp">#define DEDX_PERSPEX  DEDX_LUCITE_PERSPEX_PMMA</span>
+<span class="cp">#define DEDX_LUCITE   DEDX_LUCITE_PERSPEX_PMMA</span>
+<span class="cp">#define DEDX_TEFLON   DEDX_POLYTETRAFLUOROETHYLENE</span>
+<span class="cp">#define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND</span>
+<span class="cp">#define DEDX_CAESIUM  DEDX_CESIUM</span>
+</pre></div>
+</div>
+</section>
+<section id="a-4-additional-notes">
+<h1>A.4 Additional notes<a class="headerlink" href="#a-4-additional-notes" title="Permalink to this headline">¶</a></h1>
+<p>To build a tarball:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>libdedx/build$ make package_source
+</pre></div>
+</div>
+<p>To build a deb package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>libdedx/build cpack -G DEB
+</pre></div>
+</div>
 </section>
 
 
