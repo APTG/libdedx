@@ -33,16 +33,128 @@
             
   <section id="this-is-libdedx">
 <h1>This is libdEdx<a class="headerlink" href="#this-is-libdedx" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
+<section id="license-and-disclaimer">
+<h2>0. License and disclaimer<a class="headerlink" href="#license-and-disclaimer" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">libdEdx is licensed under GPL version 3</div>
+<div class="line">(c) Copyright 2010-2012 by</div>
+<div class="line">Jakob Toftegaard, <a class="reference external" href="mailto:jakob&#46;toftegaard&#37;&#52;&#48;gmail&#46;com">jakob<span>&#46;</span>toftegaard<span>&#64;</span>gmail<span>&#46;</span>com</a></div>
+<div class="line">Niels Bassler, <a class="reference external" href="mailto:bassler&#37;&#52;&#48;phys&#46;au&#46;dk">bassler<span>&#64;</span>phys<span>&#46;</span>au<span>&#46;</span>dk</a></div>
+<div class="line">for the Aarhus Particle Therapy Group</div>
+<div class="line"><a class="reference external" href="http://www.phys.au.dk/aptg">http://www.phys.au.dk/aptg</a></div>
+</div>
+<div class="line-block">
+<div class="line">This program is free software: you can redistribute it and/or modify</div>
+<div class="line">it under the terms of the GNU General Public License as published by</div>
+<div class="line">the Free Software Foundation, either version 3 of the License, or</div>
+<div class="line">(at your option) any later version.</div>
+</div>
+<div class="line-block">
+<div class="line">This program is distributed in the hope that it will be useful,</div>
+<div class="line">but WITHOUT ANY WARRANTY; without even the implied warranty of</div>
+<div class="line">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</div>
+<div class="line">GNU General Public License for more details.</div>
+</div>
+<div class="line-block">
+<div class="line">You should have received a copy of the GNU General Public License</div>
+<div class="line">along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</div>
 </div>
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<section id="acknowledgements">
+<h2>0.1 Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<p>We are grateful for the support by Prof. Helmut Paul from the University of
+Linz, Austria.
+Niels Bassler acknowledges support from the Danish Cancer Society.</p>
+</section>
+<section id="introduction">
+<h2>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles. It is a collection of commonly known stopping power tables and stopping-power routines. You can either use it as a library, by including the <code class="code docutils literal notranslate"><span class="pre">&lt;dedx.h&gt;</span></code> file and linking against the dedx library, or manually access a value with the <code class="code docutils literal notranslate"><span class="pre">getdedx</span></code> command.</p>
+<p>A web front end is available on <a class="reference external" href="http://dedx.au.dk">http://dedx.au.dk</a></p>
+</section>
+<section id="data-available">
+<h2>2. Data available<a class="headerlink" href="#data-available" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<li><dl class="simple">
+<dt>ASTAR:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Energy range</dt>
+<dd class="field-odd"><p>0.25 keV/u to 250 MeV/u</p>
+</dd>
+<dt class="field-even">Particles</dt>
+<dd class="field-even"><p>only helium nuclei</p>
+</dd>
+<dt class="field-odd">Targets</dt>
+<dd class="field-odd"><p>See astar_targets</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>PSTAR:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Energy range</dt>
+<dd class="field-odd"><p>1 keV/u to 10 GeV/u</p>
+</dd>
+<dt class="field-even">Particles</dt>
+<dd class="field-even"><p>only protons</p>
+</dd>
+<dt class="field-odd">Targets</dt>
+<dd class="field-odd"><p>See pstar_and_astar_targets</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>ESTAR:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Energy range</dt>
+<dd class="field-odd"><p>1 keV/u to 10 GeV/u</p>
+</dd>
+<dt class="field-even">Particles</dt>
+<dd class="field-even"><p>only electrons</p>
+</dd>
+<dt class="field-odd">Targets</dt>
+<dd class="field-odd"><p>See estar_targets</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>ICRU:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Energy range</dt>
+<dd class="field-odd"><p>25 keV/u to 1 GeV/u</p>
+</dd>
+<dt class="field-even">Particles</dt>
+<dd class="field-even"><p>See icru73_particle_targets</p>
+</dd>
+<dt class="field-odd">Targets</dt>
+<dd class="field-odd"><p>See icru73_particle_targets</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>BETHE_EXT00:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Comment</dt>
+<dd class="field-odd"><p>Bethe equation with Linhard-Scharff at lower energies. BETHE_EXT00 is optimized for particle therapy, i.e. works well at lower energies and lighter particles and targets. It is not recommended for heavy targets and heavy/fast ions. BETHE_EXT00 is the same algorithm used in SHIELD-HIT12A, but default I-values may vary.</p>
+</dd>
+<dt class="field-even">Energy range</dt>
+<dd class="field-even"><p>1 keV/u to 1 GeV/u</p>
+</dd>
+<dt class="field-odd">Particles</dt>
+<dd class="field-odd"><p>Any, but will be most correct at light ions</p>
+</dd>
+<dt class="field-even">Targets</dt>
+<dd class="field-even"><p>Any, but will be most correct at light targets</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
 </ul>
+<p>For all data tables and equations, it is possible to use Bragg’s additivity rule, if a specific target is unavailable by default.</p>
+</section>
 </section>
 
 
