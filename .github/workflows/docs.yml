@@ -1,15 +1,17 @@
 name: Github Pages
+
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@master
+      uses: actions/checkout@v2.4.0
       with:
         fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
     - name: Build and Commit
-      uses: sphinx-notes/pages@master
+      uses: sphinx-notes/pages@1.0
       with:
         documentation_path: docs/source
     - name: Push changes to gh-pages branch
