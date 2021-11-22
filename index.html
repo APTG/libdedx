@@ -541,6 +541,469 @@ Appendix</p></li>
 </pre></div>
 </div>
 </section>
+<section id="a-2-error-codes">
+<h1>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>1-100 IO error</p></li>
+<li><p>101-200 Out of bounds errors</p></li>
+<li><p>201-300       invalid input</p></li>
+<li><p>1 Composition file compos.txt does not exist</p></li>
+<li><p>2 MSTAR file mstar_gas_states.dat does not exist</p></li>
+<li><p>3 MSTAR effective_charge.dat file does not exist</p></li>
+<li><p>4 Unable to access binary data file</p></li>
+<li><p>5 Unable to access binary energy file</p></li>
+<li><p>6 Unable to write to disk</p></li>
+<li><p>7 Unable to read energy file</p></li>
+<li><p>8 Unable to read data file</p></li>
+<li><p>9 Unable to read short_names file</p></li>
+<li><p>10 Unable to read composition file</p></li>
+<li><p>101 Energy out of bounds</p></li>
+<li><p>201 Target is not in composition file</p></li>
+<li><p>202 Target and ion combination is not in data file</p></li>
+<li><p>203 ID does not exist</p></li>
+<li><p>204 Target is not an atomic element</p></li>
+<li><p>205 ESTAR is not implemented yet</p></li>
+<li><p>206 Ion is not supported for MSTAR</p></li>
+<li><p>207 Ion is not supported for requested table</p></li>
+<li><p>208 Rho must be specified in this configuration.</p></li>
+<li><p>209 Mass of ion (ion_a) must be specified in this configuration.</p></li>
+<li><p>210 I value must be larger than zero.</p></li>
+</ul>
+</section>
+<section id="a-3-additional-lists">
+<h1>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Permalink to this headline">¶</a></h1>
+<p>All names can be prefixed with <a href="#id11"><span class="problematic" id="id12">DEDX_</span></a></p>
+<p>List all known data tables and algorithms:</p>
+<div class="line-block">
+<div class="line-block">
+<div class="line">0 (N/A)</div>
+<div class="line">1 ASTAR</div>
+<div class="line">2 PSTAR</div>
+<div class="line">3 ESTAR (not implemented yet)</div>
+<div class="line">4 MSTAR</div>
+<div class="line">5 ICRU73_OLD</div>
+<div class="line">6 ICRU73</div>
+<div class="line">7 ICRU49</div>
+<div class="line">8</div>
+<div class="line">9</div>
+</div>
+<div class="line">100 BETHE_EXT00</div>
+<div class="line">101</div>
+<div class="line">102</div>
+<div class="line">103</div>
+<div class="line">104</div>
+<div class="line">105</div>
+<div class="line">106</div>
+<div class="line">107</div>
+<div class="line">108</div>
+<div class="line">109</div>
+</div>
+<p>List all known ions:</p>
+<div class="line-block">
+<div class="line-block">
+<div class="line-block">
+<div class="line">1: HYDROGEN</div>
+<div class="line">2: HELIUM</div>
+<div class="line">3: LITHIUM</div>
+<div class="line">4: BERYLLIUM</div>
+<div class="line">5: BORON</div>
+<div class="line">6: CARBON</div>
+<div class="line">7: NITROGEN</div>
+<div class="line">8: OXYGEN</div>
+<div class="line">9: FLUORINE</div>
+</div>
+<div class="line">10: NEON</div>
+<div class="line">11: SODIUM</div>
+<div class="line">12: MAGNESIUM</div>
+<div class="line">13: ALUMINUM</div>
+<div class="line">14: SILICON</div>
+<div class="line">15: PHOSPHORUS</div>
+<div class="line">16: SULFUR</div>
+<div class="line">17: CHLORINE</div>
+<div class="line">18: ARGON</div>
+<div class="line">19: POTASSIUM</div>
+<div class="line">20: CALCIUM</div>
+<div class="line">21: SCANDIUM</div>
+<div class="line">22: TITANIUM</div>
+<div class="line">23: VANADIUM</div>
+<div class="line">24: CHROMIUM</div>
+<div class="line">25: MANGANESE</div>
+<div class="line">26: IRON</div>
+<div class="line">27: COBALT</div>
+<div class="line">28: NICKEL</div>
+<div class="line">29: COPPER</div>
+<div class="line">30: ZINC</div>
+<div class="line">31: GALLIUM</div>
+<div class="line">32: GERMANIUM</div>
+<div class="line">33: ARSENIC</div>
+<div class="line">34: SELENIUM</div>
+<div class="line">35: BROMINE</div>
+<div class="line">36: KRYPTON</div>
+<div class="line">37: RUBIDIUM</div>
+<div class="line">38: STRONTIUM</div>
+<div class="line">39: YTTRIUM</div>
+<div class="line">40: ZIRCONIUM</div>
+<div class="line">41: NIOBIUM</div>
+<div class="line">42: MOLYBDENUM</div>
+<div class="line">43: TECHNETIUM</div>
+<div class="line">44: RUTHENIUM</div>
+<div class="line">45: RHODIUM</div>
+<div class="line">46: PALLADIUM</div>
+<div class="line">47: SILVER</div>
+<div class="line">48: CADMIUM</div>
+<div class="line">49: INDIUM</div>
+<div class="line">50: TIN</div>
+<div class="line">51: ANTIMONY</div>
+<div class="line">52: TELLURIUM</div>
+<div class="line">53: IODINE</div>
+<div class="line">54: XENON</div>
+<div class="line">55: CESIUM</div>
+<div class="line">56: BARIUM</div>
+<div class="line">57: LANTHANUM</div>
+<div class="line">58: CERIUM</div>
+<div class="line">59: PRASEODYMIUM</div>
+<div class="line">60: NEODYMIUM</div>
+<div class="line">61: PROMETHIUM</div>
+<div class="line">62: SAMARIUM</div>
+<div class="line">63: EUROPIUM</div>
+<div class="line">64: GADOLINIUM</div>
+<div class="line">65: TERBIUM</div>
+<div class="line">66: DYSPROSIUM</div>
+<div class="line">67: HOLMIUM</div>
+<div class="line">68: ERBIUM</div>
+<div class="line">69: THULIUM</div>
+<div class="line">70: YTTERBIUM</div>
+<div class="line">71: LUTETIUM</div>
+<div class="line">72: HAFNIUM</div>
+<div class="line">73: TANTALUM</div>
+<div class="line">74: TUNGSTEN</div>
+<div class="line">75: RHENIUM</div>
+<div class="line">76: OSMIUM</div>
+<div class="line">77: IRIDIUM</div>
+<div class="line">78: PLATINUM</div>
+<div class="line">79: GOLD</div>
+<div class="line">80: MERCURY</div>
+<div class="line">81: THALLIUM</div>
+<div class="line">82: LEAD</div>
+<div class="line">83: BISMUTH</div>
+<div class="line">84: POLONIUM</div>
+<div class="line">85: ASTATINE</div>
+<div class="line">86: RADON</div>
+<div class="line">87: FRANCIUM</div>
+<div class="line">88: RADIUM</div>
+<div class="line">89: ACTINIUM</div>
+<div class="line">90: THORIUM</div>
+<div class="line">91: PROTACTINIUM</div>
+<div class="line">92: URANIUM</div>
+<div class="line">93: NEPTUNIUM</div>
+<div class="line">94: PLUTONIUM</div>
+<div class="line">95: AMERICIUM</div>
+<div class="line">96: CURIUM</div>
+<div class="line">97: BERKELIUM</div>
+<div class="line">98: CALIFORNIUM</div>
+<div class="line">99: EINSTEINIUM</div>
+</div>
+<div class="line">100: FERMIUM</div>
+<div class="line">101: MENDELEVIUM</div>
+<div class="line">102: NOBELIUM</div>
+<div class="line">103: LAWRENCIUM</div>
+<div class="line">104: RUTHERFORDNIUM</div>
+<div class="line">105: DUBNIUM</div>
+<div class="line">106: SEABORGIUM</div>
+<div class="line">107: BOHRIUM</div>
+<div class="line">108: HASSIUM</div>
+<div class="line">109: MEITNERIUM</div>
+<div class="line">110: DARMSTADTIUM</div>
+<div class="line">111: ROENTGENIUM</div>
+<div class="line">112: COPERNICUM</div>
+</div>
+<p>List all known target materials (following ICRU naming convention):</p>
+<div class="line-block">
+<div class="line-block">
+<div class="line-block">
+<div class="line">1: HYDROGEN</div>
+<div class="line">2: HELIUM</div>
+<div class="line">3: LITHIUM</div>
+<div class="line">4: BERYLLIUM</div>
+<div class="line">5: BORON</div>
+<div class="line">6: CARBON</div>
+<div class="line">7: NITROGEN</div>
+<div class="line">8: OXYGEN</div>
+<div class="line">9: FLUORINE</div>
+</div>
+<div class="line">10: NEON</div>
+<div class="line">11: SODIUM</div>
+<div class="line">12: MAGNESIUM</div>
+<div class="line">13: ALUMINUM</div>
+<div class="line">14: SILICON</div>
+<div class="line">15: PHOSPHORUS</div>
+<div class="line">16: SULFUR</div>
+<div class="line">17: CHLORINE</div>
+<div class="line">18: ARGON</div>
+<div class="line">19: POTASSIUM</div>
+<div class="line">20: CALCIUM</div>
+<div class="line">21: SCANDIUM</div>
+<div class="line">22: TITANIUM</div>
+<div class="line">23: VANADIUM</div>
+<div class="line">24: CHROMIUM</div>
+<div class="line">25: MANGANESE</div>
+<div class="line">26: IRON</div>
+<div class="line">27: COBALT</div>
+<div class="line">28: NICKEL</div>
+<div class="line">29: COPPER</div>
+<div class="line">30: ZINC</div>
+<div class="line">31: GALLIUM</div>
+<div class="line">32: GERMANIUM</div>
+<div class="line">33: ARSENIC</div>
+<div class="line">34: SELENIUM</div>
+<div class="line">35: BROMINE</div>
+<div class="line">36: KRYPTON</div>
+<div class="line">37: RUBIDIUM</div>
+<div class="line">38: STRONTIUM</div>
+<div class="line">39: YTTRIUM</div>
+<div class="line">40: ZIRCONIUM</div>
+<div class="line">41: NIOBIUM</div>
+<div class="line">42: MOLYBDENUM</div>
+<div class="line">43: TECHNETIUM</div>
+<div class="line">44: RUTHENIUM</div>
+<div class="line">45: RHODIUM</div>
+<div class="line">46: PALLADIUM</div>
+<div class="line">47: SILVER</div>
+<div class="line">48: CADMIUM</div>
+<div class="line">49: INDIUM</div>
+<div class="line">50: TIN</div>
+<div class="line">51: ANTIMONY</div>
+<div class="line">52: TELLURIUM</div>
+<div class="line">53: IODINE</div>
+<div class="line">54: XENON</div>
+<div class="line">55: CESIUM</div>
+<div class="line">56: BARIUM</div>
+<div class="line">57: LANTHANUM</div>
+<div class="line">58: CERIUM</div>
+<div class="line">59: PRASEODYMIUM</div>
+<div class="line">60: NEODYMIUM</div>
+<div class="line">61: PROMETHIUM</div>
+<div class="line">62: SAMARIUM</div>
+<div class="line">63: EUROPIUM</div>
+<div class="line">64: GADOLINIUM</div>
+<div class="line">65: TERBIUM</div>
+<div class="line">66: DYSPROSIUM</div>
+<div class="line">67: HOLMIUM</div>
+<div class="line">68: ERBIUM</div>
+<div class="line">69: THULIUM</div>
+<div class="line">70: YTTERBIUM</div>
+<div class="line">71: LUTETIUM</div>
+<div class="line">72: HAFNIUM</div>
+<div class="line">73: TANTALUM</div>
+<div class="line">74: TUNGSTEN</div>
+<div class="line">75: RHENIUM</div>
+<div class="line">76: OSMIUM</div>
+<div class="line">77: IRIDIUM</div>
+<div class="line">78: PLATINUM</div>
+<div class="line">79: GOLD</div>
+<div class="line">80: MERCURY</div>
+<div class="line">81: THALLIUM</div>
+<div class="line">82: LEAD</div>
+<div class="line">83: BISMUTH</div>
+<div class="line">84: POLONIUM</div>
+<div class="line">85: ASTATINE</div>
+<div class="line">86: RADON</div>
+<div class="line">87: FRANCIUM</div>
+<div class="line">88: RADIUM</div>
+<div class="line">89: ACTINIUM</div>
+<div class="line">90: THORIUM</div>
+<div class="line">91: PROTACTINIUM</div>
+<div class="line">92: URANIUM</div>
+<div class="line">93: NEPTUNIUM</div>
+<div class="line">94: PLUTONIUM</div>
+<div class="line">95: AMERICIUM</div>
+<div class="line">96: CURIUM</div>
+<div class="line">97: BERKELIUM</div>
+<div class="line">98: CALIFORNIUM</div>
+<div class="line">99: A150_TISSUE_EQUIVALENT_PLASTIC</div>
+</div>
+<div class="line">100: ACETONE</div>
+<div class="line">101: ACETYLENE</div>
+<div class="line">102: ADENINE</div>
+<div class="line">103: ADIPOSETISSUE_ICRP</div>
+<div class="line">104: AIR</div>
+<div class="line">105: ALANINE</div>
+<div class="line">106: ALUMINUMOXIDE</div>
+<div class="line">107: AMBER</div>
+<div class="line">108: AMMONIA</div>
+<div class="line">109: ANILINE</div>
+<div class="line">110: ANTHRACENE</div>
+<div class="line">111: B100</div>
+<div class="line">112: BAKELITE</div>
+<div class="line">113: BARIUMFLUORIDE</div>
+<div class="line">114: BARIUMSULFATE</div>
+<div class="line">115: BENZENE</div>
+<div class="line">116: BERYLLIUMOXIDE</div>
+<div class="line">117: BISMUTHGERMANIUMOXIDE</div>
+<div class="line">118: BLOOD_ICRP</div>
+<div class="line">119: BONE_COMPACT_ICRU</div>
+<div class="line">120: BONE_CORTICAL_ICRP</div>
+<div class="line">121: BORONCARBIDE</div>
+<div class="line">122: BORONOXIDE</div>
+<div class="line">123: BRAIN_ICRP</div>
+<div class="line">124: BUTANE</div>
+<div class="line">125: N_BUTYLALCOHOL</div>
+<div class="line">126: C552</div>
+<div class="line">127: CADMIUMTELLURIDE</div>
+<div class="line">128: CADMIUMTUNGSTATE</div>
+<div class="line">129: CALCIUMCARBONATE</div>
+<div class="line">130: CALCIUMFLUORIDE</div>
+<div class="line">131: CALCIUMOXIDE</div>
+<div class="line">132: CALCIUMSULFATE</div>
+<div class="line">133: CALCIUMTUNGSTATE</div>
+<div class="line">134: CARBONDIOXIDE</div>
+<div class="line">135: CARBONTETRACHLORIDE</div>
+<div class="line">136: CELLULOSEACETATE_CELLOPHANE</div>
+<div class="line">137: CELLULOSEACETATEBUTYRATE</div>
+<div class="line">138: CELLULOSENITRATE</div>
+<div class="line">139: CERICSULFATEDOSIMETERSOLUTION</div>
+<div class="line">140: CESIUMFLUORIDE</div>
+<div class="line">141: CESIUMIODIDE</div>
+<div class="line">142: CHLOROBENZENE</div>
+<div class="line">143: CHLOROFORM</div>
+<div class="line">144: CONCRETE_PORTLAND</div>
+<div class="line">145: CYCLOHEXANE</div>
+<div class="line">146: DICHLOROBENZENE</div>
+<div class="line">147: DICHLORODIETHYLETHER</div>
+<div class="line">148: DICHLOROETHANE</div>
+<div class="line">149: DIETHYLETHER</div>
+<div class="line">150: N_N_DIMETHYLFORMAMIDE</div>
+<div class="line">151: DIMETHYLSULFOXIDE</div>
+<div class="line">152: ETHANE</div>
+<div class="line">153: ETHYLALCOHOL</div>
+<div class="line">154: ETHYLCELLULOSE</div>
+<div class="line">155: ETHYLENE</div>
+<div class="line">156: EYELENS_ICRP</div>
+<div class="line">157: FERRICOXIDE</div>
+<div class="line">158: FERROBORIDE</div>
+<div class="line">159: FERROUSOXIDE</div>
+<div class="line">160: FERROUSSULFATEDOSIMETERSOLUTION</div>
+<div class="line">161: FREON_12</div>
+<div class="line">162: FREON_12B2</div>
+<div class="line">163: FREON_13</div>
+<div class="line">164: FREON_13B1</div>
+<div class="line">165: FREON_13I1</div>
+<div class="line">166: GADOLINIUMOXYSULFIDE</div>
+<div class="line">167: GALLIUMARSENIDE</div>
+<div class="line">168: GELINPHOTOGRAPHICEMULSION</div>
+<div class="line">169: GLASS_PYREX</div>
+<div class="line">170: GLASS_LEAD</div>
+<div class="line">171: GLASS_PLATE</div>
+<div class="line">172: GLUCOSE</div>
+<div class="line">173: GLUTAMINE</div>
+<div class="line">174: GLYCEROL</div>
+<div class="line">175: GUANINE</div>
+<div class="line">176: GYPSUM_PLASTEROFPARIS</div>
+<div class="line">177: N_HEPTANE</div>
+<div class="line">178: N_HEXANE</div>
+<div class="line">179: KAPTONPOLYIMIDEFILM</div>
+<div class="line">180: LANTHANUMOXYBROMIDE</div>
+<div class="line">181: LANTHANUMOXYSULFIDE</div>
+<div class="line">182: LEADOXIDE</div>
+<div class="line">183: LITHIUMAMIDE</div>
+<div class="line">184: LITHIUMCARBONATE</div>
+<div class="line">185: LITHIUMFLUORIDE</div>
+<div class="line">186: LITHIUMHYDRIDE</div>
+<div class="line">187: LITHIUMIODIDE</div>
+<div class="line">188: LITHIUMOXIDE</div>
+<div class="line">189: LITHIUMTETRABORATE</div>
+<div class="line">190: LUNG_ICRP</div>
+<div class="line">191: M3WAX</div>
+<div class="line">192: MAGNESIUMCARBONATE</div>
+<div class="line">193: MAGNESIUMFLUORIDE</div>
+<div class="line">194: MAGNESIUMOXIDE</div>
+<div class="line">195: MAGNESIUMTETRABORATE</div>
+<div class="line">196: MERCURICIODIDE</div>
+<div class="line">197: METHANE</div>
+<div class="line">198: METHANOL</div>
+<div class="line">199: MIXDWAX</div>
+<div class="line">200: MS20TISSUESUBSTITUTE</div>
+<div class="line">201: MUSCLE_SKELETAL</div>
+<div class="line">202: MUSCLE_STRIATED</div>
+<div class="line">203: MUSCLE_EQUIVALENTLIQUID_SUCROSE</div>
+<div class="line">204: MUSCLE_EQUIVALENTLIQUID_NOSUCROSE</div>
+<div class="line">205: NAPHTHALENE</div>
+<div class="line">206: NITROBENZENE</div>
+<div class="line">207: NITROUSOXIDE</div>
+<div class="line">208: NYLON_DUPONTELVAMIDE8062</div>
+<div class="line">209: NYLON_TYPE6AND6_6</div>
+<div class="line">210: NYLON_TYPE6_10</div>
+<div class="line">211: NYLON_TYPE11_RILSAN</div>
+<div class="line">212: OCTANE_LIQUID</div>
+<div class="line">213: PARAFFINWAX</div>
+<div class="line">214: N_PENTANE</div>
+<div class="line">215: PHOTOGRAPHICEMULSION</div>
+<div class="line">216: PLASTICSCINTILLATOR_VINYLTOLUENEBASED</div>
+<div class="line">217: PLUTONIUMDIOXIDE</div>
+<div class="line">218: POLYACRYLONITRILE</div>
+<div class="line">219: POLYCARBONATE_MAKROLON_LEXAN</div>
+<div class="line">220: POLYCHLOROSTYRENE</div>
+<div class="line">221: POLYETHYLENE</div>
+<div class="line">222: MYLAR</div>
+<div class="line">223: PMMA</div>
+<div class="line">224: POLYOXYMETHYLENE</div>
+<div class="line">225: POLYPROPYLENE</div>
+<div class="line">226: POLYSTYRENE</div>
+<div class="line">227: POLYTETRAFLUOROETHYLENE (TEFLON)</div>
+<div class="line">228: POLYTRIFLUOROCHLOROETHYLENE</div>
+<div class="line">229: POLYVINYLACETATE</div>
+<div class="line">230: POLYVINYLALCOHOL</div>
+<div class="line">231: POLYVINYLBUTYRAL</div>
+<div class="line">232: POLYVINYLCHLORIDE</div>
+<div class="line">233: SARAN</div>
+<div class="line">234: POLYVINYLIDENEFLUORIDE</div>
+<div class="line">235: POLYVINYLPYRROLIDONE</div>
+<div class="line">236: POTASSIUMIODIDE</div>
+<div class="line">237: POTASSIUMOXIDE</div>
+<div class="line">238: PROPANE</div>
+<div class="line">239: PROPANE_LIQUID</div>
+<div class="line">240: N_PROPYLALCOHOL</div>
+<div class="line">241: PYRIDINE</div>
+<div class="line">242: RUBBER_BUTYL</div>
+<div class="line">243: RUBBER_NATURAL</div>
+<div class="line">244: RUBBER_NEOPRENE</div>
+<div class="line">245: SILICONDIOXIDE</div>
+<div class="line">246: SILVERBROMIDE</div>
+<div class="line">247: SILVERCHLORIDE</div>
+<div class="line">248: SILVERHALIDESINPHOTOGRAPHICEMULSION</div>
+<div class="line">249: SILVERIODIDE</div>
+<div class="line">250: SKIN_ICRP</div>
+<div class="line">251: SODIUMCARBONATE</div>
+<div class="line">252: SODIUMIODIDE</div>
+<div class="line">253: SODIUMMONOXIDE</div>
+<div class="line">254: SODIUMNITRATE</div>
+<div class="line">255: STILBENE</div>
+<div class="line">256: SUCROSE</div>
+<div class="line">257: TERPHENYL</div>
+<div class="line">258: TESTES_ICRP</div>
+<div class="line">259: TETRACHLOROETHYLENE</div>
+<div class="line">260: THALLIUMCHLORIDE</div>
+<div class="line">261: TISSUE_SOFT_ICRP</div>
+<div class="line">262: TISSUE_SOFT_ICRUFOUR_COMPONENT</div>
+<div class="line">263: TISSUE_EQUIVALENTGAS_METHANEBASED</div>
+<div class="line">264: TISSUE_EQUIVALENTGAS_PROPANEBASED</div>
+<div class="line">265: TITANIUMDIOXIDE</div>
+<div class="line">266: TOLUENE</div>
+<div class="line">267: TRICHLOROETHYLENE</div>
+<div class="line">268: TRIETHYLPHOSPHATE</div>
+<div class="line">269: TUNGSTENHEXAFLUORIDE</div>
+<div class="line">270: URANIUMDICARBIDE</div>
+<div class="line">271: URANIUMMONOCARBIDE</div>
+<div class="line">272: URANIUMOXIDE</div>
+<div class="line">273: UREA</div>
+<div class="line">274: VALINE</div>
+<div class="line">275: VITONFLUOROELASTOMER</div>
+<div class="line">276: WATER</div>
+<div class="line">277: WATERVAPOR</div>
+<div class="line">278: XYLENE</div>
+<div class="line">906: GRAPHITE</div>
+</div>
+</section>
 
 
           </div>
