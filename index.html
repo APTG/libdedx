@@ -178,6 +178,283 @@ Niels Bassler acknowledges support from the Danish Cancer Society.</p>
 <li><p>a simple method for simple implementation,</p></li>
 <li><p>a bit more complicated way, but more suitable for fast and multithreaded applications.</p></li>
 </ol>
+<p>Method 1) involves a single function call:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="nf">dedx_get_simple_stp</span><span class="p">(</span><span class="kt">int</span> <span class="n">ion</span><span class="p">,</span>
+                          <span class="kt">int</span> <span class="n">target</span><span class="p">,</span>
+                          <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span>
+                          <span class="kt">int</span> <span class="o">*</span> <span class="n">err</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The function returns the stopping power of the specific configuration,
+using the ICRU49 and ICRU73 data table if possible, else the BETHE_EXT00 table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">ion</dt>
+<dd class="field-odd"><p>is the Z value of the particle</p>
+</dd>
+<dt class="field-even">target</dt>
+<dd class="field-even"><p>is the id of the target, the id follows the ICRU naming convention the id can be found in the respective target files for each program.</p>
+</dd>
+<dt class="field-odd">energy</dt>
+<dd class="field-odd"><p>is the kinetic energy for the ion per nucleon (MeV/nucl).</p>
+</dd>
+<dt class="field-even">*err</dt>
+<dd class="field-even"><p>contains the error code and is 0 if no error was encountered. An explanation of the error codes can be found in the error_codes.txt file.</p>
+</dd>
+</dl>
+<p>Thus</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">dedx_get_simple_stp</span><span class="p">(</span><span class="n">DEDX_CARBON</span><span class="p">,</span> <span class="n">DEDX_WATER</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">err</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>will store the mass stopping power of a 100 MeV/u carbon ion in a water target.</p>
+<p>A list of ions and target media is given in appendix A.3.</p>
+<p>Method 2) is the proper method of using dedx if several stopping powers are to be retrieved. It is (hopefully) thread-safe and was optimized to be fast.</p>
+<p>First memory for a workspace and a config struct must be allocated.</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">;</span>
+<span class="n">dedx_config</span> <span class="o">*</span><span class="n">cfg</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+
+<span class="n">ws</span> <span class="o">=</span> <span class="n">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">int</span> <span class="n">datasets</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The function returns a struct of the type <code class="docutils literal notranslate"><span class="pre">dedx_workspace</span> <span class="pre">*ws</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">datasets</dt>
+<dd class="field-odd"><p>is the number of ion - target combinations you want to use at the same time.</p>
+</dd>
+<dt class="field-even">*err</dt>
+<dd class="field-even"><p>pointer to an integer holding an error code.</p>
+</dd>
+</dl>
+<p>Next you must initialize your configuration, by writing to the cfg struct.</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+   <span class="kt">int</span> <span class="n">cfg_id</span><span class="p">;</span>
+   <span class="kt">int</span> <span class="n">program</span><span class="p">;</span>
+   <span class="kt">int</span> <span class="n">target</span><span class="p">;</span>            <span class="c1">// target can either be an element or a compound</span>
+   <span class="kt">int</span> <span class="n">ion</span><span class="p">;</span>               <span class="c1">// id number of projectile</span>
+   <span class="kt">int</span> <span class="n">ion_a</span><span class="p">;</span>             <span class="c1">// nucleon number of projectile</span>
+   <span class="kt">int</span> <span class="n">bragg_used</span><span class="p">;</span>        <span class="c1">// is 1 if braggs additivity rule was applied</span>
+   <span class="kt">int</span> <span class="n">compound_state</span><span class="p">;</span>    <span class="c1">// DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ...</span>
+   <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">elements_length</span><span class="p">;</span>   <span class="c1">// elements_length  --- number of unique elements in comp.</span>
+   <span class="kt">int</span> <span class="o">*</span> <span class="n">elements_id</span><span class="p">;</span>     <span class="c1">// elements_id      --- Z of each element</span>
+   <span class="kt">int</span> <span class="o">*</span> <span class="n">elements_atoms</span><span class="p">;</span>  <span class="c1">// elements_atoms   --- number of atoms per comp. unit</span>
+   <span class="kt">char</span> <span class="n">mstar_mode</span><span class="p">;</span>
+   <span class="kt">float</span> <span class="n">i_value</span><span class="p">;</span>         <span class="c1">// i_value   --- mean excitation potential of target</span>
+   <span class="kt">float</span> <span class="n">rho</span><span class="p">;</span>
+   <span class="kt">float</span> <span class="o">*</span> <span class="n">elements_mass_fraction</span><span class="p">;</span>     <span class="c1">// mass_fraction of each element</span>
+   <span class="kt">float</span> <span class="o">*</span> <span class="n">elements_i_value</span><span class="p">;</span>           <span class="c1">// i_value of each element</span>
+   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">target_name</span><span class="p">;</span>
+   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">ion_name</span><span class="p">;</span>
+   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">program_name</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">dedx_config</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Description of the elements:</p>
+<dl class="field-list">
+<dt class="field-odd">cfg_id</dt>
+<dd class="field-odd"><p>configuration id, which is set by <code class="docutils literal notranslate"><span class="pre">dedx_config</span></code>. Don’t touch.</p>
+</dd>
+<dt class="field-even">program</dt>
+<dd class="field-even"><p>must be specified by the user, see appendix A.3</p>
+</dd>
+<dt class="field-odd">target</dt>
+<dd class="field-odd"><p>see appendix A.3. If another compound is requested which is not in the list, then the user must specify compound constituents by <code class="docutils literal notranslate"><span class="pre">*elements_id</span></code> and either <code class="docutils literal notranslate"><span class="pre">*elements_mass_fraction</span></code> or <code class="docutils literal notranslate"><span class="pre">*elements_atoms</span></code>.</p>
+</dd>
+<dt class="field-even">ion</dt>
+<dd class="field-even"><p>must be specified by the user, see appendix A.3</p>
+</dd>
+<dt class="field-odd">compound</dt>
+<dd class="field-odd"><p>is set to <code class="docutils literal notranslate"><span class="pre">TRUE</span></code> by <code class="docutils literal notranslate"><span class="pre">dedx_load_config()</span></code>, if the target was not found in the default list, but generated from individual elements instead.</p>
+</dd>
+<dt class="field-even">compound_state</dt>
+<dd class="field-even"><p>is assumed to be DEDX_DEFAULT_STATE, which means normal state of
+aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
+From version 1.2.1 the state parameter (i.e. the I-values)
+of the Bethe function will be affected, but only in the case
+where <code class="docutils literal notranslate"><span class="pre">element_id</span></code> is specified and <code class="docutils literal notranslate"><span class="pre">element_i_value</span></code> is not.
+This difference applies for elements which is naturally found
+in gas state, following ICRU49 recommendations. The I-value is
+multiplied with 1.13 to get the liquid/solid I-value phase,
+except for the following elements, where these I-values are used in
+condensed phase:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Hydrogen:   21.8 eV</p></li>
+<li><p>Carbon:             81 eV</p></li>
+<li><p>Nitrogen:   82 eV</p></li>
+<li><p>Oxygen:             106 eV</p></li>
+<li><p>Fluor               112 eV</p></li>
+<li><p>Chlorine    180 eV</p></li>
+</ul>
+</div></blockquote>
+<p>ICRU49 is ambiguous here since it also recommends using 19.2 eV for
+liquids in table 2.11, which contradicts 21.8 eV from table 2.8.
+Moreover, oxygen is stated as 95.0 eV in table 2.8 and 97 eV for gasses in table 2.11. Here, table 2.8 is used in case of ambiguous values,
+since libdEdx does not discriminate between the I-values of elements and atomic constituents in compounds. If other values are needed they can be specified with the <code class="docutils literal notranslate"><span class="pre">*elements_i_value</span> <span class="pre">parameter</span></code>.
+When using MSTAR read the <code class="docutils literal notranslate"><span class="pre">mstar_mode</span></code> function carefully too.
+The compound_state will apply equally to all constituents when working with compounds.</p>
+</dd>
+<dt class="field-odd">elements_length</dt>
+<dd class="field-odd"><p>number of unique elements in a compound. Must be specified if the target is undefined (<cite>DEDX_UNDEFINED</cite>)</p>
+</dd>
+<dt class="field-even">*elements_id</dt>
+<dd class="field-even"><p>Z of each constituent element, must be specified if target is undefined</p>
+</dd>
+<dt class="field-odd">*elements_atoms</dt>
+<dd class="field-odd"><p>number of atoms per comp. unit must be specified if the target is undefined.</p>
+</dd>
+<dt class="field-even">mstar_mode</dt>
+<dd class="field-even"><p>MSTAR features several modes of operation, depending on the state of the compound.</p>
+<dl class="field-list simple">
+<dt class="field-odd">DEDX_MSTAR_MODE_A</dt>
+<dd class="field-odd"><p>will work for most compounds. Automatic selection of state, depending on the state table in the appendix. This mode ‘a’ will select ‘g’ mode for gas phase and ‘c’ mode for condensed phase.</p>
+</dd>
+<dt class="field-even">DEDX_MSTAR_MODE_B</dt>
+<dd class="field-even"><p>recommended and default mode of operation. However, not all elements work. This mode ‘b’ will select ‘h’ for gas and ‘d’ for condensed phase, depending on the state table in the appendix.</p>
+</dd>
+<dt class="field-odd">DEDX_MSTAR_MODE_C</dt>
+<dd class="field-odd"><p>Condensed phase for ‘a’ mode.</p>
+</dd>
+<dt class="field-even">DEDX_MSTAR_MODE_D</dt>
+<dd class="field-even"><p>Condensed phase for recommended ‘b’ mode.</p>
+</dd>
+<dt class="field-odd">DEDX_MSTAR_MODE_G</dt>
+<dd class="field-odd"><p>Gas phase for ‘a’ mode.</p>
+</dd>
+<dt class="field-even">DEDX_MSTAR_MODE_H</dt>
+<dd class="field-even"><p>Gas phase for recommended ‘b’ mode.</p>
+</dd>
+</dl>
+<p>if <cite>DEDX_DEFAULT</cite>, then ‘b’ method of MSTAR is used, as recommended by MSTAR author Helmut Paul. In case of an overspecified, or even
+contradicting system (e.g. DEDX_GAS was set in compound_state and
+DEDX_MSTAR_MODE_D  mode requested), then libdEdx will follow
+mstar_mode and ignore compound_state.</p>
+<p>The condensed modes ‘c’ or ‘d’ will be selected if
+DEDX_CONDENSED is requested in compound_state. ‘c’ is the condensed
+phase for the ‘a’ mode of MSTAR. ‘d’ is the same for the recommended
+‘b’ mode of operation. The value in mstar_mode will be updated accordingly after dedx_load_config() was applied.</p>
+<p>The ‘d’ mode is not allowed on Hydrogen, Helium and Lithium. In that case
+libdEdx will switch to ‘c’ mode. mstar_mode will NOT be updated in this case.
+The reason is, that when ‘d’ was requested for a compound, then only the elements Hydrogen, Helium and Lithium will be affected, leaving all other elements in ‘d’ mode.</p>
+<p>If DEDX_GAS is requested, then ‘g’ or ‘h’ is attempted,
+depending on if ‘a’ or ‘b’ mode was requested, respectively. The value in
+mstar_mode will be updated, accordingly, after dedx_load_config() was applied.</p>
+<p>However, for Hydrogen and Helium targets, only the ‘g’ mode is allowed for DEDX_GAS in MSTAR, i.e. ‘h’ mode is not allowed.
+libdEdx will then switch to ‘g’ in that case. mstar_mode will NOT be updated in this case. E.g. when working with a compound with ‘h’
+requested, only Hydrogen and Helium will be calculated using ‘g’ mode,
+and all other constituents remain in ‘h’ mode.
+Confusing? Yes.</p>
+</dd>
+<dt class="field-odd">i_value</dt>
+<dd class="field-odd"><p>if unspecified, then ICRU I-values are used for target
+compound. If target is set, or if target is 0, then it is
+calculated from the individual i-values set in
+<code class="docutils literal notranslate"><span class="pre">*elements_i_value</span></code>, but only when the <code class="docutils literal notranslate"><span class="pre">*elements_i_value</span> <span class="pre">are</span> <span class="pre">empty</span></code>,
+i.e. uninitialized.</p>
+</dd>
+<dt class="field-even">*elements_mass_fraction</dt>
+<dd class="field-even"><p>must be specified if target and elements_atoms is
+left undefined. If both are specified, then only
+elements_mass_fraction is considered, and element_atoms
+is ignored entirely. Mass fraction is the summed atomic
+mass of a constituing element, divided by the total
+atomic mass of the compound.</p>
+</dd>
+<dt class="field-odd">*elements_i_value</dt>
+<dd class="field-odd"><p>if target is 0, then individual I-values of elements can
+be specified here. If any values are found in
+<code class="docutils literal notranslate"><span class="pre">*elements_i_value</span></code>, then i_value is ignored. Zero is not allowed. If any
+of the I-values are specified, then they must be specified for all
+elements.</p>
+</dd>
+</dl>
+<p>As a minimum, you should specify program, target and ion, i.e.</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_CARBON</span><span class="p">;</span>
+<span class="n">cfg</span><span class="o">-&gt;</span><span class="n">program</span> <span class="o">=</span> <span class="n">DEDX_ICRU</span><span class="p">;</span>
+<span class="n">cfg</span><span class="o">-&gt;</span><span class="n">target</span> <span class="o">=</span> <span class="n">DEDX_PMMA</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>and then load the config</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">dedx_load_config</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span>
+                      <span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+                      <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>which will initialize the remaining configure options which may be needed.
+The options can be probed by the user, but beware that some hold NULL pointers.</p>
+<p>You have to call <code class="docutils literal notranslate"><span class="pre">dedx_load_config()</span></code> for each target/ion combination.
+If multiple combinations are used, you must allocate memory for each
+<code class="docutils literal notranslate"><span class="pre">*config</span></code> element, and call <code class="docutils literal notranslate"><span class="pre">dedx_load_config()</span></code> for each configuration.
+Since it, there had been observed some misbehave of the library using
+malloc for allocating memory to the config struct, it is recommended
+to use <code class="docutils literal notranslate"><span class="pre">calloc</span></code> or similar.</p>
+<p>Stopping power values are returned by:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">dedx_get_stp</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span>
+                   <span class="kt">int</span> <span class="n">config</span><span class="p">,</span>
+                   <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span>
+                   <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>energy: kinetic energy of a particle in MeV/nucleon.</p>
+<p>When you are done with the library you have to run</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_free_workspace</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="n">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span> <span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>to free the allocated memory.</p>
+<ul class="simple">
+<li><p>Bragg additivity rule:
+Braggs additivity rule is applied automatically if you request a target material that is not on the list in that particular stopping power routine.</p></li>
+<li><p>Own compounds:
+You can set up your own compounds by specifying each element in the dedx_config struct. Here is an example for water, set up by mass fraction:</p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span> <span class="o">=</span> <span class="n">DEDX_ASTAR</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_HELIUM</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_OXYGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.111894</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.888106</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Mass fractions are particularly useful if you want to use special
+isotopic compositions, instead of natural compositions.</p>
+<p>Alternatively, you can set it up by the relative amount of elements:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span> <span class="o">=</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_HELIUM</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_OXYGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Then libdEdx will use the natural isotope compositions, e.g. 12.0107 for natural
+carbon which also contains C-13 and C-14.</p>
+<ul class="simple">
+<li><p>Overriding I-value:
+Instead of using the default, I value for a compound, determined by either the
+predefined ICRU material list or Braggs additivity rule of the compound, you
+can specify the I-value manually for the BETHE-type algorithms:</p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span> <span class="o">=</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_HELIUM</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">i_value</span> <span class="o">=</span> <span class="mf">78.0</span><span class="p">;</span>                  <span class="c1">// new I-value in eV</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_OXYGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</pre></div>
+</div>
 </section>
 </section>
 
