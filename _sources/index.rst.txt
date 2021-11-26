@@ -1,1 +1,1 @@
-.. include:: ../../description.rst
+.. include:: ../../index.rst
