@@ -3,7 +3,16 @@ name: Automated actions
 on: [push]
 
 jobs:
-  build:
+  compile_code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+      - name: Compile with CMake
+        run: cmake . -B ./build
+
+
+  build_docs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
