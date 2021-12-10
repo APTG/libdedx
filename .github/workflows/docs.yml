@@ -4,16 +4,22 @@ on: [push]
 
 jobs:
   compile_code:
-    runs-on: ubuntu-latest
-    steps:
+      runs-on:  ${{ matrix.platform }}
+      strategy:
+       matrix:
+         platform: [ubuntu-latest, windows-latest]
+      steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
       - name: Compile with CMake
-        run: cmake . -B ./build
-
+        working-directory: build
+        run: | 
+          cmake -DCMAKE_BUILD_TYPE=Release ../ -DCMAKE_INSTALL_PREFIX=$HOME/usr
+          cmake --build . --target install -- -j2
 
   build_docs:
     runs-on: ubuntu-latest
+    needs: [compile_code]
     steps:
     - name: Checkout
       uses: actions/checkout@v2.4.0
