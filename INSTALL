@@ -13,9 +13,9 @@ Install cmake from your local linux distribition, or get it from http://www.cmak
 From source code:
 
    1) go to the directory where you have unpacked libdedx
-   2) mkdir build; cd build
+   2) mkdir build
    3) cmake ..
-   4) make
+   4) cmake --build . --target install -- -j2
 
 which will build the .so or .dll file depending on the platform.
 Additionally the example and auxilliary programs will be build, and the binary data tables will be generated.
