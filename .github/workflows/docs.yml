@@ -12,8 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.4.0
       - name: Compile with CMake
-        working-directory: build
         run: | 
+          mkdir build
+          cd build
           cmake -DCMAKE_BUILD_TYPE=Release ../ -DCMAKE_INSTALL_PREFIX=$HOME/usr
           cmake --build . --target install -- -j2
 
