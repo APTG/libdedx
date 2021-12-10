@@ -16,7 +16,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release ../ -DCMAKE_INSTALL_PREFIX=$HOME/usr
-          cmake --build . --target install -- -j2
+          cmake --build . --target install --
 
   build_docs:
     runs-on: ubuntu-latest
