@@ -12,7 +12,12 @@ add_library (dedx STATIC dedx_tools.c dedx_bethe.c  dedx.c  dedx_file_access.c  
 # removed math_dedx.h
 # removed dedx_atima.c
 
-target_link_libraries (dedx m)
+# see https://stackoverflow.com/questions/54935559/linking-math-library-in-cmake-file-on-windows-and-linux
+IF (WIN32)
+  target_link_libraries (dedx)
+ELSE()
+  target_link_libraries (dedx m)
+ENDIF()
 
 #link_directories(${CMAKEDEMO_BINARY_DIR}/libdedx)
 

@@ -397,8 +397,8 @@ float _dedx_get_max_energy_icru(int ion) {
 }
 
 int _dedx_check_ion(int prog, int ion) {
-	// checks if ion is availble in program. Returns 0 if yes, else -1.  
-	const int *ion_list;
+	// checks if ion is available in program. Returns 0 if yes, else -1.
+	int ion_list[113];
 	int i = 0;
 
 	if (prog >= DEDX_DEFAULT) {
