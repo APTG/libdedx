@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.0)
 
 project (dedx C)
 
@@ -29,13 +29,10 @@ configure_file (
 
 #set (CMAKE_VERBOSE_MAKEFILE true)
 set (CMAKE_VERBOSE_MAKEFILE false)
-ADD_DEFINITIONS(-O2 -Wall)
+#ADD_DEFINITIONS(-O2 -Wall)
 
 include_directories ("${PROJECT_SOURCE_DIR}/libdedx")
 link_directories ("${PROJECT_SOURCE_DIR}/libdedx")
-if(WIN32)
-else()
-endif()
 add_subdirectory(buildbins)
 #add_subdirectory(examples)
 add_subdirectory(libdedx)
