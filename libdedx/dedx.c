@@ -664,6 +664,24 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 }
 
 
+float dedx_get_advanced_stp(const int program, const int ion, const int target, float energy, int *err) {
+    dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
+    float stp;
+    config->target = target;
+    config->ion = ion;
+    config->program = program;
+    dedx_workspace *ws = dedx_allocate_workspace(1,err);
+    if(*err != 0)
+        return 0;
+    dedx_load_config(ws,config,err);
+
+    stp = dedx_get_stp(ws,config,energy,err);
+    if(*err != 0)
+        return 0;
+    dedx_free_config(config,err);
+    dedx_free_workspace(ws,err);
+    return stp;
+}
 
 float dedx_get_stp(dedx_workspace * ws, dedx_config * config, float energy, int * err)
 {	
