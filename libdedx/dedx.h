@@ -212,6 +212,7 @@ float dedx_get_stp(dedx_workspace * ws,
 		dedx_config * config, float energy, int * err);
 float dedx_get_simple_stp(int ion, int target, float energy, int *err);
 void dedx_free_config(dedx_config * config, int *err);
+int dedx_get_stp_table(int program, int ion, int target, int no_of_points, const float *energies, float *stps);
 /*
    dedx_config must be specified BEFORE calling dedx_load_config()
 
