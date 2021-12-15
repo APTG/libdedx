@@ -664,9 +664,9 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 }
 
 
-float dedx_get_advanced_stp(const int program, const int ion, const int target, float energy, int *err) {
-    dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
+float dedx_get_simple_stp_for_program(const int program, const int ion, const int target, float energy, int *err) {
     float stp;
+    dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
     config->target = target;
     config->ion = ion;
     config->program = program;
