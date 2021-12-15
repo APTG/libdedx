@@ -122,6 +122,9 @@ enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
 #define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
 #define DEDX_CAESIUM  DEDX_CESIUM
 
+enum dedx_stp_units {
+    DEDX_MEVCM2G, DEDX_MEVCM, DEDX_KEVUM
+};
 
 void dedx_get_error_code(char *err_str, int err);
 const char * dedx_get_program_name(int program);
@@ -138,6 +141,9 @@ void dedx_get_material_list(int program, int * material_list);
 void dedx_get_ion_list(int program, int * ion_list);
 float dedx_get_min_energy(int program, int ion);
 float dedx_get_max_energy(int program, int ion);
+int convert_units(int old_unit, int new_unit, int material, int no_of_points, const float * old_values, float * new_values);
+float conversion_factor(int old_unit, int new_unit, int material, int *err);
+
 typedef struct
 {
 	int cache;

@@ -417,7 +417,49 @@ int _dedx_check_ion(int prog, int ion) {
 	return 0;
 }
 
+float conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
+    const float density = _dedx_read_density(material, err);
 
+    float conversion_rate;
+
+    switch (old_unit) {
+        case DEDX_MEVCM2G:
+            conversion_rate = density;
+        break;
+        case DEDX_MEVCM:
+            conversion_rate = 1.f;
+        break;
+        case DEDX_KEVUM:
+            conversion_rate = 10.f;
+        break;
+        default: conversion_rate = 1.f;
+    }
+
+    switch (new_unit) {
+        case DEDX_MEVCM2G:
+            conversion_rate /= density;
+            break;
+        case DEDX_MEVCM:
+            conversion_rate /= 1.f;
+            break;
+        case DEDX_KEVUM:
+            conversion_rate /= 10.f;
+            break;
+        default: conversion_rate = 1.f;
+    }
+    return conversion_rate;
+}
+
+int convert_units(const int old_unit, const int new_unit, const int material, const int no_of_points, const float * old_values, float * new_values) {
+    int err = 0;
+    if (old_unit == new_unit) return err;
+
+    float conversion_rate = conversion_factor(old_unit, new_unit, material, &err);
+    for(int i = 0 ; i < no_of_points; i++) {
+        new_values[i] = old_values[i] * conversion_rate;
+    }
+    return err;
+}
 
 void dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 {
