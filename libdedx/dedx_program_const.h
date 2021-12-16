@@ -31,6 +31,7 @@ const char dedx_program_version_table[110][20] = {
   "1.0","","","","","","","","",""   // 100-109
 };
 
+
 const int dedx_available_programs[20] = {
   DEDX_ASTAR, DEDX_PSTAR,
   DEDX_ESTAR, DEDX_MSTAR,

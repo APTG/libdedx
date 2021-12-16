@@ -110,7 +110,7 @@ int _dedx_load_data(dedx_workspace * ws, stopping_data * data, float * energy, i
     ws->active_datasets++;
     return active_dataset;
 }
-/*Check the whether the energy are inside the boundery*/
+/*Check the whether the energy are inside the boundary*/
 int _dedx_check_energy_bounds(_dedx_lookup_data * data, float energy)
 {
 	int length = data->datapoints;
@@ -242,46 +242,29 @@ float dedx_get_i_value(int target, int *err)
 	return _dedx_get_i_value(target,DEDX_GAS,err);
 }
 
-void dedx_get_program_list(int *program_list) {
-    int i = 0;
-    while(dedx_available_programs[i] != -1){
-        program_list[i] = dedx_available_programs[i];
-        i++;
-    }
-    program_list[i] = -1;
+const int * dedx_get_program_list(void) {
+	/* returns a list of available programs, terminated with -1 */
+	return dedx_available_programs;
+}
+const int * dedx_get_material_list(int program) {
+  /* returns a list of available materials, terminated with -1 */
+  if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT)
+    return dedx_program_available_materials[0];
+  else
+    return dedx_program_available_materials[program];
 }
 
-void dedx_get_material_list(int program, int *material_list) {
-    int i = 0;
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {
-        while(dedx_program_available_materials[program][i] != -1){
-            material_list[i] = dedx_program_available_materials[0][i];
-            i++;
-        }
-    }
-    else {
-        while(dedx_program_available_materials[program][i] != -1){
-            material_list[i] = dedx_program_available_materials[program][i];
-            i++;
-        }
-    }
-    material_list[i] = -1;
-}
-void dedx_get_ion_list(int program, int * ion_list) {
-    int i = 0;
-    /* returns a list of available ions, terminated with -1 */
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */
-        for (i=0;i<112;i++)
-            ion_list[i]=i+1;
-        ion_list[112]=-1; // stopper
-    }
-    else {
-        while(dedx_program_available_ions[program][i] != -1){
-            ion_list[i] = dedx_program_available_ions[program][i];
-            i++;
-        }
-        ion_list[i] = -1;
-    }
+const int * dedx_get_ion_list(int program) {
+	/* returns a list of available ions, terminated with -1 */
+  if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */
+    static int temp[113],i;
+    for (i=0;i<112;i++)
+      temp[i]=i+1;
+    temp[112]=-1; // stopper
+    return temp;  // TODO: Hey Jakob, er det her lovligt eller et nyt mem leak?
+  }
+  else
+    return dedx_program_available_ions[program];
 }
 
 float dedx_get_min_energy(int program, int ion) {
@@ -397,7 +380,7 @@ float _dedx_get_max_energy_icru(int ion) {
 
 int _dedx_check_ion(int prog, int ion) {
 	// checks if ion is available in program. Returns 0 if yes, else -1.
-	int ion_list[113];
+	const int *ion_list;
 	int i = 0;
 
 	if (prog >= DEDX_DEFAULT) {
@@ -407,7 +390,7 @@ int _dedx_check_ion(int prog, int ion) {
 			return 1;
 	}
 
-	dedx_get_ion_list(prog, ion_list);
+	ion_list = dedx_get_ion_list(prog);
 	while (ion_list[i] != -1) {
 		if (ion_list[i] == ion)      
 			return 1;
@@ -416,51 +399,7 @@ int _dedx_check_ion(int prog, int ion) {
 	return 0;
 }
 
-float conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
-    const float density = _dedx_read_density(material, err);
 
-    float conversion_rate;
-
-    // convert from any old unit to MeV/cm
-    switch (old_unit) {
-        case DEDX_MEVCM2G:
-            conversion_rate = density; // conversion MeV cm2/g --> MeV/cm
-        break;
-        case DEDX_MEVCM:
-            conversion_rate = 1.f;  // MeV/cm -> MeV/cm
-        break;
-        case DEDX_KEVUM:
-            conversion_rate = 10.f; // keV/um -> MeV/cm
-        break;
-        default: conversion_rate = 1.f;
-    }
-
-    // convert from MeV/cm to any new unit
-    switch (new_unit) {
-        case DEDX_MEVCM2G:
-            conversion_rate /= density;  // MeV/cm -> MeV cm2/g
-            break;
-        case DEDX_MEVCM:
-            conversion_rate /= 1.f; // MeV/cm -> MeV/cm
-            break;
-        case DEDX_KEVUM:
-            conversion_rate /= 10.f; // MeV/cm -> keV/um
-            break;
-        default: conversion_rate = 1.f;
-    }
-    return conversion_rate;
-}
-
-int convert_units(const int old_unit, const int new_unit, const int material, const int no_of_points, const float * old_values, float * new_values) {
-    int err = 0;
-    if (old_unit == new_unit) return err;
-
-    float conversion_rate = conversion_factor(old_unit, new_unit, material, &err);
-    for(int i = 0 ; i < no_of_points; i++) {
-        new_values[i] = old_values[i] * conversion_rate;
-    }
-    return err;
-}
 
 void dedx_load_config(dedx_workspace *ws, dedx_config * config, int *err)
 {
@@ -706,46 +645,7 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 	return 0;
 }
 
-//energy - in MeV/nucleon, unless  program is ESTAR, then MeV
-//stp - in MeVcm2/g
-int dedx_get_stp_table(const int program, const int ion, const int target, const int no_of_points, const float *energies, float *stps) {
-    int err = 0;
-    dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
-    config->target = target;
-    config->ion = ion;
-    config->program = program;
-    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
 
-    if (err != 0) return err;
-    dedx_load_config(ws,config, &err);
-
-    for(int i = 0 ; i < no_of_points; i++){
-        stps[i] =  dedx_get_stp(ws, config, energies[i], &err);
-    }
-    dedx_free_config(config, &err);
-    dedx_free_workspace(ws, &err);
-
-    return err;
-}
-
-float dedx_get_simple_stp_for_program(const int program, const int ion, const int target, float energy, int *err) {
-    float stp;
-    dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
-    config->target = target;
-    config->ion = ion;
-    config->program = program;
-    dedx_workspace *ws = dedx_allocate_workspace(1,err);
-    if(*err != 0)
-        return 0;
-    dedx_load_config(ws,config,err);
-
-    stp = dedx_get_stp(ws,config,energy,err);
-    if(*err != 0)
-        return 0;
-    dedx_free_config(config,err);
-    dedx_free_workspace(ws,err);
-    return stp;
-}
 
 float dedx_get_stp(dedx_workspace * ws, dedx_config * config, float energy, int * err)
 {	
