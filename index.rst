@@ -430,7 +430,7 @@ List of functions available in dedx.h:
   float            dedx_get_stp(dedx_workspace *ws, 
 		              dedx_config *config, float energy, 
 			      int *err);
-  void             dedx_get_version(int *major, int *minor, int *patch, int *svn);
+  void             dedx_get_version(int *major, int *minor, int *patch);
   void             dedx_load_config(dedx_workspace *ws, 
 		                  dedx_config *config, int *err);
 

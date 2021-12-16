@@ -131,7 +131,7 @@ const char * dedx_get_program_name(int program);
 const char * dedx_get_program_version(int program);
 const char * dedx_get_material_name(int material);
 const char * dedx_get_ion_name(int ion);
-void dedx_get_version(int *major, int *minor, int *patch, int *svn);
+void dedx_get_version(int *major, int *minor, int *patch);
 void dedx_get_composition(int target, float composition[][2], 
 	unsigned int * comp_len, int *err);
 float dedx_get_i_value(int target, int *err);

@@ -33,7 +33,7 @@ if(DO_PYTHON_BINDINGS)
     COMMAND echo "                    library_dirs = [\\'${PROJECT_BINARY_DIR}/libdedx\\']," >> setup.py
     COMMAND echo "                    sources = [\\'libdedx.c\\']\\)" >> setup.py
     COMMAND echo "setup \\(name = \\'libdedx\\'," >> setup.py
-    COMMAND echo "       version = \\'${DEDX_VERSION_MAJOR}.${DEDX_VERSION_MINOR}.${DEDX_VERSION_PATCH}-svn${DEDX_WC_REVISION}\\'," >> setup.py
+    COMMAND echo "       version = \\'${DEDX_VERSION_MAJOR}.${DEDX_VERSION_MINOR}.${DEDX_VERSION_PATCH}\\'," >> setup.py
     COMMAND echo "       description = \\'Wrapper for stopping power library libdedx\\'," >> setup.py
     COMMAND echo "       author = \\'Jakob Toftegaard\\'," >> setup.py
     COMMAND echo "       author_email = \\'jakob.toftegaard@gmail.com\\'," >> setup.py

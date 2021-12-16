@@ -31,17 +31,15 @@ int main()
   //float err_accept = 0.005; // accept 0.5 % deviation to either side
   dedx_config * config;
 
-  int vmajor,vminor,vpatch,vsvn;
+  int vmajor,vminor,vpatch;
   int counter = 1;
   float energy_grid[] = {0.07,1,10,78,1000};
 
-  dedx_get_version(&vmajor,&vminor,&vpatch,&vsvn);
+  dedx_get_version(&vmajor,&vminor,&vpatch);
 
   spacer();
-  printf("Test#     libdEdx, version %i.%i.%i-svn%i",
-	 vmajor,vminor,vpatch,vsvn);
-  printf("%-31s : Calculated  - Expected      - Conclusion    %%%%\n",
-	 "");
+  printf("Test#     libdEdx, version %i.%i.%i", vmajor,vminor,vpatch);
+  printf("%-31s : Calculated  - Expected      - Conclusion    %%%%\n", "");
   spacer();
 
 

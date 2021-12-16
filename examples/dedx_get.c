@@ -21,11 +21,9 @@ int main(int argc, char *argv[])
   char *str = (char *)malloc(100);
 
   if (argc != 5) {
-    dedx_get_version(&vmaj,&vmin,&vpatch,&vsvn);
+    dedx_get_version(&vmaj,&vmin,&vpatch);
     printf("\n This is getdedx using libdEdx version %i.%i.%i",
 	   vmaj,vmin,vpatch);
-    if (vsvn > 0)
-      printf("-svn%i",vsvn);
     printf("\n");
     printf(" (c) 2012 by Jakob Toftegaard <jakob.toftegaard@gmail.com>\n");
     printf(" and Niels Bassler <bassler@phys.au.dk>\n");

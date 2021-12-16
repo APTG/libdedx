@@ -226,12 +226,11 @@ const char * dedx_get_ion_name(int ion)
 	return dedx_ion_table[ion];
 }
 
-void dedx_get_version(int *major, int *minor, int *patch, int *svn)
+void dedx_get_version(int *major, int *minor, int *patch)
 {
 	*major = DEDX_VERSION_MAJOR;
 	*minor = DEDX_VERSION_MINOR;
 	*patch = DEDX_VERSION_PATCH;
-	*svn   = DEDX_VERSION_SVN;
 	return;
 }
 void dedx_get_composition(int target, float composition[][2], unsigned int * comp_len, int *err)

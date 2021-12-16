@@ -167,9 +167,8 @@ int main(int argc, char *argv[]){
 
 
 	/* Calculation of table */
-	dedx_get_version(&vmajor,&vminor,&vpatch,&vsvn);
-	printf("* Stopping power tables calculated with libdEdx, version %i.%i.%i-svn%i\n",
-	       vmajor,vminor,vpatch,vsvn);
+	dedx_get_version(&vmajor,&vminor,&vpatch);
+	printf("* Stopping power tables calculated with libdEdx, version %i.%i.%i\n", vmajor,vminor,vpatch);
 	printf("Preparing stopping power table for %s using %s.\n",
 	       dedx_get_material_name(target_select), progname);
 	float ste; // float to store the stopping power
