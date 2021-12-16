@@ -32,7 +32,6 @@ jobs:
         run: |
           ./build/examples/Debug/dedx_example
           ./build/examples/Debug/dedx_list
-          ./build/examples/Debug/dedx_use_wrappers
 
       - name: Install with CMake
         if: ${{ runner.os == 'Linux' }}
