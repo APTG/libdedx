@@ -1,4 +1,11 @@
-cmake_minimum_required (VERSION 3.0)
+# As minimum CMake we choose version which supports Ubuntu 18.04 LTS
+# I followed advice from https://hsf-training.github.io/hsf-training-cmake-webpage/aio/index.html
+# CMake 3.10 was released 20.11.2017 (https://www.kitware.com/cmake-3-10-0-available-for-download/)
+
+# consider using newer version of CMake, i.e. CMake 3.15 (released 17.07.2019) supports `-j N threads` and `-t target`
+# (following https://indico.jlab.org/event/420/contributions/7961/attachments/6507/8734/CMakeSandCroundtable.slides.pdf)
+
+cmake_minimum_required (VERSION 3.10)
 
 project (dedx C)
 
