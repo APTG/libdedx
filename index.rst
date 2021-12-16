@@ -82,7 +82,24 @@ For all data tables and equations, it is possible to use Bragg's additivity rule
 3. Installation
 ***************
 
-See the INSTALL file.
+Configuration and installation are handled with CMAKE.
+Install CMake from your local Linux distribution, or get it from http://www.cmake.org if using Windows
+
+From source code::
+
+   1) go to the directory where you have unpacked libdedx
+   2) cmake -S . -B build
+   3) cmake --build build
+
+which will build the .so or .dll file depending on the platform.
+Additionally, the example and auxiliary programs will be built, and the binary data tables will be generated.
+
+Finally, run::
+
+   5) cmake --install build
+
+this will copy the binary tables and tables to the relevant places on your system. On Linux, you will need to prefix this command with `sudo` or run it as root.
+
 
 ******
 4. Use
@@ -93,7 +110,7 @@ UNITS: Energies are always in terms of MeV/nucleon, except for ESTAR, where the 
 Stopping power values can be retrieved in two different ways: 
 
 1. a simple method for simple implementation, 
-2. a bit more complicated way, but more suitable for fast and multithreaded applications.
+2. a bit more complicated way, but more suitable for fast and multithreading applications.
 
 Method 1) involves a single function call:
 
@@ -150,7 +167,7 @@ Next you must initialize your configuration, by writing to the cfg struct.
       int target;            // target can either be an element or a compound
       int ion;               // id number of projectile
       int ion_a;             // nucleon number of projectile
-      int bragg_used;        // is 1 if braggs additivity rule was applied
+      int bragg_used;        // is 1 if Braggs additivity rule was applied
       int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
       unsigned int elements_length;   // elements_length  --- number of unique elements in comp.
       int * elements_id;     // elements_id      --- Z of each element
