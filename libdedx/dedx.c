@@ -707,6 +707,27 @@ int _dedx_load_atima(stopping_data * data, dedx_config * config, float * energy,
 	return 0;
 }
 
+//energy - in MeV/nucleon, unless  program is ESTAR, then MeV
+//stp - in MeVcm2/g
+int dedx_get_stp_table(const int program, const int ion, const int target, const int no_of_points, const float *energies, float *stps) {
+    int err = 0;
+    dedx_config *config = (dedx_config *)calloc(1,sizeof(dedx_config));
+    config->target = target;
+    config->ion = ion;
+    config->program = program;
+    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+
+    if (err != 0) return err;
+    dedx_load_config(ws,config, &err);
+
+    for(int i = 0 ; i < no_of_points; i++){
+        stps[i] =  dedx_get_stp(ws, config, energies[i], &err);
+    }
+    dedx_free_config(config, &err);
+    dedx_free_workspace(ws, &err);
+
+    return err;
+}
 
 float dedx_get_simple_stp_for_program(const int program, const int ion, const int target, float energy, int *err) {
     float stp;
