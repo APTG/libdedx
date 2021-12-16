@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <dedx.h>
+
+#include "dedx_wrappers.h"
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
     int target = DEDX_WATER_LIQUID;
     int no_of_points = 100;
     for(int i = 1; i < no_of_points + 1; i++){
-        energies[i - 1] = i * 1.1;
+        energies[i - 1] = i * 1.1f;
     }
 
     err = dedx_get_stp_table(program, ion, target, no_of_points, energies, results);

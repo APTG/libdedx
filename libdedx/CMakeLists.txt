@@ -3,7 +3,7 @@ set(dedx_data data/ASTAR.bin data/astarEng.dat data/mstarEng.dat data/pstarEng.b
 
 set(dedx_data_bin data/ASTAR.bin data/astarEng.bin data/ICRU73.bin data/icru73Eng.bin data/ICRU73_NEW.bin data/icru73_newEng.bin data/MSTAR.bin data/mstarEng.bin data/PSTAR.bin data/ICRU_PSTAR.bin data/ICRU_ASTAR.bin data/pstarEng.bin data/betheEng.bin data/icru_astarEng.bin data/icru_pstarEng.bin data/compos.txt data/effective_charge.dat data/short_names data/composition data/gas_states.dat data/atima_compos)
 
-add_library (dedx STATIC dedx_tools.c dedx_bethe.c  dedx.c  dedx_file_access.c  dedx_file.c  dedx_mpaul.c  dedx_mstar.c  dedx_spline.c  dedx_split.c  dedx_periodic_table.c tools/dedx_math.c dedx_validate.c dedx_wrappers.h)
+add_library (dedx STATIC dedx_tools.c dedx_bethe.c  dedx.c   dedx_wrappers.c dedx_file_access.c  dedx_file.c  dedx_mpaul.c  dedx_mstar.c  dedx_spline.c  dedx_split.c  dedx_periodic_table.c tools/dedx_math.c dedx_validate.c)
 # removed math_dedx.h
 # removed dedx_atima.c
 
@@ -16,7 +16,7 @@ IF (NOT WIN32)
   target_link_libraries (m)
 ENDIF()
 
-install (FILES dedx.h dedx_tools.h DESTINATION include)
+install (FILES dedx.h dedx_tools.h dedx_wrappers.h DESTINATION include)
 install (TARGETS dedx DESTINATION lib)
 if(WIN32)
   install (FILES ${dedx_data_bin} DESTINATION data)

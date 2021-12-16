@@ -200,7 +200,7 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config * config,float energy,int *
 }
 
 
-float conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
+float _conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
     const float density = _dedx_read_density(material, err);
 
     float conversion_rate;
@@ -239,7 +239,7 @@ int convert_units(const int old_unit, const int new_unit, const int material, co
     int err = 0;
     if (old_unit == new_unit) return err;
 
-    float conversion_rate = conversion_factor(old_unit, new_unit, material, &err);
+    float conversion_rate = _conversion_factor(old_unit, new_unit, material, &err);
     for(int i = 0 ; i < no_of_points; i++) {
         new_values[i] = old_values[i] * conversion_rate;
     }

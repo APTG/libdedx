@@ -22,7 +22,6 @@
 #include "dedx_spline.h"
 #include "dedx_lookup_data.h"
 #include "dedx_bethe.h"
-//#include "dedx_atima.h"
 #include "dedx_config.h"
 #include "dedx_periodic_table.h"
 #include "dedx_program_const.h"
