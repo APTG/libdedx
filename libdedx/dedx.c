@@ -422,28 +422,30 @@ float conversion_factor(const int old_unit, const int new_unit, const int materi
 
     float conversion_rate;
 
+    // convert from any old unit to MeV/cm
     switch (old_unit) {
         case DEDX_MEVCM2G:
-            conversion_rate = density;
+            conversion_rate = density; // conversion MeV cm2/g --> MeV/cm
         break;
         case DEDX_MEVCM:
-            conversion_rate = 1.f;
+            conversion_rate = 1.f;  // MeV/cm -> MeV/cm
         break;
         case DEDX_KEVUM:
-            conversion_rate = 10.f;
+            conversion_rate = 10.f; // keV/um -> MeV/cm
         break;
         default: conversion_rate = 1.f;
     }
 
+    // convert from MeV/cm to any new unit
     switch (new_unit) {
         case DEDX_MEVCM2G:
-            conversion_rate /= density;
+            conversion_rate /= density;  // MeV/cm -> MeV cm2/g
             break;
         case DEDX_MEVCM:
-            conversion_rate /= 1.f;
+            conversion_rate /= 1.f; // MeV/cm -> MeV/cm
             break;
         case DEDX_KEVUM:
-            conversion_rate /= 10.f;
+            conversion_rate /= 10.f; // MeV/cm -> keV/um
             break;
         default: conversion_rate = 1.f;
     }
