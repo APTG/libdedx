@@ -36,7 +36,7 @@ configure_file (
 include_directories ("${PROJECT_SOURCE_DIR}/libdedx")
 link_directories ("${PROJECT_SOURCE_DIR}/libdedx")
 add_subdirectory(buildbins)
-#add_subdirectory(examples)
+add_subdirectory(examples)
 add_subdirectory(libdedx)
 #add_subdirectory(test)
 
