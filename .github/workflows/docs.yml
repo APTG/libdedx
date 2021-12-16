@@ -35,6 +35,12 @@ jobs:
           ./build/examples/Debug/dedx_use_wrappers
 
       - name: Install with CMake
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo cmake --install build
+
+      - name: Install with CMake
+        if: ${{ runner.os == 'Windows' }}
         run: |
           cmake --install build
 
