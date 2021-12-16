@@ -19,8 +19,6 @@ jobs:
         run: | 
           cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
           cmake --build build
-#          cmake -DCMAKE_BUILD_TYPE=Release ../ -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/usr
-#          cmake --build . --target install --
 
   build_docs:
     runs-on: ubuntu-latest

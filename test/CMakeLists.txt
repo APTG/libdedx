@@ -3,8 +3,13 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 add_executable(loadTest loadTest.c)
 add_executable(test test.c)
 
+if(WIN32)
+target_link_libraries (loadTest dedx)
+target_link_libraries (test dedx)
+ELSE()
 target_link_libraries (loadTest dedx m)
 target_link_libraries (test dedx m)
+ENDIF()
 
 # TODO: add testing suite
 ENABLE_TESTING()
