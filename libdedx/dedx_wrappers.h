@@ -1,6 +1,7 @@
 #ifndef DEDX_WRAPPERS_INCLUDED
 #define DEDX_WRAPPERS_INCLUDED
 
+#include <stdlib.h>
 #include "dedx.h"
 
 void dedx_fill_program_list(int *program_list);

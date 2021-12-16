@@ -13,7 +13,7 @@ target_link_libraries (dedx)
 # You must avoid adding it as a link library when building for Windows.
 # see https://stackoverflow.com/questions/54935559/linking-math-library-in-cmake-file-on-windows-and-linux
 IF (NOT WIN32)
-  target_link_libraries (m)
+  target_link_libraries (dedx m)
 ENDIF()
 
 install (FILES dedx.h dedx_tools.h dedx_wrappers.h DESTINATION include)

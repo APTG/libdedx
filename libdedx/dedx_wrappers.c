@@ -16,49 +16,38 @@
 */
 
 #include "dedx_wrappers.h"
-#include "dedx_program_const.h"
 
 void dedx_fill_program_list(int *program_list) {
-    /* fill a list of available programs, terminated with -1 */
+    /* fill list of available programs, terminated with -1 */
     int i = 0;
-    while (dedx_available_programs[i] != -1) {
-        program_list[i] = dedx_available_programs[i];
+    const int *available_programs = dedx_get_program_list();
+
+    while (available_programs[i] != -1) {
+        program_list[i] = available_programs[i];
         i++;
     }
     program_list[i] = -1;
 }
 
 void dedx_fill_material_list(int program, int *material_list) {
-    /* fills a list of available materials, terminated with -1 */
+    /* fills list of available materials, terminated with -1 */
+    const int *available_material_list = dedx_get_material_list(program);
     int i = 0;
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {
-        while (dedx_program_available_materials[program][i] != -1) {
-            material_list[i] = dedx_program_available_materials[0][i];
-            i++;
-        }
-    } else {
-        while (dedx_program_available_materials[program][i] != -1) {
-            material_list[i] = dedx_program_available_materials[program][i];
-            i++;
-        }
+    while (available_material_list[i] != -1) {
+        material_list[i] = available_material_list[i];
+        i++;
     }
     material_list[i] = -1;
 }
 
 void dedx_fill_ion_list(int program, int *ion_list) {
     int i = 0;
-    /* returns a list of available ions, terminated with -1 */
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) {  /* any ion, no restrictions */
-        for (i = 0; i < 112; i++)
-            ion_list[i] = i + 1;
-        ion_list[112] = -1; // stopper
-    } else {
-        while (dedx_program_available_ions[program][i] != -1) {
-            ion_list[i] = dedx_program_available_ions[program][i];
-            i++;
-        }
-        ion_list[i] = -1;
+    const int *available_ion_list = dedx_get_ion_list(program);
+    while (available_ion_list[i] != -1) {
+        ion_list[i] = available_ion_list[i];
+        i++;
     }
+    ion_list[i] = -1;
 }
 
 
