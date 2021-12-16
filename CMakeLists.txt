@@ -47,3 +47,9 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY)
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+# Do we want to build the tests?
+#option(ENABLE_TESTS "Enable unit tests" ON)
+#if(ENABLE_TESTS)
+#  add_subdirectory(test)
+#endif()

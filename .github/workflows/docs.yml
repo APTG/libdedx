@@ -20,6 +20,13 @@ jobs:
           cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
           cmake --build build
 
+      - name: Run compiled programs
+        run: |
+          ./build/examples/dedx_bethe
+          ./build/examples/dedx_example
+          ./build/examples/dedx_list
+          ./build/examples/dedx_use_wrappers
+
   build_docs:
     runs-on: ubuntu-latest
     needs: [compile_code]
