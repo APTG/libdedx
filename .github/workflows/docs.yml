@@ -22,7 +22,7 @@ jobs:
 
       - name: Run compiled programs
         run: |
-          ./build/examples/dedx_bethe
+          #./build/examples/dedx_bethe
           ./build/examples/dedx_example
           ./build/examples/dedx_list
           ./build/examples/dedx_use_wrappers
