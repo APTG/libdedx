@@ -20,12 +20,28 @@ jobs:
           cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
           cmake --build build
 
-      - name: Run compiled programs
+      - name: Run compiled programs on Linux
+        if: ${{ runner.os == 'Linux' }}
         run: |
-          #./build/examples/dedx_bethe
           ./build/examples/dedx_example
           ./build/examples/dedx_list
           ./build/examples/dedx_use_wrappers
+
+      - name: Run compiled programs on Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          ./build/examples/Debug/dedx_example
+          ./build/examples/Debug/dedx_list
+          ./build/examples/Debug/dedx_use_wrappers
+
+      - name: Install with CMake
+        run: |
+          cmake --install build
+
+      - name: Test installed library
+        run: |
+          getdedx PSTAR HYDROGEN 276 100
+
 
   build_docs:
     runs-on: ubuntu-latest
