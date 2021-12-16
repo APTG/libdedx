@@ -22,7 +22,8 @@ add_custom_command(
   POST_BUILD  # POST_BUILD - Run after all other rules within the target have been executed.
   # `${CMAKE_COMMAND}` -E executes CMake commands (like echo or rm) in a portable way, this should work on Linux and Windows
   COMMAND ${CMAKE_COMMAND} -E echo "Removing old *.bin files..."
-  COMMAND ${CMAKE_COMMAND} -E rm "${PROJECT_SOURCE_DIR}/libdedx/data/*.bin"
+  # remove previously generated files, `-f` force option used to have success even if files-to-be-removed do not exists
+  COMMAND ${CMAKE_COMMAND} -E rm -f "${PROJECT_SOURCE_DIR}/libdedx/data/*.bin"
   COMMAND dedx_build_bin
   COMMENT "Execute command to build platform dependent binary data tables..."
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libdedx
