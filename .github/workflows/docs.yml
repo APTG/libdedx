@@ -37,14 +37,6 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo cmake --install build
-
-      - name: Install with CMake
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          cmake --install build
-
-      - name: Test installed library
-        run: |
           getdedx PSTAR HYDROGEN 276 100
 
 
