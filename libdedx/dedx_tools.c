@@ -198,3 +198,50 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config * config,float energy,int *
 			    acc,eps,&calculation_error);
 	return range;
 }
+
+
+float _conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
+    const float density = _dedx_read_density(material, err);
+
+    float conversion_rate;
+
+    // convert from any old unit to MeV/cm
+    switch (old_unit) {
+        case DEDX_MEVCM2G:
+            conversion_rate = density; // conversion MeV cm2/g --> MeV/cm
+            break;
+        case DEDX_MEVCM:
+            conversion_rate = 1.f;  // MeV/cm -> MeV/cm
+            break;
+        case DEDX_KEVUM:
+            conversion_rate = 10.f; // keV/um -> MeV/cm
+            break;
+        default: conversion_rate = 1.f;
+    }
+
+    // convert from MeV/cm to any new unit
+    switch (new_unit) {
+        case DEDX_MEVCM2G:
+            conversion_rate /= density;  // MeV/cm -> MeV cm2/g
+            break;
+        case DEDX_MEVCM:
+            conversion_rate /= 1.f; // MeV/cm -> MeV/cm
+            break;
+        case DEDX_KEVUM:
+            conversion_rate /= 10.f; // MeV/cm -> keV/um
+            break;
+        default: conversion_rate = 1.f;
+    }
+    return conversion_rate;
+}
+
+int convert_units(const int old_unit, const int new_unit, const int material, const int no_of_points, const float * old_values, float * new_values) {
+    int err = 0;
+    if (old_unit == new_unit) return err;
+
+    float conversion_rate = _conversion_factor(old_unit, new_unit, material, &err);
+    for(int i = 0 ; i < no_of_points; i++) {
+        new_values[i] = old_values[i] * conversion_rate;
+    }
+    return err;
+}

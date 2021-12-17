@@ -11,12 +11,34 @@ jobs:
       steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
+
+      - name: Check CMake version
+        run: cmake --version
+
       - name: Compile with CMake
         run: | 
-          mkdir build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ../ -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/usr
-          cmake --build . --target install --
+          cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
+          cmake --build build
+
+      - name: Run compiled programs on Linux
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          ./build/examples/dedx_example
+          ./build/examples/dedx_list
+          ./build/examples/dedx_use_wrappers
+
+      - name: Run compiled programs on Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          ./build/examples/Debug/dedx_example
+          ./build/examples/Debug/dedx_list
+
+      - name: Install with CMake
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo cmake --install build
+          getdedx PSTAR HYDROGEN 276 100
+
 
   build_docs:
     runs-on: ubuntu-latest

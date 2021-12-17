@@ -39,7 +39,7 @@ const int dedx_available_programs[20] = {
   DEDX_BETHE_EXT00, -1};
 
 const int dedx_program_available_ions[110][20] = {
-  // currently, excluding BETHE, which is handled in dedx.c
+  // currently excluding BETHE, which is handled in dedx.c
   {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,-1}, // all ions
   {2,-1}, // ASTAR
   {1,-1}, // PSTAR
@@ -52,7 +52,7 @@ const int dedx_program_available_ions[110][20] = {
   {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,-1} // ICRU
 };
 const int dedx_program_available_materials[110][290] = {
-  // currently, excluding BETHE, which is handled in dedx.c
+  // currently excluding BETHE, which is handled in dedx.c
   {1,2,3,4,5,6,7,8,9,
    10,11,12,13,14,15,16,17,18,19,
    20,21,22,23,24,25,26,27,28,29,

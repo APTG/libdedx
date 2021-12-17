@@ -122,28 +122,22 @@ enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
 #define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
 #define DEDX_CAESIUM  DEDX_CESIUM
 
-enum dedx_stp_units {
-    DEDX_MEVCM2G, DEDX_MEVCM, DEDX_KEVUM
-};
 
 void dedx_get_error_code(char *err_str, int err);
 const char * dedx_get_program_name(int program);
 const char * dedx_get_program_version(int program);
 const char * dedx_get_material_name(int material);
 const char * dedx_get_ion_name(int ion);
-void dedx_get_version(int *major, int *minor, int *patch, int *svn);
+void dedx_get_version(int *major, int *minor, int *patch);
 void dedx_get_composition(int target, float composition[][2], 
 	unsigned int * comp_len, int *err);
 float dedx_get_i_value(int target, int *err);
 
-void  dedx_get_program_list(int * program_list);
-void dedx_get_material_list(int program, int * material_list);
-void dedx_get_ion_list(int program, int * ion_list);
+const int * dedx_get_program_list(void);
+const int * dedx_get_material_list(int program);
+const int * dedx_get_ion_list(int program);
 float dedx_get_min_energy(int program, int ion);
 float dedx_get_max_energy(int program, int ion);
-int convert_units(int old_unit, int new_unit, int material, int no_of_points, const float * old_values, float * new_values);
-float conversion_factor(int old_unit, int new_unit, int material, int *err);
-
 typedef struct
 {
 	int cache;
@@ -217,9 +211,7 @@ void dedx_load_config(dedx_workspace *ws,
 float dedx_get_stp(dedx_workspace * ws, 
 		dedx_config * config, float energy, int * err);
 float dedx_get_simple_stp(int ion, int target, float energy, int *err);
-float dedx_get_simple_stp_for_program(const int program, const int ion, const int target, float energy, int *err);
 void dedx_free_config(dedx_config * config, int *err);
-int dedx_get_stp_table(int program, int ion, int target, int no_of_points, const float *energies, float *stps);
 /*
    dedx_config must be specified BEFORE calling dedx_load_config()
 
