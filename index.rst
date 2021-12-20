@@ -11,11 +11,9 @@ This is libdEdx
 0. License and disclaimer
 *************************
 |  libdEdx is licensed under GPL version 3
-|  (c) Copyright 2010-2012 by
-|  Jakob Toftegaard, jakob.toftegaard@gmail.com
-|  Niels Bassler, bassler@phys.au.dk
-|  for the Aarhus Particle Therapy Group 
-|  http://www.phys.au.dk/aptg
+|  (c) Copyright 2010-2021 by
+|  the libdEdx team
+|  https://github.com/APTG/libdedx/graphs/contributors
 
 |  This program is free software: you can redistribute it and/or modify
 |  it under the terms of the GNU General Public License as published by
@@ -41,9 +39,12 @@ Niels Bassler acknowledges support from the Danish Cancer Society.
 1. Introduction
 ***************
 
-libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles. It is a collection of commonly known stopping power tables and stopping-power routines. You can either use it as a library, by including the :code:`<dedx.h>` file and linking against the dedx library, or manually access a value with the :code:`getdedx` command.
+libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles.
+It is a collection of commonly known stopping power tables and stopping-power routines.
+You can either use it as a library, by including the :code:`<dedx.h>` file and linking against the dedx library,
+or manually access a value with the :code:`getdedx` command.
 
-A web front end is available on http://dedx.au.dk
+A testing version of the web front end is available on https://aptg.github.io/web_dev/
 
 *****************
 2. Data available
@@ -938,7 +939,8 @@ List of elements and compounds which are on gas phase by default:
 | 277: WATERVAPOR
 
 In your computer code, all materials and ions can also be accessed by their name
-via the ``DEDX_`` prefix. However, there are occasionally small variations in the naming scheme. Enums are defined in ``dedx.h``, but are listed here for convenience:
+via the ``DEDX_`` prefix. However, there are occasionally small variations in the naming scheme.
+Enums are defined in ``dedx.h``, but are listed here for convenience:
 
 .. code-block:: C
 
@@ -1054,21 +1056,3 @@ via the ``DEDX_`` prefix. However, there are occasionally small variations in th
   #define DEDX_TEFLON   DEDX_POLYTETRAFLUOROETHYLENE
   #define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
   #define DEDX_CAESIUM  DEDX_CESIUM
-
-
-********************
-A.4 Additional notes
-********************
-
-
-To build a tarball:
-
-.. code-block:: bash
-
-  libdedx/build$ make package_source
-
-To build a deb package:
-
-.. code-block:: bash
-
-  libdedx/build cpack -G DEB
