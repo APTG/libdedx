@@ -94,9 +94,33 @@ float dedx_get_simple_stp_for_program(const int program, const int ion, const in
 }
 
 int dedx_get_stp_table_size(const int program, const int ion, const int target){
-    return 0;
+    int err = 0;
+    int result = -1;
+
+    dedx_workspace *ws;
+    dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
+    ws = dedx_allocate_workspace(1,&err);
+
+    // set program + ion + target combination
+    cfg->program = program;
+    cfg->ion = ion;
+    cfg->target = target;
+
+    // load spline database from the data files, it contains number of energy+stp samples
+    dedx_load_config(ws, cfg, &err);
+
+    // config loading failed, returning exit code
+    if(err != 0)
+        return -1;
+
+    // assume only one dataset is loaded, extract number of samples
+    if( ws->datasets == 1 ){
+        result = ws->loaded_data[0]->n;
+    }
+
+    return result;
 };
 
 int dedx_fill_default_energy_stp_table(const int program, const int ion, const int target, float *energies, float *stps){
-
+    return 0;
 };
