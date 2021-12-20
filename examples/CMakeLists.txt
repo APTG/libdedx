@@ -23,4 +23,9 @@ IF (NOT WIN32)
     target_link_libraries (dedx_use_wrappers m)
 ENDIF()
 
+# some of the examples need data/ folder in the same location as generated executable
+add_custom_command(TARGET dedx_example PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/libdedx/data $<TARGET_FILE_DIR:dedx_example>/data)
+
 install (TARGETS getdedx DESTINATION bin)

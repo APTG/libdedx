@@ -650,7 +650,7 @@ float dedx_get_stp(dedx_workspace * ws, dedx_config * config, float energy, int 
 {	
 	int id = config->cfg_id;
 	*err = 0;
-	//Check that the energy is inside the boundery
+	//Check that the energy is within the boundary
 	if((*err = _dedx_check_energy_bounds(ws->loaded_data[id],energy)) != 0)
 		return 0;
 	if(id > ws->active_datasets) //Check that the dataset is loaded.
