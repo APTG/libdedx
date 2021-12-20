@@ -92,3 +92,11 @@ float dedx_get_simple_stp_for_program(const int program, const int ion, const in
     dedx_free_workspace(ws, err);
     return stp;
 }
+
+int dedx_get_stp_table_size(const int program, const int ion, const int target){
+    return 0;
+};
+
+int dedx_fill_default_energy_stp_table(const int program, const int ion, const int target, float *energies, float *stps){
+
+};
