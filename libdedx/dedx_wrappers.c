@@ -93,13 +93,13 @@ float dedx_get_simple_stp_for_program(const int program, const int ion, const in
     return stp;
 }
 
-int dedx_get_stp_table_size(const int program, const int ion, const int target){
+int dedx_get_stp_table_size(const int program, const int ion, const int target) {
     int err = 0;
     int result = -1;
 
     dedx_workspace *ws;
-    dedx_config *cfg = (dedx_config *)calloc(1,sizeof(dedx_config));
-    ws = dedx_allocate_workspace(1,&err);
+    dedx_config *cfg = (dedx_config *) calloc(1, sizeof(dedx_config));
+    ws = dedx_allocate_workspace(1, &err);
 
     // set program + ion + target combination
     cfg->program = program;
@@ -110,17 +110,48 @@ int dedx_get_stp_table_size(const int program, const int ion, const int target){
     dedx_load_config(ws, cfg, &err);
 
     // config loading failed, returning exit code
-    if(err != 0)
+    if (err != 0)
         return -1;
 
     // assume only one dataset is loaded, extract number of samples
-    if( ws->datasets == 1 ){
+    if (ws->datasets == 1) {
         result = ws->loaded_data[0]->n;
     }
 
     return result;
 };
 
-int dedx_fill_default_energy_stp_table(const int program, const int ion, const int target, float *energies, float *stps){
+int
+dedx_fill_default_energy_stp_table(const int program, const int ion, const int target, float *energies, float *stps) {
+    int err = 0;
+    int i;
+
+    dedx_workspace *ws;
+    dedx_config *cfg = (dedx_config *) calloc(1, sizeof(dedx_config));
+    ws = dedx_allocate_workspace(1, &err);
+
+    // set program + ion + target combination
+    cfg->program = program;
+    cfg->ion = ion;
+    cfg->target = target;
+
+    // load spline database from the data files
+    dedx_load_config(ws, cfg, &err);
+
+    // config loading failed, returning exit code
+    if (err != 0)
+        return -1;
+
+    // assume only one dataset is loaded, extract default no of energies and stopping powers
+    if (ws->datasets == 1) {
+        for (i = 0; i < ws->loaded_data[0]->n; i++) {
+            energies[i] = ws->loaded_data[0]->base[i].x;
+            stps[i] = dedx_get_stp(ws, cfg, energies[i], &err);
+            if (err != 0)
+                return -1;
+        }
+    }
+
     return 0;
+
 };
