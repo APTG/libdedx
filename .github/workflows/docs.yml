@@ -52,6 +52,7 @@ jobs:
       uses: sphinx-notes/pages@2.0
       with:
         documentation_path: docs/source
+        requirements_path: docs/source/requirements.txt
     - name: Push changes to gh-pages branch
       # this action is being triggered:
       #  - on master branch
