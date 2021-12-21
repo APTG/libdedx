@@ -7,9 +7,23 @@ int main() {
     int err = 0;
     float energies[10];
     float results[10];
-    int program = DEDX_BETHE_EXT00;
-    int ion = DEDX_HYDROGEN;
-    int target = DEDX_WATER_LIQUID;
+    const int program = DEDX_PSTAR;
+    const int ion = DEDX_HYDROGEN;
+    const int target = DEDX_WATER_LIQUID;
+
+    int no_of_samples;
+
+    no_of_samples = dedx_get_stp_table_size(program, ion, target);
+    printf("No of data samples %d\n", no_of_samples);
+
+    float *default_energies = calloc(sizeof(float), no_of_samples);
+    float *default_stps = calloc(sizeof(float), no_of_samples);
+
+    dedx_fill_default_energy_stp_table(program, ion, target, default_energies, default_stps);
+
+    free(default_energies);
+    free(default_stps);
+
     int no_of_points = 10;
     for (int i = 0; i < no_of_points; i++) {
         energies[i] = 1.f + i * 1.1f;
