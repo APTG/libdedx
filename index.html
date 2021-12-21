@@ -184,11 +184,6 @@
    A.3 Additional lists
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-4-additional-notes">
-   A.4 Additional notes
-  </a>
- </li>
 </ul>
 
 </nav>
@@ -231,18 +226,15 @@
 <li><p><a class="reference internal" href="#a-1-api" id="id11">A.1 API</a></p></li>
 <li><p><a class="reference internal" href="#a-2-error-codes" id="id12">A.2 Error codes</a></p></li>
 <li><p><a class="reference internal" href="#a-3-additional-lists" id="id13">A.3 Additional lists</a></p></li>
-<li><p><a class="reference internal" href="#a-4-additional-notes" id="id14">A.4 Additional notes</a></p></li>
 </ul>
 </div>
 <section id="license-and-disclaimer">
 <h2>0. License and disclaimer<a class="headerlink" href="#license-and-disclaimer" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">libdEdx is licensed under GPL version 3</div>
-<div class="line">(c) Copyright 2010-2012 by</div>
-<div class="line">Jakob Toftegaard, <a class="reference external" href="mailto:jakob&#46;toftegaard&#37;&#52;&#48;gmail&#46;com">jakob<span>&#46;</span>toftegaard<span>&#64;</span>gmail<span>&#46;</span>com</a></div>
-<div class="line">Niels Bassler, <a class="reference external" href="mailto:bassler&#37;&#52;&#48;phys&#46;au&#46;dk">bassler<span>&#64;</span>phys<span>&#46;</span>au<span>&#46;</span>dk</a></div>
-<div class="line">for the Aarhus Particle Therapy Group</div>
-<div class="line"><a class="reference external" href="http://www.phys.au.dk/aptg">http://www.phys.au.dk/aptg</a></div>
+<div class="line">(c) Copyright 2010-2021 by</div>
+<div class="line">the libdEdx team</div>
+<div class="line"><a class="reference external" href="https://github.com/APTG/libdedx/graphs/contributors">https://github.com/APTG/libdedx/graphs/contributors</a></div>
 </div>
 <div class="line-block">
 <div class="line">This program is free software: you can redistribute it and/or modify</div>
@@ -269,8 +261,11 @@ Niels Bassler acknowledges support from the Danish Cancer Society.</p>
 </section>
 <section id="introduction">
 <h2>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles. It is a collection of commonly known stopping power tables and stopping-power routines. You can either use it as a library, by including the <code class="code docutils literal notranslate"><span class="pre">&lt;dedx.h&gt;</span></code> file and linking against the dedx library, or manually access a value with the <code class="code docutils literal notranslate"><span class="pre">getdedx</span></code> command.</p>
-<p>A web front end is available on <a class="reference external" href="http://dedx.au.dk">http://dedx.au.dk</a></p>
+<p>libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles.
+It is a collection of commonly known stopping power tables and stopping-power routines.
+You can either use it as a library, by including the <code class="code docutils literal notranslate"><span class="pre">&lt;dedx.h&gt;</span></code> file and linking against the dedx library,
+or manually access a value with the <code class="code docutils literal notranslate"><span class="pre">getdedx</span></code> command.</p>
+<p>A testing version of the web front end is available on <a class="reference external" href="https://aptg.github.io/web_dev/">https://aptg.github.io/web_dev/</a></p>
 </section>
 <section id="data-available">
 <h2>2. Data available<a class="headerlink" href="#data-available" title="Permalink to this headline">¶</a></h2>
@@ -1231,7 +1226,8 @@ Appendix</p></li>
 <div class="line">277: WATERVAPOR</div>
 </div>
 <p>In your computer code, all materials and ions can also be accessed by their name
-via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code> prefix. However, there are occasionally small variations in the naming scheme. Enums are defined in <code class="docutils literal notranslate"><span class="pre">dedx.h</span></code>, but are listed here for convenience:</p>
+via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code> prefix. However, there are occasionally small variations in the naming scheme.
+Enums are defined in <code class="docutils literal notranslate"><span class="pre">dedx.h</span></code>, but are listed here for convenience:</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_ASTAR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">DEDX_PSTAR</span><span class="p">,</span> <span class="n">DEDX_ESTAR</span><span class="p">,</span>
       <span class="n">DEDX_MSTAR</span><span class="p">,</span> <span class="n">DEDX_ICRU73_OLD</span><span class="p">,</span> <span class="n">DEDX_ICRU73</span><span class="p">,</span> <span class="n">DEDX_ICRU49</span><span class="p">,</span> <span class="n">_DEDX_0008</span><span class="p">,</span>
       <span class="n">DEDX_ICRU</span><span class="p">,</span> <span class="n">DEDX_DEFAULT</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">};</span>
@@ -1344,17 +1340,6 @@ via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span
 <span class="cp">#define DEDX_TEFLON   DEDX_POLYTETRAFLUOROETHYLENE</span>
 <span class="cp">#define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND</span>
 <span class="cp">#define DEDX_CAESIUM  DEDX_CESIUM</span>
-</pre></div>
-</div>
-</section>
-<section id="a-4-additional-notes">
-<h2>A.4 Additional notes<a class="headerlink" href="#a-4-additional-notes" title="Permalink to this headline">¶</a></h2>
-<p>To build a tarball:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>libdedx/build$ make package_source
-</pre></div>
-</div>
-<p>To build a deb package:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>libdedx/build cpack -G DEB
 </pre></div>
 </div>
 </section>
