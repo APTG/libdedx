@@ -156,7 +156,7 @@ int dedx_fill_default_energy_stp_table(const int program, const int ion, const i
 
 };
 
-int dedx_get_csda_table(const int program, const int ion, const int target, const int no_of_points,
+int dedx_get_csda_range_table(const int program, const int ion, const int target, const int no_of_points,
                        const float *energies, double *csda_ranges) {
     int err = 0;
     dedx_config *config = (dedx_config *) calloc(1, sizeof(dedx_config));
