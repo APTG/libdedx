@@ -6,7 +6,8 @@
 int main() {
     int err = 0;
     float energies[10];
-    float results[10];
+    float stps[10];
+    double csda_ranges[10];
     const int program = DEDX_PSTAR;
     const int ion = DEDX_HYDROGEN;
     const int target = DEDX_WATER_LIQUID;
@@ -29,12 +30,19 @@ int main() {
         energies[i] = 1.f + i * 1.1f;
     }
 
-    err = dedx_get_stp_table(program, ion, target, no_of_points, energies, results);
+    err = dedx_get_stp_table(program, ion, target, no_of_points, energies, stps);
     if (err != 0)
         printf("Encountered error no. %d", err);
     else
         for (int i = 0; i < no_of_points; i++)
-            printf("%f \n", results[i]);
+            printf("E = %f MeV/nucl stop pow. = %f MeV cm2 / g \n", energies[i], stps[i]);
+
+    err = dedx_get_csda_range_table(program, ion, target, no_of_points, energies, csda_ranges);
+    if (err != 0)
+        printf("Encountered error no. %d", err);
+    else
+        for (int i = 0; i < no_of_points; i++)
+            printf("E = %f MeV/nucl CSDA range = %f g/cm2\n", energies[i], csda_ranges[i]);
 
     float result = dedx_get_simple_stp_for_program(program, ion, target, energies[0], &err);
     if (err != 0)
