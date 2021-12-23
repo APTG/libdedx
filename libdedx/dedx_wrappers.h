@@ -20,4 +20,6 @@ int dedx_get_stp_table_size(const int program, const int ion, const int target);
 
 int dedx_fill_default_energy_stp_table(const int program, const int ion, const int target, float *energies, float *stps);
 
+int dedx_get_csda_table(const int program, const int ion, const int target, const int no_of_points,
+                        const float *energies, double *csda_ranges);
 #endif //DEDX_WRAPPERS_INCLUDED
