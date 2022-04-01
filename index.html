@@ -8,8 +8,9 @@
 
     <title>This is libdEdx &#8212; libdEdx  documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -19,14 +20,10 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/css/blank.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -41,7 +38,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -93,7 +90,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -101,6 +99,9 @@
     
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -111,7 +112,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -206,7 +207,7 @@
               <div>
                 
   <section id="this-is-libdedx">
-<h1>This is libdEdx<a class="headerlink" href="#this-is-libdedx" title="Permalink to this headline">¶</a></h1>
+<h1>This is libdEdx<a class="headerlink" href="#this-is-libdedx" title="Permalink to this headline">#</a></h1>
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
@@ -229,7 +230,7 @@
 </ul>
 </div>
 <section id="license-and-disclaimer">
-<h2>0. License and disclaimer<a class="headerlink" href="#license-and-disclaimer" title="Permalink to this headline">¶</a></h2>
+<h2>0. License and disclaimer<a class="headerlink" href="#license-and-disclaimer" title="Permalink to this headline">#</a></h2>
 <div class="line-block">
 <div class="line">libdEdx is licensed under GPL version 3</div>
 <div class="line">(c) Copyright 2010-2021 by</div>
@@ -254,13 +255,13 @@
 </div>
 </section>
 <section id="acknowledgements">
-<h2>0.1 Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<h2>0.1 Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">#</a></h2>
 <p>We are grateful for the support by Prof. Helmut Paul from the University of
 Linz, Austria.
 Niels Bassler acknowledges support from the Danish Cancer Society.</p>
 </section>
 <section id="introduction">
-<h2>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<h2>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
 <p>libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles.
 It is a collection of commonly known stopping power tables and stopping-power routines.
 You can either use it as a library, by including the <code class="code docutils literal notranslate"><span class="pre">&lt;dedx.h&gt;</span></code> file and linking against the dedx library,
@@ -268,7 +269,7 @@ or manually access a value with the <code class="code docutils literal notransla
 <p>A testing version of the web front end is available on <a class="reference external" href="https://aptg.github.io/web_dev/">https://aptg.github.io/web_dev/</a></p>
 </section>
 <section id="data-available">
-<h2>2. Data available<a class="headerlink" href="#data-available" title="Permalink to this headline">¶</a></h2>
+<h2>2. Data available<a class="headerlink" href="#data-available" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
 <dt>ASTAR:</dt><dd><dl class="field-list simple">
@@ -352,7 +353,7 @@ or manually access a value with the <code class="code docutils literal notransla
 <p>For all data tables and equations, it is possible to use Bragg’s additivity rule, if a specific target is unavailable by default.</p>
 </section>
 <section id="installation">
-<h2>3. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h2>3. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h2>
 <p>Configuration and installation are handled with CMAKE.
 Install CMake from your local Linux distribution, or get it from <a class="reference external" href="http://www.cmake.org">http://www.cmake.org</a> if using Windows</p>
 <p>From source code:</p>
@@ -370,7 +371,7 @@ Additionally, the example and auxiliary programs will be built, and the binary d
 <p>this will copy the binary tables and tables to the relevant places on your system. On Linux, you will need to prefix this command with <cite>sudo</cite> or run it as root.</p>
 </section>
 <section id="use">
-<h2>4. Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<h2>4. Use<a class="headerlink" href="#use" title="Permalink to this headline">#</a></h2>
 <p>UNITS: Energies are always in terms of MeV/nucleon, except for ESTAR, where the electron energy must be specified in terms of MeV. The resulting mass stopping power is in MeV cm2/g.</p>
 <p>Stopping power values can be retrieved in two different ways:</p>
 <ol class="arabic simple">
@@ -656,9 +657,9 @@ can specify the I-value manually for the BETHE-type algorithms:</p></li>
 </div>
 </section>
 <section id="release-notes">
-<h2>5. Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
+<h2>5. Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">#</a></h2>
 <section id="version-1-2-1">
-<h3>Version: 1.2.1<a class="headerlink" href="#version-1-2-1" title="Permalink to this headline">¶</a></h3>
+<h3>Version: 1.2.1<a class="headerlink" href="#version-1-2-1" title="Permalink to this headline">#</a></h3>
 <dl class="simple">
 <dt>Changes:</dt><dd><ul class="simple">
 <li><p>several bug fixes regarding the state of the compound when using Bragg’s rule.</p></li>
@@ -670,7 +671,7 @@ Appendix</p></li>
 </dl>
 </section>
 <section id="version-1-2">
-<h3>Version: 1.2<a class="headerlink" href="#version-1-2" title="Permalink to this headline">¶</a></h3>
+<h3>Version: 1.2<a class="headerlink" href="#version-1-2" title="Permalink to this headline">#</a></h3>
 <dl class="simple">
 <dt>Changes:</dt><dd><ul class="simple">
 <li><p>New API, which should be more stable for future enhancements</p></li>
@@ -691,7 +692,7 @@ Appendix</p></li>
 </dl>
 </section>
 <section id="version-1-0-1">
-<h3>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Permalink to this headline">¶</a></h3>
+<h3>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Permalink to this headline">#</a></h3>
 <dl class="simple">
 <dt>Known limitations:</dt><dd><ul class="simple">
 <li><p>ESTAR is not implemented</p></li>
@@ -703,7 +704,7 @@ Appendix</p></li>
 </section>
 </section>
 <section id="a-1-api">
-<h2>A.1 API<a class="headerlink" href="#a-1-api" title="Permalink to this headline">¶</a></h2>
+<h2>A.1 API<a class="headerlink" href="#a-1-api" title="Permalink to this headline">#</a></h2>
 <p>List of functions available in dedx.h:</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span> <span class="o">*</span> <span class="nf">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
 <span class="kt">void</span>             <span class="nf">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
@@ -728,7 +729,7 @@ Appendix</p></li>
 </div>
 </section>
 <section id="a-2-error-codes">
-<h2>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Permalink to this headline">¶</a></h2>
+<h2>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>1-100 IO error</p></li>
 <li><p>101-200 Out of bounds errors</p></li>
@@ -757,7 +758,7 @@ Appendix</p></li>
 </ul>
 </section>
 <section id="a-3-additional-lists">
-<h2>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Permalink to this headline">¶</a></h2>
+<h2>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Permalink to this headline">#</a></h2>
 <p>All names can be prefixed with <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code></p>
 <p>List all known data tables and algorithms:</p>
 <div class="line-block">
@@ -1359,7 +1360,8 @@ Enums are defined in <code class="docutils literal notranslate"><span class="pre
       </div>
     </div>
   
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
