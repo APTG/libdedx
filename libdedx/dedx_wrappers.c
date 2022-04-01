@@ -17,6 +17,7 @@
 
 #include "dedx_wrappers.h"
 #include "dedx_tools.h"
+#include "dedx_periodic_table.h"
 
 void dedx_fill_program_list(int *program_list) {
     /* fill list of available programs, terminated with -1 */
@@ -163,7 +164,8 @@ int dedx_get_csda_range_table(const int program, const int ion, const int target
     config->target = target;
     config->ion = ion;
     config->program = program;
-    config->ion_a = ion;
+    config->ion_a = _dedx_get_nucleon(config->ion, &err);
+    if (err != 0) return err;
     dedx_workspace *ws = dedx_allocate_workspace(1, &err);
 
     if (err != 0) return err;
