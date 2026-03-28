@@ -31,17 +31,17 @@
  * @{
  */
 enum {
-    DEDX_ASTAR = 1,    /**< NIST ASTAR — alpha particle stopping powers */
-    DEDX_PSTAR,        /**< NIST PSTAR — proton stopping powers */
-    DEDX_ESTAR,        /**< NIST ESTAR — electron stopping powers (not fully supported) */
-    DEDX_MSTAR,        /**< MSTAR — stopping powers for heavier ions */
-    DEDX_ICRU73_OLD,   /**< ICRU Report 73 (2005), older parametrization */
-    DEDX_ICRU73,       /**< ICRU Report 73 (2005) */
-    DEDX_ICRU49,       /**< ICRU Report 49 (1993) — protons and alpha particles */
-    _DEDX_0008,        /**< Reserved */
-    DEDX_ICRU,         /**< Auto-selects ICRU49 or ICRU73 based on ion type */
+    DEDX_ASTAR = 1,     /**< NIST ASTAR — alpha particle stopping powers */
+    DEDX_PSTAR,         /**< NIST PSTAR — proton stopping powers */
+    DEDX_ESTAR,         /**< NIST ESTAR — electron stopping powers (not fully supported) */
+    DEDX_MSTAR,         /**< MSTAR — stopping powers for heavier ions */
+    DEDX_ICRU73_OLD,    /**< ICRU Report 73 (2005), older parametrization */
+    DEDX_ICRU73,        /**< ICRU Report 73 (2005) */
+    DEDX_ICRU49,        /**< ICRU Report 49 (1993) — protons and alpha particles */
+    _DEDX_0008,         /**< Reserved */
+    DEDX_ICRU,          /**< Auto-selects ICRU49 or ICRU73 based on ion type */
     DEDX_DEFAULT = 100, /**< Default program (Bethe formula) */
-    DEDX_BETHE_EXT00   /**< Bethe formula with extensions */
+    DEDX_BETHE_EXT00    /**< Bethe formula with extensions */
 };
 /** @} */
 
@@ -49,9 +49,11 @@ enum {
  * @defgroup states Material aggregate states
  * @{
  */
-enum { DEDX_DEFAULT_STATE = 0, /**< Default state (normal state of aggregation) */
-       DEDX_GAS,               /**< Force gas state */
-       DEDX_CONDENSED };       /**< Force condensed state */
+enum {
+    DEDX_DEFAULT_STATE = 0, /**< Default state (normal state of aggregation) */
+    DEDX_GAS,               /**< Force gas state */
+    DEDX_CONDENSED          /**< Force condensed state */
+};
 /** @} */
 
 /**
@@ -72,12 +74,16 @@ enum {
 /** @} */
 
 /**
- * @defgroup ions Ion identifiers
- * @brief Atomic number (Z) based identifiers for projectile ions.
- *        Elements 1–98 correspond to their atomic number.
+ * @defgroup ions_and_materials Ion and material identifiers
+ * @brief Identifiers for projectile ions and target materials.
+ *
+ * Elemental ions (Z=1–98) correspond to their atomic number.
+ * Compound materials follow sequentially after the elements.
+ * Both share a single enum to preserve the numeric ID mapping.
  * @{
  */
 enum {
+    /* --- Elemental ions (Z = atomic number) --- */
     DEDX_HYDROGEN = 1,
     DEDX_HELIUM,
     DEDX_LITHIUM,
@@ -177,16 +183,8 @@ enum {
     DEDX_CURIUM,
     DEDX_BERKELIUM,
     DEDX_CALIFORNIUM,
-};
-/** @} */
 
-/**
- * @defgroup materials Material (target) identifiers
- * @brief Identifiers for compound and elemental target materials.
- *        Based on the NIST material database.
- * @{
- */
-enum {
+    /* --- Compound and mixture targets (NIST material database) --- */
     DEDX_A150_TISSUE_EQUIVALENT_PLASTIC,
     DEDX_ACETONE,
     DEDX_ACETYLENE,
@@ -368,32 +366,32 @@ enum {
     DEDX_WATER_VAPOR,
     DEDX_XYLENE
 };
-/** @} */
+/** @} */ /* ions_and_materials */
 
 /** @defgroup special_ions Special particle identifiers
  *  @brief Identifiers for particles that do not map directly to atomic number.
  *  @{
  */
-#define DEDX_PROTON    1     /**< Proton (Z=1, same as DEDX_HYDROGEN) */
-#define DEDX_ELECTRON  1001  /**< Electron */
-#define DEDX_POSITRON  1002  /**< Positron */
-#define DEDX_PIMINUS   1003  /**< Pi minus */
-#define DEDX_PIPLUS    1004  /**< Pi plus */
-#define DEDX_PIZERO    1005  /**< Pi zero */
+#define DEDX_PROTON 1        /**< Proton (Z=1, same as DEDX_HYDROGEN) */
+#define DEDX_ELECTRON 1001   /**< Electron */
+#define DEDX_POSITRON 1002   /**< Positron */
+#define DEDX_PIMINUS 1003    /**< Pi minus */
+#define DEDX_PIPLUS 1004     /**< Pi plus */
+#define DEDX_PIZERO 1005     /**< Pi zero */
 #define DEDX_ANTIPROTON 1006 /**< Antiproton */
 /** @} */
 
 /** @defgroup aliases Common material aliases
  *  @{
  */
-#define DEDX_WATER    DEDX_WATER_LIQUID
-#define DEDX_AIR      DEDX_AIR_DRY_NEAR_SEA_LEVEL
-#define DEDX_PMMA     DEDX_LUCITE_PERSPEX_PMMA
-#define DEDX_PERSPEX  DEDX_LUCITE_PERSPEX_PMMA
-#define DEDX_LUCITE   DEDX_LUCITE_PERSPEX_PMMA
-#define DEDX_TEFLON   DEDX_POLYTETRAFLUOROETHYLENE
+#define DEDX_WATER DEDX_WATER_LIQUID
+#define DEDX_AIR DEDX_AIR_DRY_NEAR_SEA_LEVEL
+#define DEDX_PMMA DEDX_LUCITE_PERSPEX_PMMA
+#define DEDX_PERSPEX DEDX_LUCITE_PERSPEX_PMMA
+#define DEDX_LUCITE DEDX_LUCITE_PERSPEX_PMMA
+#define DEDX_TEFLON DEDX_POLYTETRAFLUOROETHYLENE
 #define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
-#define DEDX_CAESIUM  DEDX_CESIUM
+#define DEDX_CAESIUM DEDX_CESIUM
 /** @} */
 
 /** @brief Translate a numeric error code to a human-readable string.
@@ -549,27 +547,27 @@ void dedx_free_workspace(dedx_workspace *workspace, int *err);
  * - @c rho            — required for Bethe-type programs (DEDX_BETHE_EXT00)
  */
 typedef struct {
-    int cfg_id;          /**< Configuration ID assigned by dedx_load_config(); do not set. */
-    int program;         /**< Stopping power program (e.g. DEDX_PSTAR). Required. */
-    int target;          /**< Target material identifier, or 0 for custom compound. */
-    int ion;             /**< Projectile ion identifier (e.g. DEDX_PROTON). Required. */
-    int ion_a;           /**< Nucleon number of projectile (set automatically). */
-    int bragg_used;      /**< 1 if Bragg additivity rule was applied; set by library. */
-    int compound_state;  /**< Aggregate state: DEDX_DEFAULT, DEDX_GAS, or DEDX_CONDENSED. */
+    int cfg_id;         /**< Configuration ID assigned by dedx_load_config(); do not set. */
+    int program;        /**< Stopping power program (e.g. DEDX_PSTAR). Required. */
+    int target;         /**< Target material identifier, or 0 for custom compound. */
+    int ion;            /**< Projectile ion identifier (e.g. DEDX_PROTON). Required. */
+    int ion_a;          /**< Nucleon number of projectile (set automatically). */
+    int bragg_used;     /**< 1 if Bragg additivity rule was applied; set by library. */
+    int compound_state; /**< Aggregate state: DEDX_DEFAULT, DEDX_GAS, or DEDX_CONDENSED. */
 
-    unsigned int elements_length;    /**< Number of elements in custom compound. */
-    unsigned int loaded;             /**< 1 if configuration has been loaded; set by library. */
-    int *elements_id;                /**< Atomic numbers (Z) of each element in compound. */
-    int *elements_atoms;             /**< Number of atoms per formula unit for each element. */
-    char mstar_mode;                 /**< MSTAR mode: DEDX_MSTAR_MODE_DEFAULT or A–H. */
-    float i_value;                   /**< Mean excitation potential of target in eV. */
-    float _temp_i_value;             /**< Internal: temporary I-value for Bethe calculation. */
-    float rho;                       /**< Target density in g/cm³ (required for DEDX_BETHE_EXT00). */
-    float *elements_mass_fraction;   /**< Mass fractions of each element (alternative to atoms). */
-    float *elements_i_value;         /**< I-values of individual elements in eV. */
-    const char *target_name;         /**< Resolved target name; set by library. */
-    const char *ion_name;            /**< Resolved ion name; set by library. */
-    const char *program_name;        /**< Resolved program name; set by library. */
+    unsigned int elements_length;  /**< Number of elements in custom compound. */
+    unsigned int loaded;           /**< 1 if configuration has been loaded; set by library. */
+    int *elements_id;              /**< Atomic numbers (Z) of each element in compound. */
+    int *elements_atoms;           /**< Number of atoms per formula unit for each element. */
+    char mstar_mode;               /**< MSTAR mode: DEDX_MSTAR_MODE_DEFAULT or A–H. */
+    float i_value;                 /**< Mean excitation potential of target in eV. */
+    float _temp_i_value;           /**< Internal: temporary I-value for Bethe calculation. */
+    float rho;                     /**< Target density in g/cm³ (required for DEDX_BETHE_EXT00). */
+    float *elements_mass_fraction; /**< Mass fractions of each element (alternative to atoms). */
+    float *elements_i_value;       /**< I-values of individual elements in eV. */
+    const char *target_name;       /**< Resolved target name; set by library. */
+    const char *ion_name;          /**< Resolved ion name; set by library. */
+    const char *program_name;      /**< Resolved program name; set by library. */
 } dedx_config;
 
 /** @brief Load a stopping power configuration into the workspace.
