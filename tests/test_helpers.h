@@ -21,13 +21,7 @@ static inline int check_config_stp(dedx_config *cfg, float energy, float expecte
 
     dedx_load_config(ws, cfg, &err);
     if (err != 0) {
-        fprintf(stderr,
-                "FAIL load: %s program=%d ion=%d target=%d err=%d\n",
-                label,
-                program,
-                ion,
-                target,
-                err);
+        fprintf(stderr, "FAIL load: %s program=%d ion=%d target=%d err=%d\n", label, program, ion, target, err);
         dedx_free_config(cfg, &err);
         dedx_free_workspace(ws, &err);
         return 1;

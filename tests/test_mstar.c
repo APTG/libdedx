@@ -31,23 +31,38 @@ int main(void) {
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[3], 3.105e2f);
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[4], 7.772e1f);
 
-    failures += check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[0], 5.634e3f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[1], 6.593e3f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[2], 1.639e3f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[3], 3.166e2f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[4], 7.994e1f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[0], 5.634e3f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[1], 6.593e3f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[2], 1.639e3f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[3], 3.166e2f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[4], 7.994e1f, "mstar-a");
 
-    failures += check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[0], 6.185e3f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[1], 6.400e3f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[2], 1.598e3f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[3], 3.082e2f, "mstar-a");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[4], 7.755e1f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[0], 6.185e3f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[1], 6.400e3f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[2], 1.598e3f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[3], 3.082e2f, "mstar-a");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_PMMA, DEDX_MSTAR_MODE_A), energy_grid[4], 7.755e1f, "mstar-a");
 
-    failures += check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[0], 6.349e3f, "mstar-c");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[1], 6.538e3f, "mstar-c");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[2], 1.614e3f, "mstar-c");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[3], 3.103e2f, "mstar-c");
-    failures += check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[4], 7.767e1f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[0], 6.349e3f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[1], 6.538e3f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[2], 1.614e3f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[3], 3.103e2f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[4], 7.767e1f, "mstar-c");
 
     return failures;
 }
