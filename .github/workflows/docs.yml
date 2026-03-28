@@ -5,22 +5,20 @@ on: [push]
 jobs:
   build_docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+          fetch-depth: 0
 
-      - name: Build and Commit
+      - name: Build and Deploy
+        # Deploys to GitHub Pages only on main or release tags (v*)
+        if: "github.ref == 'refs/heads/main' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
         uses: sphinx-notes/pages@3.5
         with:
           documentation_path: docs/source
           requirements_path: docs/source/requirements.txt
-
-      - name: Push changes to gh-pages branch
-        # triggered on main branch or release tags (named v*)
-        if: "github.ref == 'refs/heads/main' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
