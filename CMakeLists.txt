@@ -33,7 +33,9 @@ else()
 endif()
 
 # ---- Data paths (baked into dedx_config.h at configure time) ----
-set(DEDX_DATA_PATH_LOCAL "${PROJECT_SOURCE_DIR}/libdedx/data/")
+# DEDX_DATA_PATH_LOCAL is used at runtime to prefer the source-tree data dir over the install path.
+# Pass -DDEDX_DATA_PATH_LOCAL= (empty) to disable it, e.g. in install smoke tests.
+set(DEDX_DATA_PATH_LOCAL "${PROJECT_SOURCE_DIR}/libdedx/data/" CACHE STRING "Build-tree data path (empty to force use of install path)")
 if(WIN32)
     set(DEDX_DATA_PATH "data/")
 else()
