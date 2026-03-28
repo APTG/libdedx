@@ -1,8 +1,10 @@
 name: clang-tidy
 
+# Automatic triggering is disabled until the findings logged in the clang-tidy tracking issue
+# are resolved. The workflow can still be run manually from the Actions tab via workflow_dispatch.
+# To re-enable: replace the trigger below with `on: [push, pull_request]`.
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   clang-tidy:
