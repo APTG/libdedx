@@ -1,5 +1,7 @@
 #include "test_helpers.h"
 
+// Reference values from ICRU Reports 49 and 73 (DEDX_ICRU is an alias selecting the appropriate report by ion type)
+
 int main(void) {
     int failures = 0;
     const float energy_grid[] = {0.07f, 1.0f, 10.0f, 78.0f, 1000.0f};

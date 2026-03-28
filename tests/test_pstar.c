@@ -1,8 +1,6 @@
 #include "test_helpers.h"
 
-// Reference values from reference_testvals_libdedx.ods
-// Ion: proton, Program: PSTAR
-// Energy grid: 0.07, 1, 10, 78, 1000 MeV/u
+// Reference values from the NIST PSTAR database: https://physics.nist.gov/PhysRefData/Star/Text/PSTAR.html
 
 int main(void) {
     int failures = 0;

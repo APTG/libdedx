@@ -1,5 +1,7 @@
 #include "test_helpers.h"
 
+// Reference values from ICRU Report 73 (2005): Stopping of Ions Heavier than Helium
+
 int main(void) {
     int failures = 0;
     const float energy_grid[] = {0.07f, 1.0f, 10.0f, 78.0f, 1000.0f};
