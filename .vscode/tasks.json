@@ -4,14 +4,14 @@
         {
             "label": "CMake: Configure",
             "type": "shell",
-            "command": "cmake -S . -B build",
+            "command": "cmake --preset debug",
             "group": "build",
             "presentation": { "reveal": "always" }
         },
         {
             "label": "CMake: Build",
             "type": "shell",
-            "command": "cmake --build build --parallel",
+            "command": "cmake --build --preset debug --parallel",
             "group": { "kind": "build", "isDefault": true },
             "presentation": { "reveal": "always" },
             "dependsOn": "CMake: Configure"
@@ -19,7 +19,7 @@
         {
             "label": "CTest: Run",
             "type": "shell",
-            "command": "ctest --test-dir build --output-on-failure",
+            "command": "ctest --preset debug",
             "group": { "kind": "test", "isDefault": true },
             "presentation": { "reveal": "always" },
             "dependsOn": "CMake: Build"

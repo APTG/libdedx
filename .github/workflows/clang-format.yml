@@ -11,19 +11,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install clang-format
+      - name: Install clang-format-19
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format
+          sudo apt-get install -y clang-format-19
+          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-19 100
 
       - name: Check clang-format version
-        run: |
-          clang-format --version
-          MAJOR=$(clang-format --version | sed -E 's/.*version ([0-9]+).*/\1/')
-          if [ "$MAJOR" -lt 18 ]; then
-            echo "clang-format >= 18 required"
-            exit 1
-          fi
+        run: clang-format --version
 
       - name: Check formatting
         run: |
