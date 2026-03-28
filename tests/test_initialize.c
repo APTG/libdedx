@@ -1,6 +1,5 @@
-#include <stdio.h>
-
 #include <dedx.h>
+#include <stdio.h>
 
 int main(void) {
     int err = 0;

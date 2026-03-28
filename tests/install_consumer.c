@@ -1,7 +1,6 @@
 #include <dedx.h>
 #include <dedx_tools.h>
 #include <dedx_wrappers.h>
-
 #include <stdio.h>
 
 int main(void) {
