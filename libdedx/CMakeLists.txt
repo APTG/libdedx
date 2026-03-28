@@ -3,35 +3,47 @@ set(dedx_data data/ASTAR.bin data/astarEng.dat data/mstarEng.dat data/pstarEng.b
 
 set(dedx_data_bin data/ASTAR.bin data/astarEng.bin data/ICRU73.bin data/icru73Eng.bin data/ICRU73_NEW.bin data/icru73_newEng.bin data/MSTAR.bin data/mstarEng.bin data/PSTAR.bin data/ICRU_PSTAR.bin data/ICRU_ASTAR.bin data/pstarEng.bin data/betheEng.bin data/icru_astarEng.bin data/icru_pstarEng.bin data/compos.txt data/effective_charge.dat data/short_names data/composition data/gas_states.dat data/atima_compos)
 
-add_library(dedx STATIC dedx_tools.c dedx_bethe.c dedx.c dedx_wrappers.c dedx_file_access.c dedx_file.c dedx_mpaul.c dedx_mstar.c dedx_spline.c dedx_split.c dedx_periodic_table.c tools/dedx_math.c dedx_validate.c)
-
-target_include_directories(dedx PUBLIC
+# Object library: compiled once with -fPIC so the objects feed both the
+# static and the shared library without a second compilation pass.
+add_library(dedx_objects OBJECT
+    dedx_tools.c dedx_bethe.c dedx.c dedx_wrappers.c dedx_file_access.c
+    dedx_file.c dedx_mpaul.c dedx_mstar.c dedx_spline.c dedx_split.c
+    dedx_periodic_table.c tools/dedx_math.c dedx_validate.c
+)
+set_property(TARGET dedx_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_include_directories(dedx_objects PUBLIC
     "${PROJECT_SOURCE_DIR}/libdedx"
     "${PROJECT_BINARY_DIR}"
 )
-# removed math_dedx.h
-# removed dedx_atima.c
-
 # Version passed as compile definitions, derived from git tag at configure time
-target_compile_definitions(dedx PRIVATE
+target_compile_definitions(dedx_objects PRIVATE
     DEDX_VERSION_MAJOR=${DEDX_VERSION_MAJOR}
     DEDX_VERSION_MINOR=${DEDX_VERSION_MINOR}
     DEDX_VERSION_PATCH=${DEDX_VERSION_PATCH}
 )
 
-target_link_libraries(dedx)
-
+# Static library — for C/CMake consumers; PUBLIC so include dirs propagate.
+add_library(dedx STATIC)
+target_link_libraries(dedx PUBLIC dedx_objects)
 # Visual Studio does not need or want you to explicitly request linking the math library.
 # You must avoid adding it as a link library when building for Windows.
 # see https://stackoverflow.com/questions/54935559/linking-math-library-in-cmake-file-on-windows-and-linux
-IF (NOT WIN32)
-  target_link_libraries (dedx m)
-ENDIF()
+if(NOT WIN32)
+    target_link_libraries(dedx PUBLIC m)
+endif()
 
-install (FILES dedx.h dedx_tools.h dedx_wrappers.h DESTINATION include)
-install (TARGETS dedx DESTINATION lib)
+# Shared library — for Python ctypes and other dynamic consumers.
+add_library(dedx_shared SHARED)
+target_link_libraries(dedx_shared PRIVATE dedx_objects)
+set_target_properties(dedx_shared PROPERTIES OUTPUT_NAME dedx)
+if(NOT WIN32)
+    target_link_libraries(dedx_shared PRIVATE m)
+endif()
+
+install(FILES dedx.h dedx_tools.h dedx_wrappers.h DESTINATION include)
+install(TARGETS dedx dedx_shared DESTINATION lib)
 if(WIN32)
-  install (FILES ${dedx_data_bin} DESTINATION data)
+    install(FILES ${dedx_data_bin} DESTINATION data)
 else()
-  install (FILES ${dedx_data_bin} DESTINATION share/libdedx)
+    install(FILES ${dedx_data_bin} DESTINATION share/libdedx)
 endif()

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "libdedx"
+version = "0.1.0"
+description = "Python ctypes binding for the libdedx stopping-power library"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "LGPL-2.0-or-later"}
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools]
+py-modules = ["libdedx"]
+include-package-data = true
+
+[tool.setuptools.data-files]
+"" = ["libdedx.pyi"]

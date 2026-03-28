@@ -1,0 +1,21 @@
+name: Python
+
+on: [push, pull_request]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure and build (shared library)
+        run: |
+          cmake -S . -B build
+          cmake --build build --parallel
+
+      - name: Install Python binding and test dependencies
+        run: pip install --break-system-packages pytest python/
+
+      - name: Run tests
+        run: |
+          LIBDEDX_SO=build/libdedx/libdedx.so pytest python/tests/ -v

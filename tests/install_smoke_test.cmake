@@ -49,7 +49,10 @@ if(NOT rc EQUAL 0)
     message(FATAL_ERROR "install smoke consumer compile failed: ${rc}")
 endif()
 
-execute_process(COMMAND "${smoke_consumer}"
+execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E env
+            "LD_LIBRARY_PATH=${smoke_prefix}/lib"
+            "${smoke_consumer}"
     RESULT_VARIABLE rc)
 if(NOT rc EQUAL 0)
     message(FATAL_ERROR "install smoke consumer run failed: ${rc}")
