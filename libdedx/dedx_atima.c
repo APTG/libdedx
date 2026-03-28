@@ -174,7 +174,7 @@ float _dedx_rpstop(int TZ, float energy) {
     if (E < pe0)
         E = pe0;
     sl = coef[0] * pow(E, coef[1]) + coef[2] * pow(E, coef[3]);
-    sh = coef[4] / (pow(E, coef[5])) *log(coef[6] / E + coef[7] * E);
+    sh = coef[4] / (pow(E, coef[5])) * (log(coef[6] / E + coef[7] * E));
     sp = sl * sh / (sl + sh);
     if (E <= pe0) {
         if (TZ > 6) {
