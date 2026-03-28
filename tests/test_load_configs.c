@@ -16,7 +16,7 @@ static int run_load_case(const load_case *tc) {
 
     if (err != 0 || ws == NULL || cfg == NULL) {
         fprintf(stderr, "setup failed for %s: err=%d\n", tc->label, err);
-        free(cfg);
+        dedx_free_config(cfg, &err);
         if (ws != NULL) {
             dedx_free_workspace(ws, &err);
         }
@@ -30,12 +30,12 @@ static int run_load_case(const load_case *tc) {
     dedx_load_config(ws, cfg, &err);
     if (err != 0) {
         fprintf(stderr, "dedx_load_config failed for %s: err=%d\n", tc->label, err);
-        free(cfg);
+        dedx_free_config(cfg, &err);
         dedx_free_workspace(ws, &err);
         return 1;
     }
 
-    free(cfg);
+    dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
     if (err != 0) {
         fprintf(stderr, "cleanup failed for %s: err=%d\n", tc->label, err);
