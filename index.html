@@ -1,214 +1,255 @@
 
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" data-content_root="./" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>This is libdEdx &#8212; libdEdx  documentation</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
-
-  <div id="navbar-start">
-    
-    
-<a class="navbar-brand" href="#">
-<p class="title">libdEdx</p>
-</a>
-
-    
-  </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
   
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    
-    
-</ul>
-      </div>
-      
-    </div>
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-      </ul>
-      </div>
-      
-    </div>
-  </div>
-</div>
-    </nav>
+  
+  <dialog id="pst-search-dialog">
     
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-    <div class="container-xl">
-      <div class="row">
-          
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-  <div class="bd-toc-item active">
-    
-  </div>
-</nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
-
-          
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
-<nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#license-and-disclaimer">
-   0. License and disclaimer
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#acknowledgements">
-   0.1 Acknowledgements
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#introduction">
-   1. Introduction
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#data-available">
-   2. Data available
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#installation">
-   3. Installation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#use">
-   4. Use
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#release-notes">
-   5. Release notes
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#version-1-2-1">
-     Version: 1.2.1
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#version-1-2">
-     Version: 1.2
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#version-1-0-1">
-     Version 1.0.1
-    </a>
-   </li>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">libdEdx  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
   </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-1-api">
-   A.1 API
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-2-error-codes">
-   A.2 Error codes
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-3-additional-lists">
-   A.3 Additional lists
-  </a>
- </li>
-</ul>
-
-</nav>
-              </div>
-              
-              <div class="toc-item">
-                
-              </div>
-              
-            
-          </div>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
           
           
-            
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+  </ul>
+</nav></div>
           
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
               
-              <div>
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
                 
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="this-is-libdedx">
-<h1>This is libdEdx<a class="headerlink" href="#this-is-libdedx" title="Permalink to this headline">#</a></h1>
-<div class="contents local topic" id="table-of-contents">
+<h1>This is libdEdx<a class="headerlink" href="#this-is-libdedx" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#license-and-disclaimer" id="id1">0. License and disclaimer</a></p></li>
@@ -228,14 +269,14 @@
 <li><p><a class="reference internal" href="#a-2-error-codes" id="id12">A.2 Error codes</a></p></li>
 <li><p><a class="reference internal" href="#a-3-additional-lists" id="id13">A.3 Additional lists</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="license-and-disclaimer">
-<h2>0. License and disclaimer<a class="headerlink" href="#license-and-disclaimer" title="Permalink to this headline">#</a></h2>
+<h2>0. License and disclaimer<a class="headerlink" href="#license-and-disclaimer" title="Link to this heading">#</a></h2>
 <div class="line-block">
 <div class="line">libdEdx is licensed under GPL version 3</div>
 <div class="line">(c) Copyright 2010-2021 by</div>
 <div class="line">the libdEdx team</div>
-<div class="line"><a class="reference external" href="https://github.com/APTG/libdedx/graphs/contributors">https://github.com/APTG/libdedx/graphs/contributors</a></div>
+<div class="line"><a class="github reference external" href="https://github.com/APTG/libdedx/graphs/contributors">APTG/libdedx</a></div>
 </div>
 <div class="line-block">
 <div class="line">This program is free software: you can redistribute it and/or modify</div>
@@ -255,13 +296,13 @@
 </div>
 </section>
 <section id="acknowledgements">
-<h2>0.1 Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">#</a></h2>
+<h2>0.1 Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">#</a></h2>
 <p>We are grateful for the support by Prof. Helmut Paul from the University of
 Linz, Austria.
 Niels Bassler acknowledges support from the Danish Cancer Society.</p>
 </section>
 <section id="introduction">
-<h2>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
+<h2>1. Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <p>libdEdx is an easy to use library which provides electronic stopping powers of fast charged particles.
 It is a collection of commonly known stopping power tables and stopping-power routines.
 You can either use it as a library, by including the <code class="code docutils literal notranslate"><span class="pre">&lt;dedx.h&gt;</span></code> file and linking against the dedx library,
@@ -269,17 +310,17 @@ or manually access a value with the <code class="code docutils literal notransla
 <p>A testing version of the web front end is available on <a class="reference external" href="https://aptg.github.io/web_dev/">https://aptg.github.io/web_dev/</a></p>
 </section>
 <section id="data-available">
-<h2>2. Data available<a class="headerlink" href="#data-available" title="Permalink to this headline">#</a></h2>
+<h2>2. Data available<a class="headerlink" href="#data-available" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
 <dt>ASTAR:</dt><dd><dl class="field-list simple">
-<dt class="field-odd">Energy range</dt>
+<dt class="field-odd">Energy range<span class="colon">:</span></dt>
 <dd class="field-odd"><p>0.25 keV/u to 250 MeV/u</p>
 </dd>
-<dt class="field-even">Particles</dt>
+<dt class="field-even">Particles<span class="colon">:</span></dt>
 <dd class="field-even"><p>only helium nuclei</p>
 </dd>
-<dt class="field-odd">Targets</dt>
+<dt class="field-odd">Targets<span class="colon">:</span></dt>
 <dd class="field-odd"><p>See astar_targets</p>
 </dd>
 </dl>
@@ -288,13 +329,13 @@ or manually access a value with the <code class="code docutils literal notransla
 </li>
 <li><dl class="simple">
 <dt>PSTAR:</dt><dd><dl class="field-list simple">
-<dt class="field-odd">Energy range</dt>
+<dt class="field-odd">Energy range<span class="colon">:</span></dt>
 <dd class="field-odd"><p>1 keV/u to 10 GeV/u</p>
 </dd>
-<dt class="field-even">Particles</dt>
+<dt class="field-even">Particles<span class="colon">:</span></dt>
 <dd class="field-even"><p>only protons</p>
 </dd>
-<dt class="field-odd">Targets</dt>
+<dt class="field-odd">Targets<span class="colon">:</span></dt>
 <dd class="field-odd"><p>See pstar_and_astar_targets</p>
 </dd>
 </dl>
@@ -303,13 +344,13 @@ or manually access a value with the <code class="code docutils literal notransla
 </li>
 <li><dl class="simple">
 <dt>ESTAR:</dt><dd><dl class="field-list simple">
-<dt class="field-odd">Energy range</dt>
+<dt class="field-odd">Energy range<span class="colon">:</span></dt>
 <dd class="field-odd"><p>1 keV/u to 10 GeV/u</p>
 </dd>
-<dt class="field-even">Particles</dt>
+<dt class="field-even">Particles<span class="colon">:</span></dt>
 <dd class="field-even"><p>only electrons</p>
 </dd>
-<dt class="field-odd">Targets</dt>
+<dt class="field-odd">Targets<span class="colon">:</span></dt>
 <dd class="field-odd"><p>See estar_targets</p>
 </dd>
 </dl>
@@ -318,13 +359,13 @@ or manually access a value with the <code class="code docutils literal notransla
 </li>
 <li><dl class="simple">
 <dt>ICRU:</dt><dd><dl class="field-list simple">
-<dt class="field-odd">Energy range</dt>
+<dt class="field-odd">Energy range<span class="colon">:</span></dt>
 <dd class="field-odd"><p>25 keV/u to 1 GeV/u</p>
 </dd>
-<dt class="field-even">Particles</dt>
+<dt class="field-even">Particles<span class="colon">:</span></dt>
 <dd class="field-even"><p>See icru73_particle_targets</p>
 </dd>
-<dt class="field-odd">Targets</dt>
+<dt class="field-odd">Targets<span class="colon">:</span></dt>
 <dd class="field-odd"><p>See icru73_particle_targets</p>
 </dd>
 </dl>
@@ -333,16 +374,16 @@ or manually access a value with the <code class="code docutils literal notransla
 </li>
 <li><dl class="simple">
 <dt>BETHE_EXT00:</dt><dd><dl class="field-list simple">
-<dt class="field-odd">Comment</dt>
+<dt class="field-odd">Comment<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Bethe equation with Linhard-Scharff at lower energies. BETHE_EXT00 is optimized for particle therapy, i.e. works well at lower energies and lighter particles and targets. It is not recommended for heavy targets and heavy/fast ions. BETHE_EXT00 is the same algorithm used in SHIELD-HIT12A, but default I-values may vary.</p>
 </dd>
-<dt class="field-even">Energy range</dt>
+<dt class="field-even">Energy range<span class="colon">:</span></dt>
 <dd class="field-even"><p>1 keV/u to 1 GeV/u</p>
 </dd>
-<dt class="field-odd">Particles</dt>
+<dt class="field-odd">Particles<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Any, but will be most correct at light ions</p>
 </dd>
-<dt class="field-even">Targets</dt>
+<dt class="field-even">Targets<span class="colon">:</span></dt>
 <dd class="field-even"><p>Any, but will be most correct at light targets</p>
 </dd>
 </dl>
@@ -353,7 +394,7 @@ or manually access a value with the <code class="code docutils literal notransla
 <p>For all data tables and equations, it is possible to use Bragg’s additivity rule, if a specific target is unavailable by default.</p>
 </section>
 <section id="installation">
-<h2>3. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h2>
+<h2>3. Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <p>Configuration and installation are handled with CMAKE.
 Install CMake from your local Linux distribution, or get it from <a class="reference external" href="http://www.cmake.org">http://www.cmake.org</a> if using Windows</p>
 <p>From source code:</p>
@@ -371,7 +412,7 @@ Additionally, the example and auxiliary programs will be built, and the binary d
 <p>this will copy the binary tables and tables to the relevant places on your system. On Linux, you will need to prefix this command with <cite>sudo</cite> or run it as root.</p>
 </section>
 <section id="use">
-<h2>4. Use<a class="headerlink" href="#use" title="Permalink to this headline">#</a></h2>
+<h2>4. Use<a class="headerlink" href="#use" title="Link to this heading">#</a></h2>
 <p>UNITS: Energies are always in terms of MeV/nucleon, except for ESTAR, where the electron energy must be specified in terms of MeV. The resulting mass stopping power is in MeV cm2/g.</p>
 <p>Stopping power values can be retrieved in two different ways:</p>
 <ol class="arabic simple">
@@ -379,93 +420,93 @@ Additionally, the example and auxiliary programs will be built, and the binary d
 <li><p>a bit more complicated way, but more suitable for fast and multithreading applications.</p></li>
 </ol>
 <p>Method 1) involves a single function call:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="nf">dedx_get_simple_stp</span><span class="p">(</span><span class="kt">int</span> <span class="n">ion</span><span class="p">,</span>
-                          <span class="kt">int</span> <span class="n">target</span><span class="p">,</span>
-                          <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span>
-                          <span class="kt">int</span> <span class="o">*</span> <span class="n">err</span><span class="p">);</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span><span class="w"> </span><span class="nf">dedx_get_simple_stp</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ion</span><span class="p">,</span>
+<span class="w">                          </span><span class="kt">int</span><span class="w"> </span><span class="n">target</span><span class="p">,</span>
+<span class="w">                          </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">,</span>
+<span class="w">                          </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">err</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The function returns the stopping power of the specific configuration,
 using the ICRU49 and ICRU73 data table if possible, else the BETHE_EXT00 table.</p>
 <dl class="field-list simple">
-<dt class="field-odd">ion</dt>
+<dt class="field-odd">ion<span class="colon">:</span></dt>
 <dd class="field-odd"><p>is the Z value of the particle</p>
 </dd>
-<dt class="field-even">target</dt>
+<dt class="field-even">target<span class="colon">:</span></dt>
 <dd class="field-even"><p>is the id of the target, the id follows the ICRU naming convention the id can be found in the respective target files for each program.</p>
 </dd>
-<dt class="field-odd">energy</dt>
+<dt class="field-odd">energy<span class="colon">:</span></dt>
 <dd class="field-odd"><p>is the kinetic energy for the ion per nucleon (MeV/nucl).</p>
 </dd>
-<dt class="field-even">*err</dt>
+<dt class="field-even">*err<span class="colon">:</span></dt>
 <dd class="field-even"><p>contains the error code and is 0 if no error was encountered. An explanation of the error codes can be found in the error_codes.txt file.</p>
 </dd>
 </dl>
 <p>Thus</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">dedx_get_simple_stp</span><span class="p">(</span><span class="n">DEDX_CARBON</span><span class="p">,</span> <span class="n">DEDX_WATER</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">err</span><span class="p">);</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dedx_get_simple_stp</span><span class="p">(</span><span class="n">DEDX_CARBON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_WATER</span><span class="p">,</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">err</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>will store the mass stopping power of a 100 MeV/u carbon ion in a water target.</p>
 <p>A list of ions and target media is given in appendix A.3.</p>
 <p>Method 2) is the proper method of using dedx if several stopping powers are to be retrieved. It is (hopefully) thread-safe and was optimized to be fast.</p>
 <p>First memory for a workspace and a config struct must be allocated.</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">;</span>
-<span class="n">dedx_config</span> <span class="o">*</span><span class="n">cfg</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">;</span>
+<span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="n">cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
 
-<span class="n">ws</span> <span class="o">=</span> <span class="n">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">int</span> <span class="n">datasets</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">)</span>
+<span class="n">ws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">datasets</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The function returns a struct of the type <code class="docutils literal notranslate"><span class="pre">dedx_workspace</span> <span class="pre">*ws</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">datasets</dt>
+<dt class="field-odd">datasets<span class="colon">:</span></dt>
 <dd class="field-odd"><p>is the number of ion - target combinations you want to use at the same time.</p>
 </dd>
-<dt class="field-even">*err</dt>
+<dt class="field-even">*err<span class="colon">:</span></dt>
 <dd class="field-even"><p>pointer to an integer holding an error code.</p>
 </dd>
 </dl>
 <p>Next you must initialize your configuration, by writing to the cfg struct.</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
 <span class="p">{</span>
-   <span class="kt">int</span> <span class="n">cfg_id</span><span class="p">;</span>
-   <span class="kt">int</span> <span class="n">program</span><span class="p">;</span>
-   <span class="kt">int</span> <span class="n">target</span><span class="p">;</span>            <span class="c1">// target can either be an element or a compound</span>
-   <span class="kt">int</span> <span class="n">ion</span><span class="p">;</span>               <span class="c1">// id number of projectile</span>
-   <span class="kt">int</span> <span class="n">ion_a</span><span class="p">;</span>             <span class="c1">// nucleon number of projectile</span>
-   <span class="kt">int</span> <span class="n">bragg_used</span><span class="p">;</span>        <span class="c1">// is 1 if Braggs additivity rule was applied</span>
-   <span class="kt">int</span> <span class="n">compound_state</span><span class="p">;</span>    <span class="c1">// DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ...</span>
-   <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">elements_length</span><span class="p">;</span>   <span class="c1">// elements_length  --- number of unique elements in comp.</span>
-   <span class="kt">int</span> <span class="o">*</span> <span class="n">elements_id</span><span class="p">;</span>     <span class="c1">// elements_id      --- Z of each element</span>
-   <span class="kt">int</span> <span class="o">*</span> <span class="n">elements_atoms</span><span class="p">;</span>  <span class="c1">// elements_atoms   --- number of atoms per comp. unit</span>
-   <span class="kt">char</span> <span class="n">mstar_mode</span><span class="p">;</span>
-   <span class="kt">float</span> <span class="n">i_value</span><span class="p">;</span>         <span class="c1">// i_value   --- mean excitation potential of target</span>
-   <span class="kt">float</span> <span class="n">rho</span><span class="p">;</span>
-   <span class="kt">float</span> <span class="o">*</span> <span class="n">elements_mass_fraction</span><span class="p">;</span>     <span class="c1">// mass_fraction of each element</span>
-   <span class="kt">float</span> <span class="o">*</span> <span class="n">elements_i_value</span><span class="p">;</span>           <span class="c1">// i_value of each element</span>
-   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">target_name</span><span class="p">;</span>
-   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">ion_name</span><span class="p">;</span>
-   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">program_name</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">dedx_config</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">cfg_id</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">target</span><span class="p">;</span><span class="w">            </span><span class="c1">// target can either be an element or a compound</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">ion</span><span class="p">;</span><span class="w">               </span><span class="c1">// id number of projectile</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">ion_a</span><span class="p">;</span><span class="w">             </span><span class="c1">// nucleon number of projectile</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">bragg_used</span><span class="p">;</span><span class="w">        </span><span class="c1">// is 1 if Braggs additivity rule was applied</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="n">compound_state</span><span class="p">;</span><span class="w">    </span><span class="c1">// DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ...</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">elements_length</span><span class="p">;</span><span class="w">   </span><span class="c1">// elements_length  --- number of unique elements in comp.</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">elements_id</span><span class="p">;</span><span class="w">     </span><span class="c1">// elements_id      --- Z of each element</span>
+<span class="w">   </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">elements_atoms</span><span class="p">;</span><span class="w">  </span><span class="c1">// elements_atoms   --- number of atoms per comp. unit</span>
+<span class="w">   </span><span class="kt">char</span><span class="w"> </span><span class="n">mstar_mode</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="n">i_value</span><span class="p">;</span><span class="w">         </span><span class="c1">// i_value   --- mean excitation potential of target</span>
+<span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="n">rho</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">elements_mass_fraction</span><span class="p">;</span><span class="w">     </span><span class="c1">// mass_fraction of each element</span>
+<span class="w">   </span><span class="kt">float</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">elements_i_value</span><span class="p">;</span><span class="w">           </span><span class="c1">// i_value of each element</span>
+<span class="w">   </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">target_name</span><span class="p">;</span>
+<span class="w">   </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ion_name</span><span class="p">;</span>
+<span class="w">   </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">program_name</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">dedx_config</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Description of the elements:</p>
 <dl class="field-list">
-<dt class="field-odd">cfg_id</dt>
+<dt class="field-odd">cfg_id<span class="colon">:</span></dt>
 <dd class="field-odd"><p>configuration id, which is set by <code class="docutils literal notranslate"><span class="pre">dedx_config</span></code>. Don’t touch.</p>
 </dd>
-<dt class="field-even">program</dt>
+<dt class="field-even">program<span class="colon">:</span></dt>
 <dd class="field-even"><p>must be specified by the user, see appendix A.3</p>
 </dd>
-<dt class="field-odd">target</dt>
+<dt class="field-odd">target<span class="colon">:</span></dt>
 <dd class="field-odd"><p>see appendix A.3. If another compound is requested which is not in the list, then the user must specify compound constituents by <code class="docutils literal notranslate"><span class="pre">*elements_id</span></code> and either <code class="docutils literal notranslate"><span class="pre">*elements_mass_fraction</span></code> or <code class="docutils literal notranslate"><span class="pre">*elements_atoms</span></code>.</p>
 </dd>
-<dt class="field-even">ion</dt>
+<dt class="field-even">ion<span class="colon">:</span></dt>
 <dd class="field-even"><p>must be specified by the user, see appendix A.3</p>
 </dd>
-<dt class="field-odd">compound</dt>
+<dt class="field-odd">compound<span class="colon">:</span></dt>
 <dd class="field-odd"><p>is set to <code class="docutils literal notranslate"><span class="pre">TRUE</span></code> by <code class="docutils literal notranslate"><span class="pre">dedx_load_config()</span></code>, if the target was not found in the default list, but generated from individual elements instead.</p>
 </dd>
-<dt class="field-even">compound_state</dt>
+<dt class="field-even">compound_state<span class="colon">:</span></dt>
 <dd class="field-even"><p>is assumed to be DEDX_DEFAULT_STATE, which means normal state of
 aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
 From version 1.2.1 the state parameter (i.e. the I-values)
@@ -493,34 +534,34 @@ since libdEdx does not discriminate between the I-values of elements and atomic 
 When using MSTAR read the <code class="docutils literal notranslate"><span class="pre">mstar_mode</span></code> function carefully too.
 The compound_state will apply equally to all constituents when working with compounds.</p>
 </dd>
-<dt class="field-odd">elements_length</dt>
+<dt class="field-odd">elements_length<span class="colon">:</span></dt>
 <dd class="field-odd"><p>number of unique elements in a compound. Must be specified if the target is undefined (<cite>DEDX_UNDEFINED</cite>)</p>
 </dd>
-<dt class="field-even">*elements_id</dt>
+<dt class="field-even">*elements_id<span class="colon">:</span></dt>
 <dd class="field-even"><p>Z of each constituent element, must be specified if target is undefined</p>
 </dd>
-<dt class="field-odd">*elements_atoms</dt>
+<dt class="field-odd">*elements_atoms<span class="colon">:</span></dt>
 <dd class="field-odd"><p>number of atoms per comp. unit must be specified if the target is undefined.</p>
 </dd>
-<dt class="field-even">mstar_mode</dt>
+<dt class="field-even">mstar_mode<span class="colon">:</span></dt>
 <dd class="field-even"><p>MSTAR features several modes of operation, depending on the state of the compound.</p>
 <dl class="field-list simple">
-<dt class="field-odd">DEDX_MSTAR_MODE_A</dt>
+<dt class="field-odd">DEDX_MSTAR_MODE_A<span class="colon">:</span></dt>
 <dd class="field-odd"><p>will work for most compounds. Automatic selection of state, depending on the state table in the appendix. This mode ‘a’ will select ‘g’ mode for gas phase and ‘c’ mode for condensed phase.</p>
 </dd>
-<dt class="field-even">DEDX_MSTAR_MODE_B</dt>
+<dt class="field-even">DEDX_MSTAR_MODE_B<span class="colon">:</span></dt>
 <dd class="field-even"><p>recommended and default mode of operation. However, not all elements work. This mode ‘b’ will select ‘h’ for gas and ‘d’ for condensed phase, depending on the state table in the appendix.</p>
 </dd>
-<dt class="field-odd">DEDX_MSTAR_MODE_C</dt>
+<dt class="field-odd">DEDX_MSTAR_MODE_C<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Condensed phase for ‘a’ mode.</p>
 </dd>
-<dt class="field-even">DEDX_MSTAR_MODE_D</dt>
+<dt class="field-even">DEDX_MSTAR_MODE_D<span class="colon">:</span></dt>
 <dd class="field-even"><p>Condensed phase for recommended ‘b’ mode.</p>
 </dd>
-<dt class="field-odd">DEDX_MSTAR_MODE_G</dt>
+<dt class="field-odd">DEDX_MSTAR_MODE_G<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Gas phase for ‘a’ mode.</p>
 </dd>
-<dt class="field-even">DEDX_MSTAR_MODE_H</dt>
+<dt class="field-even">DEDX_MSTAR_MODE_H<span class="colon">:</span></dt>
 <dd class="field-even"><p>Gas phase for recommended ‘b’ mode.</p>
 </dd>
 </dl>
@@ -544,14 +585,14 @@ requested, only Hydrogen and Helium will be calculated using ‘g’ mode,
 and all other constituents remain in ‘h’ mode.
 Confusing? Yes.</p>
 </dd>
-<dt class="field-odd">i_value</dt>
+<dt class="field-odd">i_value<span class="colon">:</span></dt>
 <dd class="field-odd"><p>if unspecified, then ICRU I-values are used for target
 compound. If target is set, or if target is 0, then it is
 calculated from the individual i-values set in
 <code class="docutils literal notranslate"><span class="pre">*elements_i_value</span></code>, but only when the <code class="docutils literal notranslate"><span class="pre">*elements_i_value</span> <span class="pre">are</span> <span class="pre">empty</span></code>,
 i.e. uninitialized.</p>
 </dd>
-<dt class="field-even">*elements_mass_fraction</dt>
+<dt class="field-even">*elements_mass_fraction<span class="colon">:</span></dt>
 <dd class="field-even"><p>must be specified if target and elements_atoms is
 left undefined. If both are specified, then only
 elements_mass_fraction is considered, and element_atoms
@@ -559,7 +600,7 @@ is ignored entirely. Mass fraction is the summed atomic
 mass of a constituing element, divided by the total
 atomic mass of the compound.</p>
 </dd>
-<dt class="field-odd">*elements_i_value</dt>
+<dt class="field-odd">*elements_i_value<span class="colon">:</span></dt>
 <dd class="field-odd"><p>if target is 0, then individual I-values of elements can
 be specified here. If any values are found in
 <code class="docutils literal notranslate"><span class="pre">*elements_i_value</span></code>, then i_value is ignored. Zero is not allowed. If any
@@ -568,15 +609,15 @@ elements.</p>
 </dd>
 </dl>
 <p>As a minimum, you should specify program, target and ion, i.e.</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_CARBON</span><span class="p">;</span>
-<span class="n">cfg</span><span class="o">-&gt;</span><span class="n">program</span> <span class="o">=</span> <span class="n">DEDX_ICRU</span><span class="p">;</span>
-<span class="n">cfg</span><span class="o">-&gt;</span><span class="n">target</span> <span class="o">=</span> <span class="n">DEDX_PMMA</span><span class="p">;</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">-&gt;</span><span class="n">ion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_CARBON</span><span class="p">;</span>
+<span class="n">cfg</span><span class="o">-&gt;</span><span class="n">program</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_ICRU</span><span class="p">;</span>
+<span class="n">cfg</span><span class="o">-&gt;</span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_PMMA</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>and then load the config</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">dedx_load_config</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span>
-                      <span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
-                      <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">dedx_load_config</span><span class="p">(</span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">,</span>
+<span class="w">                      </span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="n">config</span><span class="p">,</span>
+<span class="w">                      </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>which will initialize the remaining configure options which may be needed.
@@ -588,16 +629,16 @@ Since it, there had been observed some misbehave of the library using
 malloc for allocating memory to the config struct, it is recommended
 to use <code class="docutils literal notranslate"><span class="pre">calloc</span></code> or similar.</p>
 <p>Stopping power values are returned by:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">dedx_get_stp</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span>
-                   <span class="kt">int</span> <span class="n">config</span><span class="p">,</span>
-                   <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span>
-                   <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">)</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span><span class="w"> </span><span class="n">dedx_get_stp</span><span class="p">(</span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">,</span>
+<span class="w">                   </span><span class="kt">int</span><span class="w"> </span><span class="n">config</span><span class="p">,</span>
+<span class="w">                   </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">,</span>
+<span class="w">                   </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>energy: kinetic energy of a particle in MeV/nucleon.</p>
 <p>When you are done with the library you have to run</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_free_workspace</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="n">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span> <span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_free_workspace</span><span class="p">(</span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="n">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>to free the allocated memory.</p>
@@ -607,31 +648,31 @@ Braggs additivity rule is applied automatically if you request a target material
 <li><p>Own compounds:
 You can set up your own compounds by specifying each element in the dedx_config struct. Here is an example for water, set up by mass fraction:</p></li>
 </ul>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span> <span class="o">=</span> <span class="n">DEDX_ASTAR</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_HELIUM</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_OXYGEN</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.111894</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.888106</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_ASTAR</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_HELIUM</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_OXYGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.111894</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_mass_fraction</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.888106</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Mass fractions are particularly useful if you want to use special
 isotopic compositions, instead of natural compositions.</p>
 <p>Alternatively, you can set it up by the relative amount of elements:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span> <span class="o">=</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_HELIUM</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_OXYGEN</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_BETHE_EXT00</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_HELIUM</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_OXYGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Then libdEdx will use the natural isotope compositions, e.g. 12.0107 for natural
@@ -642,24 +683,24 @@ Instead of using the default, I value for a compound, determined by either the
 predefined ICRU material list or Braggs additivity rule of the compound, you
 can specify the I-value manually for the BETHE-type algorithms:</p></li>
 </ul>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span> <span class="o">=</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span> <span class="o">=</span> <span class="n">DEDX_HELIUM</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">i_value</span> <span class="o">=</span> <span class="mf">78.0</span><span class="p">;</span>                  <span class="c1">// new I-value in eV</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEDX_OXYGEN</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span> <span class="o">=</span> <span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">dedx_config</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_BETHE_EXT00</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">ion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_HELIUM</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">i_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">78.0</span><span class="p">;</span><span class="w">                  </span><span class="c1">// new I-value in eV</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_HYDROGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEDX_OXYGEN</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calloc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">elements_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
 </pre></div>
 </div>
 </section>
 <section id="release-notes">
-<h2>5. Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">#</a></h2>
+<h2>5. Release notes<a class="headerlink" href="#release-notes" title="Link to this heading">#</a></h2>
 <section id="version-1-2-1">
-<h3>Version: 1.2.1<a class="headerlink" href="#version-1-2-1" title="Permalink to this headline">#</a></h3>
+<h3>Version: 1.2.1<a class="headerlink" href="#version-1-2-1" title="Link to this heading">#</a></h3>
 <dl class="simple">
 <dt>Changes:</dt><dd><ul class="simple">
 <li><p>several bug fixes regarding the state of the compound when using Bragg’s rule.</p></li>
@@ -671,7 +712,7 @@ Appendix</p></li>
 </dl>
 </section>
 <section id="version-1-2">
-<h3>Version: 1.2<a class="headerlink" href="#version-1-2" title="Permalink to this headline">#</a></h3>
+<h3>Version: 1.2<a class="headerlink" href="#version-1-2" title="Link to this heading">#</a></h3>
 <dl class="simple">
 <dt>Changes:</dt><dd><ul class="simple">
 <li><p>New API, which should be more stable for future enhancements</p></li>
@@ -692,7 +733,7 @@ Appendix</p></li>
 </dl>
 </section>
 <section id="version-1-0-1">
-<h3>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Permalink to this headline">#</a></h3>
+<h3>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Link to this heading">#</a></h3>
 <dl class="simple">
 <dt>Known limitations:</dt><dd><ul class="simple">
 <li><p>ESTAR is not implemented</p></li>
@@ -704,32 +745,32 @@ Appendix</p></li>
 </section>
 </section>
 <section id="a-1-api">
-<h2>A.1 API<a class="headerlink" href="#a-1-api" title="Permalink to this headline">#</a></h2>
+<h2>A.1 API<a class="headerlink" href="#a-1-api" title="Link to this heading">#</a></h2>
 <p>List of functions available in dedx.h:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span> <span class="o">*</span> <span class="nf">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="kt">void</span>             <span class="nf">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="kt">void</span>             <span class="nf">dedx_free_workspace</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="kt">void</span>             <span class="nf">dedx_get_composition</span><span class="p">(</span><span class="kt">int</span> <span class="n">target</span><span class="p">,</span> <span class="kt">float</span> <span class="n">composition</span><span class="p">[][</span><span class="mi">2</span><span class="p">],</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">comp_len</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="kt">void</span>             <span class="nf">dedx_get_error_code</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">err_str</span><span class="p">,</span> <span class="kt">int</span> <span class="n">err</span><span class="p">);</span>
-<span class="kt">float</span>            <span class="nf">dedx_get_i_value</span><span class="p">(</span><span class="kt">int</span> <span class="n">target</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span>      <span class="nf">dedx_get_ion_list</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_ion_name</span><span class="p">(</span><span class="kt">int</span> <span class="n">ion</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span>      <span class="nf">dedx_get_material_list</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_material_name</span><span class="p">(</span><span class="kt">int</span> <span class="n">material</span><span class="p">);</span>
-<span class="kt">float</span>            <span class="nf">dedx_get_min_energy</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ion</span><span class="p">);</span>
-<span class="kt">float</span>            <span class="nf">dedx_get_max_energy</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ion</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">int</span> <span class="o">*</span>      <span class="nf">dedx_get_program_list</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_program_name</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
-<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span>     <span class="nf">dedx_get_program_version</span><span class="p">(</span><span class="kt">int</span> <span class="n">program</span><span class="p">);</span>
-<span class="kt">float</span>            <span class="nf">dedx_get_simple_stp</span><span class="p">(</span><span class="kt">int</span> <span class="n">ion</span><span class="p">,</span> <span class="kt">int</span> <span class="n">target</span><span class="p">,</span> <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="kt">float</span>            <span class="nf">dedx_get_stp</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span> <span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">float</span> <span class="n">energy</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
-<span class="kt">void</span>             <span class="nf">dedx_get_version</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">major</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">minor</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">patch</span><span class="p">);</span>
-<span class="kt">void</span>             <span class="nf">dedx_load_config</span><span class="p">(</span><span class="n">dedx_workspace</span> <span class="o">*</span><span class="n">ws</span><span class="p">,</span> <span class="n">dedx_config</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nf">dedx_allocate_workspace</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span><span class="w">             </span><span class="nf">dedx_free_config</span><span class="p">(</span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span><span class="w">             </span><span class="nf">dedx_free_workspace</span><span class="p">(</span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span><span class="w">             </span><span class="nf">dedx_get_composition</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">composition</span><span class="p">[][</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">comp_len</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span><span class="w">             </span><span class="nf">dedx_get_error_code</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">err_str</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="p">);</span>
+<span class="kt">float</span><span class="w">            </span><span class="nf">dedx_get_i_value</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w">      </span><span class="nf">dedx_get_ion_list</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w">     </span><span class="nf">dedx_get_ion_name</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ion</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w">      </span><span class="nf">dedx_get_material_list</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w">     </span><span class="nf">dedx_get_material_name</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">material</span><span class="p">);</span>
+<span class="kt">float</span><span class="w">            </span><span class="nf">dedx_get_min_energy</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ion</span><span class="p">);</span>
+<span class="kt">float</span><span class="w">            </span><span class="nf">dedx_get_max_energy</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ion</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="w">      </span><span class="nf">dedx_get_program_list</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w">     </span><span class="nf">dedx_get_program_name</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">);</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="w">     </span><span class="nf">dedx_get_program_version</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">program</span><span class="p">);</span>
+<span class="kt">float</span><span class="w">            </span><span class="nf">dedx_get_simple_stp</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ion</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">float</span><span class="w">            </span><span class="nf">dedx_get_stp</span><span class="p">(</span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
+<span class="kt">void</span><span class="w">             </span><span class="nf">dedx_get_version</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">major</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">minor</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">patch</span><span class="p">);</span>
+<span class="kt">void</span><span class="w">             </span><span class="nf">dedx_load_config</span><span class="p">(</span><span class="n">dedx_workspace</span><span class="w"> </span><span class="o">*</span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="n">dedx_config</span><span class="w"> </span><span class="o">*</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">err</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
 <section id="a-2-error-codes">
-<h2>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Permalink to this headline">#</a></h2>
+<h2>A.2 Error codes<a class="headerlink" href="#a-2-error-codes" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>1-100 IO error</p></li>
 <li><p>101-200 Out of bounds errors</p></li>
@@ -758,7 +799,7 @@ Appendix</p></li>
 </ul>
 </section>
 <section id="a-3-additional-lists">
-<h2>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Permalink to this headline">#</a></h2>
+<h2>A.3 Additional lists<a class="headerlink" href="#a-3-additional-lists" title="Link to this heading">#</a></h2>
 <p>All names can be prefixed with <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code></p>
 <p>List all known data tables and algorithms:</p>
 <div class="line-block">
@@ -1229,100 +1270,100 @@ Appendix</p></li>
 <p>In your computer code, all materials and ions can also be accessed by their name
 via the <code class="docutils literal notranslate"><span class="pre">DEDX_</span></code> prefix. However, there are occasionally small variations in the naming scheme.
 Enums are defined in <code class="docutils literal notranslate"><span class="pre">dedx.h</span></code>, but are listed here for convenience:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_ASTAR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">DEDX_PSTAR</span><span class="p">,</span> <span class="n">DEDX_ESTAR</span><span class="p">,</span>
-      <span class="n">DEDX_MSTAR</span><span class="p">,</span> <span class="n">DEDX_ICRU73_OLD</span><span class="p">,</span> <span class="n">DEDX_ICRU73</span><span class="p">,</span> <span class="n">DEDX_ICRU49</span><span class="p">,</span> <span class="n">_DEDX_0008</span><span class="p">,</span>
-      <span class="n">DEDX_ICRU</span><span class="p">,</span> <span class="n">DEDX_DEFAULT</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">DEDX_BETHE_EXT00</span><span class="p">};</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">enum</span><span class="w"> </span><span class="p">{</span><span class="n">DEDX_ASTAR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PSTAR</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ESTAR</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MSTAR</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ICRU73_OLD</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ICRU73</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ICRU49</span><span class="p">,</span><span class="w"> </span><span class="n">_DEDX_0008</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ICRU</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_DEFAULT</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BETHE_EXT00</span><span class="p">};</span>
 
-<span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_DEFAULT_STATE</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">DEDX_GAS</span><span class="p">,</span><span class="n">DEDX_CONDENSED</span><span class="p">};</span>
+<span class="k">enum</span><span class="w"> </span><span class="p">{</span><span class="n">DEDX_DEFAULT_STATE</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">DEDX_GAS</span><span class="p">,</span><span class="n">DEDX_CONDENSED</span><span class="p">};</span>
 
-<span class="k">enum</span> <span class="p">{</span><span class="n">DEDX_HYDROGEN</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">DEDX_HELIUM</span><span class="p">,</span> <span class="n">DEDX_LITHIUM</span><span class="p">,</span> <span class="n">DEDX_BERYLLIUM</span><span class="p">,</span> <span class="n">DEDX_BORON</span><span class="p">,</span>
-      <span class="n">DEDX_CARBON</span><span class="p">,</span> <span class="n">DEDX_GRAPHITE</span><span class="o">=</span><span class="mi">906</span><span class="p">,</span> <span class="n">DEDX_NITROGEN</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">DEDX_OXYGEN</span><span class="p">,</span>
-      <span class="n">DEDX_FLUORINE</span><span class="p">,</span> <span class="n">DEDX_NEON</span><span class="p">,</span> <span class="n">DEDX_SODIUM</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM</span><span class="p">,</span>
-      <span class="n">DEDX_ALUMINUM</span><span class="p">,</span> <span class="n">DEDX_SILICON</span><span class="p">,</span> <span class="n">DEDX_PHOSPHORUS</span><span class="p">,</span> <span class="n">DEDX_SULFUR</span><span class="p">,</span>
-      <span class="n">DEDX_CHLORINE</span><span class="p">,</span> <span class="n">DEDX_ARGON</span><span class="p">,</span> <span class="n">DEDX_POTASSIUM</span><span class="p">,</span> <span class="n">DEDX_CALCIUM</span><span class="p">,</span> <span class="n">DEDX_SCANDIUM</span><span class="p">,</span>
-      <span class="n">DEDX_TITeANIUM</span><span class="p">,</span> <span class="n">DEDX_VANADIUM</span><span class="p">,</span> <span class="n">DEDX_CHROMIUM</span><span class="p">,</span> <span class="n">DEDX_MANGANESE</span><span class="p">,</span> <span class="n">DEDX_IRON</span><span class="p">,</span>
-      <span class="n">DEDX_COBALT</span><span class="p">,</span> <span class="n">DEDX_NICKEL</span><span class="p">,</span> <span class="n">DEDX_COPPER</span><span class="p">,</span> <span class="n">DEDX_ZINC</span><span class="p">,</span> <span class="n">DEDX_GALLIUM</span><span class="p">,</span>
-      <span class="n">DEDX_GERMANIUM</span><span class="p">,</span> <span class="n">DEDX_ARSENIC</span><span class="p">,</span> <span class="n">DEDX_SELENIUM</span><span class="p">,</span> <span class="n">DEDX_BROMINE</span><span class="p">,</span> <span class="n">DEDX_KRYPTON</span><span class="p">,</span>
-      <span class="n">DEDX_RUBIDIUM</span><span class="p">,</span> <span class="n">DEDX_STRONTIUM</span><span class="p">,</span> <span class="n">DEDX_YTTRIUM</span><span class="p">,</span> <span class="n">DEDX_ZIRCONIUM</span><span class="p">,</span> <span class="n">DEDX_NIOBIUM</span><span class="p">,</span>
-      <span class="n">DEDX_MOLYBDENUM</span><span class="p">,</span> <span class="n">DEDX_TECHNETIUM</span><span class="p">,</span> <span class="n">DEDX_RUTHENIUM</span><span class="p">,</span> <span class="n">DEDX_RHODIUM</span><span class="p">,</span>
-      <span class="n">DEDX_PALLADIUM</span><span class="p">,</span> <span class="n">DEDX_SILVER</span><span class="p">,</span> <span class="n">DEDX_CADMIUM</span><span class="p">,</span> <span class="n">DEDX_INDIUM</span><span class="p">,</span> <span class="n">DEDX_TIN</span><span class="p">,</span>
-      <span class="n">DEDX_ANTIMONY</span><span class="p">,</span> <span class="n">DEDX_TELLURIUM</span><span class="p">,</span> <span class="n">DEDX_IODINE</span><span class="p">,</span> <span class="n">DEDX_XENON</span><span class="p">,</span> <span class="n">DEDX_CESIUM</span><span class="p">,</span>
-      <span class="n">DEDX_BARIUM</span><span class="p">,</span> <span class="n">DEDX_LANTHANUM</span><span class="p">,</span> <span class="n">DEDX_CERIUM</span><span class="p">,</span> <span class="n">DEDX_PRASEODYMIUM</span><span class="p">,</span>
-      <span class="n">DEDX_NEODYMIUM</span><span class="p">,</span> <span class="n">DEDX_PROMETHIUM</span><span class="p">,</span> <span class="n">DEDX_SAMARIUM</span><span class="p">,</span> <span class="n">DEDX_EUROPIUM</span><span class="p">,</span>
-      <span class="n">DEDX_GADOLINIUM</span><span class="p">,</span> <span class="n">DEDX_TERBIUM</span><span class="p">,</span> <span class="n">DEDX_DYSPROSIUM</span><span class="p">,</span> <span class="n">DEDX_HOLMIUM</span><span class="p">,</span>
-      <span class="n">DEDX_ERBIUM</span><span class="p">,</span> <span class="n">DEDX_THULIUM</span><span class="p">,</span> <span class="n">DEDX_YTTERBIUM</span><span class="p">,</span> <span class="n">DEDX_LUTETIUM</span><span class="p">,</span> <span class="n">DEDX_HAFNIUM</span><span class="p">,</span>
-      <span class="n">DEDX_TANTALUM</span><span class="p">,</span> <span class="n">DEDX_TUNGSTEN</span><span class="p">,</span> <span class="n">DEDX_RHENIUM</span><span class="p">,</span> <span class="n">DEDX_OSMIUM</span><span class="p">,</span> <span class="n">DEDX_IRIDIUM</span><span class="p">,</span>
-      <span class="n">DEDX_PLATINUM</span><span class="p">,</span> <span class="n">DEDX_GOLD</span><span class="p">,</span> <span class="n">DEDX_MERCURY</span><span class="p">,</span> <span class="n">DEDX_THALLIUM</span><span class="p">,</span> <span class="n">DEDX_LEAD</span><span class="p">,</span>
-      <span class="n">DEDX_BISMUTH</span><span class="p">,</span> <span class="n">DEDX_POLONIUM</span><span class="p">,</span> <span class="n">DEDX_ASTATINE</span><span class="p">,</span> <span class="n">DEDX_RADON</span><span class="p">,</span> <span class="n">DEDX_FRANCIUM</span><span class="p">,</span>
-      <span class="n">DEDX_RADIUM</span><span class="p">,</span> <span class="n">DEDX_ACTINIUM</span><span class="p">,</span> <span class="n">DEDX_THORIUM</span><span class="p">,</span> <span class="n">DEDX_PROTACTINIUM</span><span class="p">,</span>
-      <span class="n">DEDX_URANIUM</span><span class="p">,</span> <span class="n">DEDX_NEPTUNIUM</span><span class="p">,</span> <span class="n">DEDX_PLUTONIUM</span><span class="p">,</span> <span class="n">DEDX_AMERICIUM</span><span class="p">,</span>
-      <span class="n">DEDX_CURIUM</span><span class="p">,</span> <span class="n">DEDX_BERKELIUM</span><span class="p">,</span> <span class="n">DEDX_CALIFORNIUM</span><span class="p">,</span>
-      <span class="n">DEDX_A150_TISSUE_EQUIVALENT_PLASTIC</span><span class="p">,</span> <span class="n">DEDX_ACETONE</span><span class="p">,</span> <span class="n">DEDX_ACETYLENE</span><span class="p">,</span>
-      <span class="n">DEDX_ADENINE</span><span class="p">,</span> <span class="n">DEDX_ADIPOSE_TISSUE_ICRP</span><span class="p">,</span> <span class="n">DEDX_AIR_DRY_NEAR_SEA_LEVEL</span><span class="p">,</span>
-      <span class="n">DEDX_ALANINE</span><span class="p">,</span> <span class="n">DEDX_ALUMINUMOXIDE</span><span class="p">,</span> <span class="n">DEDX_AMBER</span><span class="p">,</span> <span class="n">DEDX_AMMONIA</span><span class="p">,</span> <span class="n">DEDX_ANILINE</span><span class="p">,</span>
-      <span class="n">DEDX_ANTHRACENE</span><span class="p">,</span> <span class="n">DEDX_B100</span><span class="p">,</span> <span class="n">DEDX_BAKELITE</span><span class="p">,</span> <span class="n">DEDX_BARIUM_FLUORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_BARIUM_SULFATE</span><span class="p">,</span> <span class="n">DEDX_BENZENE</span><span class="p">,</span> <span class="n">DEDX_BERYLLIUM_OXIDE</span><span class="p">,</span>
-      <span class="n">DEDX_BISMUTH_GERMANIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_BLOOD_ICRP</span><span class="p">,</span> <span class="n">DEDX_BONE_COMPACT_ICRU</span><span class="p">,</span>
-      <span class="n">DEDX_BONE_CORTICAL_ICRP</span><span class="p">,</span> <span class="n">DEDX_BORON_CARBIDE</span><span class="p">,</span> <span class="n">DEDX_BORON_OXIDE</span><span class="p">,</span>
-      <span class="n">DEDX_BRAIN_ICRP</span><span class="p">,</span> <span class="n">DEDX_BUTANE</span><span class="p">,</span> <span class="n">DEDX_N_BUTYLALCOHOL</span><span class="p">,</span>
-      <span class="n">DEDX_C552_AIR_EQUIVALENT_PLASTIC</span><span class="p">,</span> <span class="n">DEDX_CADMIUM_TELLURIDE</span><span class="p">,</span>
-      <span class="n">DEDX_CADMIUM_TUNGSTATE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_CARBONATE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_FLUORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_CALCIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_SULFATE</span><span class="p">,</span> <span class="n">DEDX_CALCIUM_TUNGSTATE</span><span class="p">,</span>
-      <span class="n">DEDX_CARBON_DIOXIDE</span><span class="p">,</span> <span class="n">DEDX_CARBON_TETRACHLORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_CELLULOSE_ACETATE_CELLOPHANE</span><span class="p">,</span> <span class="n">DEDX_CELLULOSE_ACETATE_BUTYRATE</span><span class="p">,</span>
-      <span class="n">DEDX_CELLULOSE_NITRATE</span><span class="p">,</span> <span class="n">DEDX_CERIC_SULFATE_DOSIMETER_SOLUTION</span><span class="p">,</span>
-      <span class="n">DEDX_CESIUM_FLUORIDE</span><span class="p">,</span> <span class="n">DEDX_CESIUM_IODIDE</span><span class="p">,</span> <span class="n">DEDX_CHLORO_BENZENE</span><span class="p">,</span>
-      <span class="n">DEDX_CHLOROFORM</span><span class="p">,</span> <span class="n">DEDX_CONCRETE_PORTLAND</span><span class="p">,</span> <span class="n">DEDX_CYCLOHEXANE</span><span class="p">,</span>
-      <span class="n">DEDX_DICHLOROBENZENE</span><span class="p">,</span> <span class="n">DEDX_DICHLORODIETHYL_ETHER</span><span class="p">,</span> <span class="n">DEDX_DICHLOROETHANE</span><span class="p">,</span>
-      <span class="n">DEDX_DIETHYLETHER</span><span class="p">,</span> <span class="n">DEDX_N_N_DIMETHYL_FORMAMIDE</span><span class="p">,</span> <span class="n">DEDX_DIMETHYL_SULFOXIDE</span><span class="p">,</span>
-      <span class="n">DEDX_ETHANE</span><span class="p">,</span> <span class="n">DEDX_ETHYL_ALCOHOL</span><span class="p">,</span> <span class="n">DEDX_ETHYL_CELLULOSE</span><span class="p">,</span> <span class="n">DEDX_ETHYLENE</span><span class="p">,</span>
-      <span class="n">DEDX_EYE_LENS_ICRP</span><span class="p">,</span> <span class="n">DEDX_FERRIC_OXIDE</span><span class="p">,</span> <span class="n">DEDX_FERRO_BORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_FERROUS_OXIDE</span><span class="p">,</span> <span class="n">DEDX_FERROUS_SULFATE_DOSIMETER_SOLUTION</span><span class="p">,</span>
-      <span class="n">DEDX_FREON_12</span><span class="p">,</span> <span class="n">DEDX_FREON_12B2</span><span class="p">,</span> <span class="n">DEDX_FREON_13</span><span class="p">,</span> <span class="n">DEDX_FREON_13B1</span><span class="p">,</span>
-      <span class="n">DEDX_FREON_13I1</span><span class="p">,</span> <span class="n">DEDX_GADOLINIUM_OXYSULFIDE</span><span class="p">,</span> <span class="n">DEDX_GALLIUM_ARSENIDE</span><span class="p">,</span>
-      <span class="n">DEDX_GEL_IN_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span>
-      <span class="n">DEDX_GLASS_PYREX</span><span class="p">,</span> <span class="n">DEDX_GLASS_LEAD</span><span class="p">,</span> <span class="n">DEDX_GLASS_PLATE</span><span class="p">,</span> <span class="cm">/* 169,170,171 */</span>
-      <span class="n">DEDX_GLUCOSE</span><span class="p">,</span> <span class="n">DEDX_GLUTAMINE</span><span class="p">,</span> <span class="n">DEDX_GLYCEROL</span><span class="p">,</span>
-      <span class="n">DEDX_GUANINE</span><span class="p">,</span> <span class="n">DEDX_GYPSUM_PLASTER_OF_PARIS</span><span class="p">,</span> <span class="n">DEDX_N_HEPTANE</span><span class="p">,</span> <span class="n">DEDX_N_HEXANE</span><span class="p">,</span>
-      <span class="n">DEDX_KAPTON_POLYIMIDE_FILM</span><span class="p">,</span> <span class="n">DEDX_LANTHANUM_OXYBROMIDE</span><span class="p">,</span>
-      <span class="n">DEDX_LANTHANUM_OXYSULFIDE</span><span class="p">,</span> <span class="n">DEDX_LEAD_OXIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_AMIDE</span><span class="p">,</span>
-      <span class="n">DEDX_LITHIUM_CARBONATE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_FLUORIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_HYDRIDE</span><span class="p">,</span>
-      <span class="n">DEDX_LITHIUM_IODIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_LITHIUM_TETRABORATE</span><span class="p">,</span>
-      <span class="n">DEDX_LUNG_ICRP</span><span class="p">,</span> <span class="n">DEDX_M3_WAX</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM_CARBONATE</span><span class="p">,</span>
-      <span class="n">DEDX_MAGNESIUM_FLUORIDE</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_MAGNESIUM_TETRABORATE</span><span class="p">,</span>
-      <span class="n">DEDX_MERCURIC_IODIDE</span><span class="p">,</span> <span class="n">DEDX_METHANE</span><span class="p">,</span> <span class="n">DEDX_METHANOL</span><span class="p">,</span> <span class="n">DEDX_MIX_D_WAX</span><span class="p">,</span>
-      <span class="n">DEDX_MS20_TISSUE_SUBSTITUTE</span><span class="p">,</span> <span class="n">DEDX_MUSCLE_SKELETAL</span><span class="p">,</span> <span class="n">DEDX_MUSCLE_STRIATED</span><span class="p">,</span>
-      <span class="n">DEDX_MUSCLE_EQUIVALENT_LIQUID_WITH_SUCROSE</span><span class="p">,</span>
-      <span class="n">DEDX_MUSCLE_EQUIVALENT_LIQUID_WITHOUT_SUCROSE</span><span class="p">,</span> <span class="n">DEDX_NAPHTHALENE</span><span class="p">,</span>
-      <span class="n">DEDX_NITROBENZENE</span><span class="p">,</span> <span class="n">DEDX_NITROUS_OXIDE</span><span class="p">,</span> <span class="n">DEDX_NYLON_DUPONT_ELVAMIDE_8062</span><span class="p">,</span>
-      <span class="n">DEDX_NYLON_TYPE_6_AND_6_6</span><span class="p">,</span> <span class="n">DEDX_NYLON_TYPE_6_10</span><span class="p">,</span>
-      <span class="n">DEDX_NYLON_TYPE_11_RILSAN</span><span class="p">,</span> <span class="n">DEDX_OCTANE_LIQUID</span><span class="p">,</span> <span class="n">DEDX_PARAFFIN_WAX</span><span class="p">,</span>
-      <span class="n">DEDX_N_PENTANE</span><span class="p">,</span> <span class="n">DEDX_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span>
-      <span class="n">DEDX_PLASTIC_SCINTILLATOR_VINYLTOLUENE_BASED</span><span class="p">,</span> <span class="n">DEDX_PLUTONIUM_DIOXIDE</span><span class="p">,</span>
-      <span class="n">DEDX_POLYACRYLONITRILE</span><span class="p">,</span> <span class="n">DEDX_POLYCARBONATE_MAKROLON_LEXAN</span><span class="p">,</span>
-      <span class="n">DEDX_POLYCHLOROSTYRENE</span><span class="p">,</span> <span class="n">DEDX_POLYETHYLENE</span><span class="p">,</span> <span class="n">DEDX_MYLAR</span><span class="p">,</span>
-      <span class="n">DEDX_LUCITE_PERSPEX_PMMA</span><span class="p">,</span> <span class="n">DEDX_POLYOXYMETHYLENE</span><span class="p">,</span>
-      <span class="n">DEDX_POLYPROPYLENE</span><span class="p">,</span> <span class="n">DEDX_POLYSTYRENE</span><span class="p">,</span> <span class="n">DEDX_POLYTETRAFLUOROETHYLENE</span><span class="p">,</span>
-      <span class="n">DEDX_POLYTRIFLUOROCHLOROETHYLENE</span><span class="p">,</span> <span class="n">DEDX_POLYVINYL_ACETATE</span><span class="p">,</span>
-      <span class="n">DEDX_POLYVINYL_ALCOHOL</span><span class="p">,</span> <span class="n">DEDX_POLYVINYL_BUTYRAL</span><span class="p">,</span> <span class="n">DEDX_POLYVINYL_CHLORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_POLYVINYLIDENE_CHLORIDE_SARAN</span><span class="p">,</span> <span class="n">DEDX_POLYVINYLIDENE_FLUORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_POLYVINYL_PYRROLIDONE</span><span class="p">,</span> <span class="n">DEDX_POTASSIUM_IODIDE</span><span class="p">,</span> <span class="n">DEDX_POTASSIUM_OXIDE</span><span class="p">,</span>
-      <span class="n">DEDX_PROPANE</span><span class="p">,</span> <span class="n">DEDX_PROPANE_LIQUID</span><span class="p">,</span> <span class="n">DEDX_N_PROPYL_ALCOHOL</span><span class="p">,</span> <span class="n">DEDX_PYRIDINE</span><span class="p">,</span>
-      <span class="n">DEDX_RUBBER_BUTYL</span><span class="p">,</span> <span class="n">DEDX_RUBBER_NATURAL</span><span class="p">,</span> <span class="n">DEDX_RUBBER_NEOPRENE</span><span class="p">,</span>
-      <span class="n">DEDX_SILICON_DIOXIDE</span><span class="p">,</span> <span class="n">DEDX_SILVER_BROMIDE</span><span class="p">,</span> <span class="n">DEDX_SILVER_CHLORIDE</span><span class="p">,</span>
-      <span class="n">DEDX_SILVER_HALIDES_IN_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span> <span class="n">DEDX_SILVER_IODIDE</span><span class="p">,</span>
-      <span class="n">DEDX_SKIN_ICRP</span><span class="p">,</span> <span class="n">DEDX_SODIUM_CARBONATE</span><span class="p">,</span> <span class="n">DEDX_SODIUM_IODIDE</span><span class="p">,</span>
-      <span class="n">DEDX_SODIUM_MONOXIDE</span><span class="p">,</span> <span class="n">DEDX_SODIUM_NITRATE</span><span class="p">,</span> <span class="n">DEDX_STILBENE</span><span class="p">,</span>
-      <span class="n">DEDX_SUCROSE</span><span class="p">,</span> <span class="n">DEDX_TERPHENYL</span><span class="p">,</span> <span class="n">DEDX_TESTES_ICRP</span><span class="p">,</span>
-      <span class="n">DEDX_TETRACHLOROETHYLENE</span><span class="p">,</span> <span class="n">DEDX_THALLIUM_CHLORIDE</span><span class="p">,</span> <span class="n">DEDX_TISSUE_SOFT_ICRP</span><span class="p">,</span>
-      <span class="n">DEDX_TISSUE_SOFT_ICRU_FOUR_COMPONENT</span><span class="p">,</span>
-      <span class="n">DEDX_TISSUE_EQUIVALENT_GAS_METHANE_BASED</span><span class="p">,</span>
-      <span class="n">DEDX_TISSUE_EQUIVALENT_GAS_PROPANE_BASED</span><span class="p">,</span> <span class="n">DEDX_TITANIUM_DIOXIDE</span><span class="p">,</span>
-      <span class="n">DEDX_TOLUENE</span><span class="p">,</span> <span class="n">DEDX_TRICHLOROETHYLENE</span><span class="p">,</span> <span class="n">DEDX_TRIETHYL_PHOSPHATE</span><span class="p">,</span>
-      <span class="n">DEDX_TUNGSTEN_HEXAFLUORIDE</span><span class="p">,</span> <span class="n">DEDX_URANIUM_DICARBIDE</span><span class="p">,</span>
-      <span class="n">DEDX_URANIUM_MONOCARBIDE</span><span class="p">,</span> <span class="n">DEDX_URANIUM_OXIDE</span><span class="p">,</span> <span class="n">DEDX_UREA</span><span class="p">,</span> <span class="n">DEDX_VALINE</span><span class="p">,</span>
-      <span class="n">DEDX_VITON_FLUOROELASTOMER</span><span class="p">,</span> <span class="n">DEDX_WATER_LIQUID</span><span class="p">,</span> <span class="n">DEDX_WATER_VAPOR</span><span class="p">,</span>
-      <span class="n">DEDX_XYLENE</span><span class="p">};</span>
+<span class="k">enum</span><span class="w"> </span><span class="p">{</span><span class="n">DEDX_HYDROGEN</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_HELIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LITHIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BERYLLIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BORON</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CARBON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GRAPHITE</span><span class="o">=</span><span class="mi">906</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NITROGEN</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_OXYGEN</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_FLUORINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NEON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SODIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MAGNESIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ALUMINUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SILICON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PHOSPHORUS</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SULFUR</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CHLORINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ARGON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POTASSIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CALCIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SCANDIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TITeANIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_VANADIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CHROMIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MANGANESE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_IRON</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_COBALT</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NICKEL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_COPPER</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ZINC</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GALLIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_GERMANIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ARSENIC</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SELENIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BROMINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_KRYPTON</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_RUBIDIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_STRONTIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_YTTRIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ZIRCONIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NIOBIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MOLYBDENUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TECHNETIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_RUTHENIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_RHODIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_PALLADIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SILVER</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CADMIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_INDIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TIN</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ANTIMONY</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TELLURIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_IODINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_XENON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CESIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_BARIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LANTHANUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CERIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PRASEODYMIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_NEODYMIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PROMETHIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SAMARIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_EUROPIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_GADOLINIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TERBIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_DYSPROSIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_HOLMIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ERBIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_THULIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_YTTERBIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LUTETIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_HAFNIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TANTALUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TUNGSTEN</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_RHENIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_OSMIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_IRIDIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_PLATINUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GOLD</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MERCURY</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_THALLIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LEAD</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_BISMUTH</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLONIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ASTATINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_RADON</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FRANCIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_RADIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ACTINIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_THORIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PROTACTINIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_URANIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NEPTUNIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PLUTONIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_AMERICIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CURIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BERKELIUM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CALIFORNIUM</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_A150_TISSUE_EQUIVALENT_PLASTIC</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ACETONE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ACETYLENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ADENINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ADIPOSE_TISSUE_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_AIR_DRY_NEAR_SEA_LEVEL</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ALANINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ALUMINUMOXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_AMBER</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_AMMONIA</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ANILINE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ANTHRACENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_B100</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BAKELITE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BARIUM_FLUORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_BARIUM_SULFATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BENZENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BERYLLIUM_OXIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_BISMUTH_GERMANIUM_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BLOOD_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BONE_COMPACT_ICRU</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_BONE_CORTICAL_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BORON_CARBIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BORON_OXIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_BRAIN_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_BUTANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_N_BUTYLALCOHOL</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_C552_AIR_EQUIVALENT_PLASTIC</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CADMIUM_TELLURIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CADMIUM_TUNGSTATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CALCIUM_CARBONATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CALCIUM_FLUORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CALCIUM_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CALCIUM_SULFATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CALCIUM_TUNGSTATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CARBON_DIOXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CARBON_TETRACHLORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CELLULOSE_ACETATE_CELLOPHANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CELLULOSE_ACETATE_BUTYRATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CELLULOSE_NITRATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CERIC_SULFATE_DOSIMETER_SOLUTION</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CESIUM_FLUORIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CESIUM_IODIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CHLORO_BENZENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_CHLOROFORM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CONCRETE_PORTLAND</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_CYCLOHEXANE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_DICHLOROBENZENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_DICHLORODIETHYL_ETHER</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_DICHLOROETHANE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_DIETHYLETHER</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_N_N_DIMETHYL_FORMAMIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_DIMETHYL_SULFOXIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_ETHANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ETHYL_ALCOHOL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ETHYL_CELLULOSE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_ETHYLENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_EYE_LENS_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FERRIC_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FERRO_BORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_FERROUS_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FERROUS_SULFATE_DOSIMETER_SOLUTION</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_FREON_12</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FREON_12B2</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FREON_13</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_FREON_13B1</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_FREON_13I1</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GADOLINIUM_OXYSULFIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GALLIUM_ARSENIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_GEL_IN_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_GLASS_PYREX</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GLASS_LEAD</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GLASS_PLATE</span><span class="p">,</span><span class="w"> </span><span class="cm">/* 169,170,171 */</span>
+<span class="w">      </span><span class="n">DEDX_GLUCOSE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GLUTAMINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GLYCEROL</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_GUANINE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_GYPSUM_PLASTER_OF_PARIS</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_N_HEPTANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_N_HEXANE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_KAPTON_POLYIMIDE_FILM</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LANTHANUM_OXYBROMIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_LANTHANUM_OXYSULFIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LEAD_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LITHIUM_AMIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_LITHIUM_CARBONATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LITHIUM_FLUORIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LITHIUM_HYDRIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_LITHIUM_IODIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LITHIUM_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_LITHIUM_TETRABORATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_LUNG_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_M3_WAX</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MAGNESIUM_CARBONATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MAGNESIUM_FLUORIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MAGNESIUM_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MAGNESIUM_TETRABORATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MERCURIC_IODIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_METHANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_METHANOL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MIX_D_WAX</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MS20_TISSUE_SUBSTITUTE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MUSCLE_SKELETAL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MUSCLE_STRIATED</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MUSCLE_EQUIVALENT_LIQUID_WITH_SUCROSE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_MUSCLE_EQUIVALENT_LIQUID_WITHOUT_SUCROSE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NAPHTHALENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_NITROBENZENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NITROUS_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NYLON_DUPONT_ELVAMIDE_8062</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_NYLON_TYPE_6_AND_6_6</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_NYLON_TYPE_6_10</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_NYLON_TYPE_11_RILSAN</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_OCTANE_LIQUID</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PARAFFIN_WAX</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_N_PENTANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_PLASTIC_SCINTILLATOR_VINYLTOLUENE_BASED</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PLUTONIUM_DIOXIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYACRYLONITRILE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYCARBONATE_MAKROLON_LEXAN</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYCHLOROSTYRENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYETHYLENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_MYLAR</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_LUCITE_PERSPEX_PMMA</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYOXYMETHYLENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYPROPYLENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYSTYRENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYTETRAFLUOROETHYLENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYTRIFLUOROCHLOROETHYLENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYVINYL_ACETATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYVINYL_ALCOHOL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYVINYL_BUTYRAL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYVINYL_CHLORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYVINYLIDENE_CHLORIDE_SARAN</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POLYVINYLIDENE_FLUORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_POLYVINYL_PYRROLIDONE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POTASSIUM_IODIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_POTASSIUM_OXIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_PROPANE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PROPANE_LIQUID</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_N_PROPYL_ALCOHOL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_PYRIDINE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_RUBBER_BUTYL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_RUBBER_NATURAL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_RUBBER_NEOPRENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_SILICON_DIOXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SILVER_BROMIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SILVER_CHLORIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_SILVER_HALIDES_IN_PHOTOGRAPHIC_EMULSION</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SILVER_IODIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_SKIN_ICRP</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SODIUM_CARBONATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SODIUM_IODIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_SODIUM_MONOXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_SODIUM_NITRATE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_STILBENE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_SUCROSE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TERPHENYL</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TESTES_ICRP</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TETRACHLOROETHYLENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_THALLIUM_CHLORIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TISSUE_SOFT_ICRP</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TISSUE_SOFT_ICRU_FOUR_COMPONENT</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TISSUE_EQUIVALENT_GAS_METHANE_BASED</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TISSUE_EQUIVALENT_GAS_PROPANE_BASED</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TITANIUM_DIOXIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TOLUENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TRICHLOROETHYLENE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_TRIETHYL_PHOSPHATE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_TUNGSTEN_HEXAFLUORIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_URANIUM_DICARBIDE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_URANIUM_MONOCARBIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_URANIUM_OXIDE</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_UREA</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_VALINE</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_VITON_FLUOROELASTOMER</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_WATER_LIQUID</span><span class="p">,</span><span class="w"> </span><span class="n">DEDX_WATER_VAPOR</span><span class="p">,</span>
+<span class="w">      </span><span class="n">DEDX_XYLENE</span><span class="p">};</span>
 
 <span class="cm">/* aliases */</span>
 <span class="cp">#define DEDX_PROTON     1</span>
@@ -1347,37 +1388,116 @@ Enums are defined in <code class="docutils literal notranslate"><span class="pre
 </section>
 
 
-              </div>
+                </article>
               
               
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
 </div>
+                </footer>
               
-          </main>
-          
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-      </div>
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license-and-disclaimer">0. License and disclaimer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgements">0.1 Acknowledgements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">1. Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-available">2. Data available</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">3. Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use">4. Use</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">5. Release notes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-1">Version: 1.2.1</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2">Version: 1.2</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-0-1">Version 1.0.1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-1-api">A.1 API</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-2-error-codes">A.2 Error codes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-3-additional-lists">A.3 Additional lists</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
     
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright 2021, J. Toftegard, N. Bassler, L. Grzanka.<br>
-</p>
+      © Copyright 2021, J. Toftegard, N. Bassler, L. Grzanka.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
     </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
-</p>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
     </div>
-    
-  </div>
-</footer>
+  
+</div>
+
+  </footer>
   </body>
 </html>
