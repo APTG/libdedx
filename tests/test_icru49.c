@@ -1,5 +1,7 @@
 #include "test_helpers.h"
 
+// Reference values from ICRU Report 49 (1993): Stopping Powers and Ranges for Protons and Alpha Particles
+
 int main(void) {
     int failures = 0;
     const float energy_grid[] = {0.07f, 1.0f, 10.0f, 78.0f, 1000.0f};

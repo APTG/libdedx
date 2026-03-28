@@ -33,7 +33,9 @@ else()
 endif()
 
 # ---- Data paths (baked into dedx_config.h at configure time) ----
-set(DEDX_DATA_PATH_LOCAL "${PROJECT_SOURCE_DIR}/libdedx/data/")
+# DEDX_DATA_PATH_LOCAL is used at runtime to prefer the source-tree data dir over the install path.
+# Pass -DDEDX_DATA_PATH_LOCAL= (empty) to disable it, e.g. in install smoke tests.
+set(DEDX_DATA_PATH_LOCAL "${PROJECT_SOURCE_DIR}/libdedx/data/" CACHE STRING "Build-tree data path (empty to force use of install path)")
 if(WIN32)
     set(DEDX_DATA_PATH "data/")
 else()
@@ -49,7 +51,10 @@ configure_file(
 include_directories("${PROJECT_SOURCE_DIR}/libdedx")
 include_directories("${PROJECT_BINARY_DIR}")
 link_directories("${PROJECT_SOURCE_DIR}/libdedx")
-add_subdirectory(buildbins)
+option(DEDX_BUILD_BINARY_TABLE "Build the binary data tables (requires a working install of libdedx data)" ON)
+if(DEDX_BUILD_BINARY_TABLE)
+    add_subdirectory(buildbins)
+endif()
 add_subdirectory(examples)
 add_subdirectory(libdedx)
 

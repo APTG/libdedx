@@ -1,18 +1,18 @@
 {
     // CMake
-    "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.configureOnOpen": true,
+    "cmake.useCMakePresets": "always",
 
     // CTest integration — tells VS Code Test Explorer to use CTest
     "cmake.ctest.allowParallelJobs": true,
-    "testExplorer.useNativeTesting": true,
 
-    // Clangd (C language server)
-    "clangd.arguments": [
-        "--compile-commands-dir=${workspaceFolder}/build",
-        "--clang-tidy",
-        "--header-insertion=never"
-    ],
+    // Clangd (C language server) — clangd not currently installed, using ms-vscode.cpptools instead.
+    // If clangd is installed later, switch defaultFormatter below and uncomment:
+    // "clangd.arguments": [
+    //     "--compile-commands-dir=${workspaceFolder}/build",
+    //     "--clang-tidy",
+    //     "--header-insertion=never"
+    // ],
     "[c]": {
         "editor.defaultFormatter": "ms-vscode.cpptools",
         "editor.formatOnSave": true

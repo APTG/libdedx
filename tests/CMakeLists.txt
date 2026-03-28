@@ -1,24 +1,5 @@
 include_directories("${PROJECT_SOURCE_DIR}")
 
-add_executable(loadTest loadTest.c)
-
-target_link_libraries(loadTest dedx)
-
-if(NOT WIN32)
-    target_link_libraries(loadTest m)
-endif()
-
-# enable_testing() is called in the root CMakeLists.txt
-add_test(NAME test_initialiaze     COMMAND loadTest 1)
-add_test(NAME test_load_ASTAR      COMMAND loadTest 2)
-add_test(NAME test_load_PSTAR      COMMAND loadTest 3)
-add_test(NAME test_load_MSTAR      COMMAND loadTest 4)
-add_test(NAME test_load_ICRU49_proton COMMAND loadTest 5)
-add_test(NAME test_load_ICRU49_helium COMMAND loadTest 6)
-add_test(NAME test_load_Bethe      COMMAND loadTest 7)
-add_test(NAME test_load_ICRU73     COMMAND loadTest 8)
-add_test(NAME test_load_ICRU73_NEW COMMAND loadTest 9)
-
 # ---- New-style tests: one file per physics program ----
 # Each test_*.c has its own main() and returns number of failures.
 # Adding a new program test is as simple as adding a test_<program>.c file.
@@ -35,3 +16,15 @@ foreach(test_src ${TEST_SOURCES})
 
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
+
+if(NOT WIN32)
+    add_test(
+        NAME test_install_consumer
+        COMMAND ${CMAKE_COMMAND}
+                -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
+                -DTEST_BINARY_DIR=${PROJECT_BINARY_DIR}
+                -DCMAKE_COMMAND=${CMAKE_COMMAND}
+                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
+                -P ${PROJECT_SOURCE_DIR}/tests/install_smoke_test.cmake)
+endif()
