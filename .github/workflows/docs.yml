@@ -12,7 +12,7 @@ jobs:
           fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
 
       - name: Build and Commit
-        uses: sphinx-notes/pages@3.0
+        uses: sphinx-notes/pages@3.5
         with:
           documentation_path: docs/source
           requirements_path: docs/source/requirements.txt
