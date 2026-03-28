@@ -36,8 +36,8 @@ endif()
 
 execute_process(
     COMMAND "${CMAKE_C_COMPILER}"
-            -I"${smoke_prefix}/include"
-            -L"${smoke_prefix}/lib"
+            "-I${smoke_prefix}/include"
+            "-L${smoke_prefix}/lib"
             "${SOURCE_DIR}/tests/install_consumer.c"
             -o "${smoke_consumer}"
             -ldedx
