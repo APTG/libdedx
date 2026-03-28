@@ -9,19 +9,19 @@ target_link_libraries (dedx_test dedx)
 # Visual Studio does not need or want you to explicitly request linking the math library.
 # You must avoid adding it as a link library when building for Windows.
 # see https://stackoverflow.com/questions/54935559/linking-math-library-in-cmake-file-on-windows-and-linux
-IF (NOT WIN32)
-    target_link_libraries (loadTest m)
-    target_link_libraries (dedx_test m)
-ENDIF()
+if(NOT WIN32)
+    target_link_libraries(loadTest m)
+    target_link_libraries(dedx_test m)
+endif()
 
 # enable_testing() is called in the root CMakeLists.txt
-ADD_TEST(test_initialiaze loadTest 1)
-ADD_TEST(test_load_ASTAR loadTest 2)
-ADD_TEST(test_load_PSTAR loadTest 3)
-ADD_TEST(test_load_MSTAR loadTest 4)
-ADD_TEST(test_load_ICRU49_proton loadTest 5)
-ADD_TEST(test_load_ICRU49_helium loadTest 6)
-ADD_TEST(test_load_Bethe loadTest 7)
-ADD_TEST(test_load_ICRU73 loadTest 8)
-ADD_TEST(test_load_ICRU73_NEW loadTest 9)
+add_test(NAME test_initialiaze     COMMAND loadTest 1)
+add_test(NAME test_load_ASTAR      COMMAND loadTest 2)
+add_test(NAME test_load_PSTAR      COMMAND loadTest 3)
+add_test(NAME test_load_MSTAR      COMMAND loadTest 4)
+add_test(NAME test_load_ICRU49_proton COMMAND loadTest 5)
+add_test(NAME test_load_ICRU49_helium COMMAND loadTest 6)
+add_test(NAME test_load_Bethe      COMMAND loadTest 7)
+add_test(NAME test_load_ICRU73     COMMAND loadTest 8)
+add_test(NAME test_load_ICRU73_NEW COMMAND loadTest 9)
 
