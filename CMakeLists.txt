@@ -54,7 +54,7 @@ add_subdirectory(examples)
 add_subdirectory(libdedx)
 
 enable_testing()
-add_subdirectory(test)
+add_subdirectory(tests)
 
 # add uninstall target according to CMAKE FAQ:
 # https://gitlab.kitware.com/cmake/community/-/wikis/FAQ#can-i-do-make-uninstall-with-cmake
