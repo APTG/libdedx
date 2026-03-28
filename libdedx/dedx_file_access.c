@@ -230,8 +230,9 @@ size_t _dedx_target_is_gas(int target, int *err) {
     size_t is_gas = 0;
     char str[100];
 
+    _dedx_set_folder();
     char file[] = "gas_states.dat";
-    char path[80];
+    char path[512];
     strcpy(path, folder);
     strcat(path, file);
     FILE *fp = fopen(path, "r");
