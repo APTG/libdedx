@@ -1,5 +1,3 @@
-include_directories ("${PROJECT_SOURCE_DIR}")
-
 # here we create `dedx_build_bin` executable which builds *.bin files from *.dat files
 add_executable(dedx_build_bin dedx_build_bin.c)
 target_link_libraries (dedx_build_bin dedx)
