@@ -1,0 +1,26 @@
+name: clang-tidy
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-tidy-19
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy-19
+
+      - name: Configure (generates compile_commands.json)
+        run: cmake -S . -B build
+
+      - name: Run clang-tidy
+        run: |
+          run-clang-tidy-19 \
+            -p build \
+            -header-filter='(libdedx|tests|examples|buildbins)/' \
+            '(libdedx|tests|examples|buildbins)/.*\.c$'

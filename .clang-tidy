@@ -1,0 +1,20 @@
+# clang-tidy configuration for libdedx
+#
+# Enabled check groups:
+#   clang-analyzer-*  Clang's own inter-procedural static analyzer (high confidence)
+#   bugprone-*        Common bug patterns in C code
+#
+# Disabled individually:
+#   bugprone-easily-swappable-parameters        too noisy for physics code (many float params)
+#   clang-analyzer-security.insecureAPI.*       flags printf/strcpy family — too noisy for now
+
+Checks: >-
+  clang-analyzer-*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+
+WarningsAsErrors: '*'
+
+# Only report issues in our own headers, not system or third-party ones
+HeaderFilterRegex: '(libdedx|tests|examples|buildbins)/'
