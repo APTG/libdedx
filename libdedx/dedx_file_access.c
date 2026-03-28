@@ -199,7 +199,8 @@ float _dedx_read_effective_charge(int id, int *err) {
     char **temp = NULL;
     unsigned int items = 0;
     char file[] = "effective_charge.dat";
-    char path[80];
+    char path[512];
+    _dedx_set_folder();
     strcpy(path, folder);
     strcat(path, file);
 
@@ -230,8 +231,9 @@ size_t _dedx_target_is_gas(int target, int *err) {
     size_t is_gas = 0;
     char str[100];
 
+    _dedx_set_folder();
     char file[] = "gas_states.dat";
-    char path[80];
+    char path[512];
     strcpy(path, folder);
     strcat(path, file);
     FILE *fp = fopen(path, "r");
@@ -325,7 +327,8 @@ float _dedx_read_density(int id, int *err) {
 float _dedx_get_i_value(int target, int state, int *err) {
     float pot = 0.0;
     char file[] = "compos.txt";
-    char path[80];
+    char path[512];
+    _dedx_set_folder();
     char str[100];
     char **temp;
     unsigned int items = 0;
@@ -365,7 +368,7 @@ float _dedx_get_i_value(int target, int state, int *err) {
 void _dedx_get_composition(int target, float composition[][2], unsigned int *length, int *err) {
     *err = 0;
     char file[] = "composition";
-    char path[80];
+    char path[512];
     char str[100];
     *length = 0;
     float f_temp;
@@ -373,6 +376,7 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int *len
     unsigned int items;
     char **temp;
 
+    _dedx_set_folder();
     strcpy(path, folder);
     strcat(path, file);
 
@@ -407,7 +411,8 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int *len
 float *_dedx_get_atima_data(int target, int *err) {
     *err = 0;
     char file[] = "atima_compos";
-    char path[80];
+    char path[512];
+    _dedx_set_folder();
     char str[100];
     float *compos;
 

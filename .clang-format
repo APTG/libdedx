@@ -1,3 +1,4 @@
+# Requires clang-format 19 (pinned in CI via clang-format.yml)
 BasedOnStyle: LLVM
 IndentWidth: 4
 UseTab: Never

@@ -1,68 +1,26 @@
-name: Automated actions
+name: Docs
 
 on: [push]
 
 jobs:
-  compile_code:
-      runs-on:  ${{ matrix.platform }}
-      strategy:
-       matrix:
-         platform: [ubuntu-latest, windows-latest]
-      steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Check CMake version
-        run: cmake --version
-
-      - name: Compile with CMake
-        run: |
-          cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
-          cmake --build build
-
-      - name: Run CTest
-        if: ${{ runner.os == 'Linux' }}
-        run: ctest --test-dir build --output-on-failure
-
-      - name: Run compiled programs on Linux
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          ./build/examples/dedx_example
-          ./build/examples/dedx_list
-          ./build/examples/dedx_use_wrappers
-
-      - name: Run compiled programs on Windows
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          ./build/examples/Debug/dedx_example
-          ./build/examples/Debug/dedx_list
-
-      - name: Install with CMake
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo cmake --install build
-          getdedx PSTAR HYDROGEN 276 100
-
-
   build_docs:
     runs-on: ubuntu-latest
-    needs: [compile_code]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
-    - name: Build and Commit
-      uses: sphinx-notes/pages@2.0
-      with:
-        documentation_path: docs/source
-        requirements_path: docs/source/requirements.txt
-    - name: Push changes to gh-pages branch
-      # this action is being triggered:
-      #  - on main branch
-      #  - on release tags (named v*)
-      if: "github.ref == 'refs/heads/main' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+
+      - name: Build and Commit
+        uses: sphinx-notes/pages@2.0
+        with:
+          documentation_path: docs/source
+          requirements_path: docs/source/requirements.txt
+
+      - name: Push changes to gh-pages branch
+        # triggered on main branch or release tags (named v*)
+        if: "github.ref == 'refs/heads/main' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages

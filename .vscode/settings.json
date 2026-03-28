@@ -1,0 +1,25 @@
+{
+    // CMake
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.configureOnOpen": true,
+
+    // CTest integration — tells VS Code Test Explorer to use CTest
+    "cmake.ctest.allowParallelJobs": true,
+    "testExplorer.useNativeTesting": true,
+
+    // Clangd (C language server)
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build",
+        "--clang-tidy",
+        "--header-insertion=never"
+    ],
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.formatOnSave": true
+    },
+
+    // Editor
+    "editor.rulers": [120],
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
+}
