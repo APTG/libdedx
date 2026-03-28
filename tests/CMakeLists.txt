@@ -1,5 +1,3 @@
-include_directories("${PROJECT_SOURCE_DIR}")
-
 # ---- New-style tests: one file per physics program ----
 # Each test_*.c has its own main() and returns number of failures.
 # Adding a new program test is as simple as adding a test_<program>.c file.

@@ -1,5 +1,3 @@
-include_directories ("${PROJECT_SOURCE_DIR}")
-
 add_executable(dedx_example dedx_example.c)
 add_executable(getdedx dedx_get.c)
 add_executable(dedx_list dedx_list.c)

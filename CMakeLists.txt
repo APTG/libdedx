@@ -51,9 +51,6 @@ configure_file(
     "${PROJECT_BINARY_DIR}/dedx_config.h"
 )
 
-include_directories("${PROJECT_SOURCE_DIR}/libdedx")
-include_directories("${PROJECT_BINARY_DIR}")
-link_directories("${PROJECT_SOURCE_DIR}/libdedx")
 option(DEDX_BUILD_BINARY_TABLE "Build the binary data tables (requires a working install of libdedx data)" ON)
 if(DEDX_BUILD_BINARY_TABLE)
     add_subdirectory(buildbins)
