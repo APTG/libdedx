@@ -10,6 +10,4 @@
     double PA0;
 } bethe_struct;*/
 
-
-
 #endif // DEDX_BETHE_STRUCT_H_INCLUDED

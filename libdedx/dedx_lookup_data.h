@@ -1,7 +1,7 @@
 #ifndef DEDX_LOOKUP_DATA_H_INCLUDED
 #define DEDX_LOOKUP_DATA_H_INCLUDED
 
-//#include "dedx.h"
+// #include "dedx.h"
 
 /* typedef struct */
 /* { */

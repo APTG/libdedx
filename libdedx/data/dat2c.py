@@ -13,7 +13,7 @@ def write2d(_data, _name, _bsize, _nsize,_type="float"): #
     k = 1
 
     _size = _bsize*_nsize
-    
+
     print _name+"[%i][%i] = {{" %(_nsize,_bsize)
 
     for x in _data:
@@ -49,7 +49,7 @@ def write2d(_data, _name, _bsize, _nsize,_type="float"): #
             if _type == "float":
                 print ("%8.5e," %x), # foobar
             if _type == "int" :
-                print ("%3i" %x), #                
+                print ("%3i" %x), #
         j += 1
 
         # check if end of data
@@ -62,11 +62,11 @@ def write2d(_data, _name, _bsize, _nsize,_type="float"): #
         # check if end of line
         if i >= 6:
             i = 0
-            print ""            
+            print ""
         i += 1
 
 
-def write1d(_data, _name, _bsize, _type="float"): # 
+def write1d(_data, _name, _bsize, _type="float"): #
 
     # _data:  linear data array
     # _name:  name of varioable
@@ -75,7 +75,7 @@ def write1d(_data, _name, _bsize, _type="float"): #
 
     i = 1
     j = 1
-    
+
     print _name+"[%i] = {" %(_bsize)
     for x in _data:
 
@@ -103,9 +103,9 @@ def write1d(_data, _name, _bsize, _type="float"): #
         # check if end of line
         if i >= 6:
             i = 0
-            print ""            
+            print ""
         i += 1
-        
+
 
 #### ASTAR ####
 #data = np.loadtxt("astarEng.dat")
@@ -148,13 +148,13 @@ def write1d(_data, _name, _bsize, _type="float"): #
 #write1d(data[1:],"static const float icru_pstar_energy",133)
 #data = np.loadtxt("ICRU_PSTAR.dat")
 #write2d(data,"static const float icru_pstar",133,74)
-    
+
 ### ICRU49 ALPHAS ###
 #data = np.loadtxt("icru_astarEng.dat")
 #write1d(data[1:],"static const float icru_astar_energy",122)
 #data = np.loadtxt("ICRU_ASTAR.dat")
 #write2d(data,"static const float icru_astar",122,74)
-   
+
 ### BETHE energy grid (what is this used for anyway?)  ###
 #data = np.loadtxt("betheEng.dat")
 #write1d(data[1:],"static const float bethe_energy",122)
@@ -177,13 +177,13 @@ for line in lines:
         i = 0
         cindx.append(j) # start index of each new element
 
-        
+
 
     if line[0] == "\n":
         nele.append(i)
 
 
-    if (line[0].isdigit()):        
+    if (line[0].isdigit()):
         i += 1
         j += 1
         cdata_elem.append(int(line.split(":")[0]))

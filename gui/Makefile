@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -g 
-LFLAGS = -ldedx `wx-config --libs` `wx-config --cxxflags` 
+CFLAGS = -g
+LFLAGS = -ldedx `wx-config --libs` `wx-config --cxxflags`
 codefiles = main.cpp mainframe.cpp mainMenu.cpp dropdown/target.cpp dropdown/prog.cpp
 
 out: main

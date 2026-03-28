@@ -21,7 +21,7 @@ if(DO_PYTHON_BINDINGS)
   add_custom_command(
     TARGET python_bindings
     POST_BUILD
-    
+
     COMMAND echo "\\#!/usr/bin/python" > setup.py
     COMMAND echo "from distutils.core import setup, Extension" >> setup.py
     COMMAND echo "" >> setup.py
@@ -41,7 +41,7 @@ if(DO_PYTHON_BINDINGS)
     COMMAND echo "       long_description = \\'\\'," >> setup.py
     COMMAND echo "       ext_modules = [module1]\\)" >> setup.py
     COMMAND echo "" >> setup.py
-    
+
     COMMAND ${PYTHON_EXECUTABLE} setup.py build
     COMMENT "Build python bindings..."
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/python
