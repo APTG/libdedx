@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "dedx_file_access.h"
+
 typedef struct {
     // int id;
     //   double A;

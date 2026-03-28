@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* gcc -g -lm test.c -o test -Wall -ldedx -Wall */
+/* gcc -g test.c -o test -Wall -ldedx -lm -Wall */
 
 #define TEST_STP 1
 #define TEST_CSDA 2
