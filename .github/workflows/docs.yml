@@ -16,7 +16,7 @@ jobs:
         run: cmake --version
 
       - name: Compile with CMake
-        run: | 
+        run: |
           cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
           cmake --build build
 
@@ -55,9 +55,9 @@ jobs:
         requirements_path: docs/source/requirements.txt
     - name: Push changes to gh-pages branch
       # this action is being triggered:
-      #  - on master branch
+      #  - on main branch
       #  - on release tags (named v*)
-      if: "github.ref == 'refs/heads/master' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
+      if: "github.ref == 'refs/heads/main' || (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v'))"
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
