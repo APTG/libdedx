@@ -25,6 +25,13 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: ctest --test-dir build --output-on-failure
 
+      - name: Valgrind test_bethe_ext00
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt-get install -y valgrind
+          valgrind --leak-check=full --track-origins=yes --error-exitcode=1 \
+            ./build/tests/test_bethe_ext00
+
       - name: Run compiled programs on Linux
         if: ${{ runner.os == 'Linux' }}
         run: |
