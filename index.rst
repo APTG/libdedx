@@ -3,7 +3,7 @@ This is libdEdx
 ===============
 
 .. contents:: Table of Contents
-   :local: 
+   :local:
    :backlinks: none
 
 
@@ -31,8 +31,8 @@ This is libdEdx
 ********************
 0.1 Acknowledgements
 ********************
-We are grateful for the support by Prof. Helmut Paul from the University of 
-Linz, Austria. 
+We are grateful for the support by Prof. Helmut Paul from the University of
+Linz, Austria.
 Niels Bassler acknowledges support from the Danish Cancer Society.
 
 ***************
@@ -71,7 +71,7 @@ A testing version of the web front end is available on https://aptg.github.io/we
    :Particles: See icru73_particle_targets
    :Targets: See icru73_particle_targets
 
-* BETHE_EXT00: 
+* BETHE_EXT00:
    :Comment: Bethe equation with Linhard-Scharff at lower energies. BETHE_EXT00 is optimized for particle therapy, i.e. works well at lower energies and lighter particles and targets. It is not recommended for heavy targets and heavy/fast ions. BETHE_EXT00 is the same algorithm used in SHIELD-HIT12A, but default I-values may vary.
    :Energy range: 1 keV/u to 1 GeV/u
    :Particles: Any, but will be most correct at light ions
@@ -108,21 +108,21 @@ this will copy the binary tables and tables to the relevant places on your syste
 
 UNITS: Energies are always in terms of MeV/nucleon, except for ESTAR, where the electron energy must be specified in terms of MeV. The resulting mass stopping power is in MeV cm2/g.
 
-Stopping power values can be retrieved in two different ways: 
+Stopping power values can be retrieved in two different ways:
 
-1. a simple method for simple implementation, 
+1. a simple method for simple implementation,
 2. a bit more complicated way, but more suitable for fast and multithreading applications.
 
 Method 1) involves a single function call:
 
 .. code-block:: C
-        
-        float dedx_get_simple_stp(int ion, 
-				  int target, 
-				  float energy, 
+
+        float dedx_get_simple_stp(int ion,
+				  int target,
+				  float energy,
 				  int * err);
 
-The function returns the stopping power of the specific configuration, 
+The function returns the stopping power of the specific configuration,
 using the ICRU49 and ICRU73 data table if possible, else the BETHE_EXT00 table.
 
 :ion: is the Z value of the particle
@@ -169,12 +169,12 @@ Next you must initialize your configuration, by writing to the cfg struct.
       int ion;               // id number of projectile
       int ion_a;             // nucleon number of projectile
       int bragg_used;        // is 1 if Braggs additivity rule was applied
-      int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ... 
+      int compound_state;    // DEDX_DEFAULT=0,  DEDX_GAS DEDX_CONDENSED ...
       unsigned int elements_length;   // elements_length  --- number of unique elements in comp.
       int * elements_id;     // elements_id      --- Z of each element
       int * elements_atoms;  // elements_atoms   --- number of atoms per comp. unit
       char mstar_mode;
-      float i_value;         // i_value   --- mean excitation potential of target 
+      float i_value;         // i_value   --- mean excitation potential of target
       float rho;
       float * elements_mass_fraction;     // mass_fraction of each element
       float * elements_i_value;           // i_value of each element
@@ -196,15 +196,15 @@ Description of the elements:
 
 :compound: is set to ``TRUE`` by ``dedx_load_config()``, if the target was not found in the default list, but generated from individual elements instead.
 
-:compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of 
+:compound_state: is assumed to be DEDX_DEFAULT_STATE, which means normal state of
  aggregation. It could also be: DEDX_GAS or DEDX_CONDENSED
- From version 1.2.1 the state parameter (i.e. the I-values) 
- of the Bethe function will be affected, but only in the case 
- where ``element_id`` is specified and ``element_i_value`` is not. 
+ From version 1.2.1 the state parameter (i.e. the I-values)
+ of the Bethe function will be affected, but only in the case
+ where ``element_id`` is specified and ``element_i_value`` is not.
  This difference applies for elements which is naturally found
- in gas state, following ICRU49 recommendations. The I-value is 
+ in gas state, following ICRU49 recommendations. The I-value is
  multiplied with 1.13 to get the liquid/solid I-value phase,
- except for the following elements, where these I-values are used in 
+ except for the following elements, where these I-values are used in
  condensed phase:
 
   - Hydrogen:	21.8 eV
@@ -215,12 +215,12 @@ Description of the elements:
   - Chlorine	180 eV
 
  ICRU49 is ambiguous here since it also recommends using 19.2 eV for
- liquids in table 2.11, which contradicts 21.8 eV from table 2.8. 
+ liquids in table 2.11, which contradicts 21.8 eV from table 2.8.
  Moreover, oxygen is stated as 95.0 eV in table 2.8 and 97 eV for gasses in table 2.11. Here, table 2.8 is used in case of ambiguous values,
  since libdEdx does not discriminate between the I-values of elements and atomic constituents in compounds. If other values are needed they can be specified with the ``*elements_i_value parameter``.
  When using MSTAR read the ``mstar_mode`` function carefully too.
  The compound_state will apply equally to all constituents when working with compounds.
-                
+
 :elements_length: number of unique elements in a compound. Must be specified if the target is undefined (`DEDX_UNDEFINED`)
 
 :\*elements_id: Z of each constituent element, must be specified if target is undefined
@@ -236,47 +236,47 @@ Description of the elements:
  :DEDX_MSTAR_MODE_G: Gas phase for 'a' mode.
  :DEDX_MSTAR_MODE_H: Gas phase for recommended 'b' mode.
 
- if `DEDX_DEFAULT`, then 'b' method of MSTAR is used, as recommended by MSTAR author Helmut Paul. In case of an overspecified, or even 
+ if `DEDX_DEFAULT`, then 'b' method of MSTAR is used, as recommended by MSTAR author Helmut Paul. In case of an overspecified, or even
  contradicting system (e.g. DEDX_GAS was set in compound_state and
- DEDX_MSTAR_MODE_D  mode requested), then libdEdx will follow 
+ DEDX_MSTAR_MODE_D  mode requested), then libdEdx will follow
  mstar_mode and ignore compound_state.
 
  The condensed modes 'c' or 'd' will be selected if
  DEDX_CONDENSED is requested in compound_state. 'c' is the condensed
  phase for the 'a' mode of MSTAR. 'd' is the same for the recommended
  'b' mode of operation. The value in mstar_mode will be updated accordingly after dedx_load_config() was applied.
-		
+
  The 'd' mode is not allowed on Hydrogen, Helium and Lithium. In that case
  libdEdx will switch to 'c' mode. mstar_mode will NOT be updated in this case.
- The reason is, that when 'd' was requested for a compound, then only the elements Hydrogen, Helium and Lithium will be affected, leaving all other elements in 'd' mode. 
+ The reason is, that when 'd' was requested for a compound, then only the elements Hydrogen, Helium and Lithium will be affected, leaving all other elements in 'd' mode.
 
  If DEDX_GAS is requested, then 'g' or 'h' is attempted,
  depending on if 'a' or 'b' mode was requested, respectively. The value in
  mstar_mode will be updated, accordingly, after dedx_load_config() was applied.
 
- However, for Hydrogen and Helium targets, only the 'g' mode is allowed for DEDX_GAS in MSTAR, i.e. 'h' mode is not allowed. 
- libdEdx will then switch to 'g' in that case. mstar_mode will NOT be updated in this case. E.g. when working with a compound with 'h' 
+ However, for Hydrogen and Helium targets, only the 'g' mode is allowed for DEDX_GAS in MSTAR, i.e. 'h' mode is not allowed.
+ libdEdx will then switch to 'g' in that case. mstar_mode will NOT be updated in this case. E.g. when working with a compound with 'h'
  requested, only Hydrogen and Helium will be calculated using 'g' mode,
  and all other constituents remain in 'h' mode.
  Confusing? Yes.
 
-:i_value: if unspecified, then ICRU I-values are used for target 
-  compound. If target is set, or if target is 0, then it is 
-  calculated from the individual i-values set in 
+:i_value: if unspecified, then ICRU I-values are used for target
+  compound. If target is set, or if target is 0, then it is
+  calculated from the individual i-values set in
   ``*elements_i_value``, but only when the ``*elements_i_value are empty``,
   i.e. uninitialized.
 
-:\*elements_mass_fraction: must be specified if target and elements_atoms is 
-			 left undefined. If both are specified, then only 
+:\*elements_mass_fraction: must be specified if target and elements_atoms is
+			 left undefined. If both are specified, then only
 			 elements_mass_fraction is considered, and element_atoms
-			 is ignored entirely. Mass fraction is the summed atomic 
-			 mass of a constituing element, divided by the total 
+			 is ignored entirely. Mass fraction is the summed atomic
+			 mass of a constituing element, divided by the total
 			 atomic mass of the compound.
 
-:\*elements_i_value: if target is 0, then individual I-values of elements can 
-		   be specified here. If any values are found in 
+:\*elements_i_value: if target is 0, then individual I-values of elements can
+		   be specified here. If any values are found in
 		   ``*elements_i_value``, then i_value is ignored. Zero is not allowed. If any
-		   of the I-values are specified, then they must be specified for all 
+		   of the I-values are specified, then they must be specified for all
 		   elements.
 
 As a minimum, you should specify program, target and ion, i.e.
@@ -291,32 +291,32 @@ and then load the config
 
 .. code-block:: C
 
-    void dedx_load_config(dedx_workspace *ws, 
-                          dedx_config *config, 
+    void dedx_load_config(dedx_workspace *ws,
+                          dedx_config *config,
                           int *err);
 
 which will initialize the remaining configure options which may be needed.
 The options can be probed by the user, but beware that some hold NULL pointers.
 
-You have to call ``dedx_load_config()`` for each target/ion combination. 
-If multiple combinations are used, you must allocate memory for each 
+You have to call ``dedx_load_config()`` for each target/ion combination.
+If multiple combinations are used, you must allocate memory for each
 ``*config`` element, and call ``dedx_load_config()`` for each configuration.
 Since it, there had been observed some misbehave of the library using
-malloc for allocating memory to the config struct, it is recommended 
+malloc for allocating memory to the config struct, it is recommended
 to use ``calloc`` or similar.
 
 Stopping power values are returned by:
 
 .. code-block:: C
 
-        float dedx_get_stp(dedx_workspace *ws, 
-	                   int config, 
-			   float energy, 
+        float dedx_get_stp(dedx_workspace *ws,
+	                   int config,
+			   float energy,
 			   int *err)
 
 energy: kinetic energy of a particle in MeV/nucleon.
 
-When you are done with the library you have to run 
+When you are done with the library you have to run
 
 .. code-block:: C
 
@@ -326,7 +326,7 @@ When you are done with the library you have to run
 to free the allocated memory.
 
 - Bragg additivity rule:
-  Braggs additivity rule is applied automatically if you request a target material that is not on the list in that particular stopping power routine. 
+  Braggs additivity rule is applied automatically if you request a target material that is not on the list in that particular stopping power routine.
 
 - Own compounds:
   You can set up your own compounds by specifying each element in the dedx_config struct. Here is an example for water, set up by mass fraction:
@@ -341,7 +341,7 @@ to free the allocated memory.
 	config->elements_id[1] = DEDX_OXYGEN;
 	config->elements_mass_fraction = calloc(2,sizeof(float));
 	config->elements_mass_fraction[0] = 0.111894;
-	config->elements_mass_fraction[1] = 0.888106; 
+	config->elements_mass_fraction[1] = 0.888106;
 	config->elements_length = 2;
 
 Mass fractions are particularly useful if you want to use special
@@ -362,11 +362,11 @@ Alternatively, you can set it up by the relative amount of elements:
 	config->elements_atoms[1] = 1;
 	config->elements_length = 2;
 
-Then libdEdx will use the natural isotope compositions, e.g. 12.0107 for natural 
+Then libdEdx will use the natural isotope compositions, e.g. 12.0107 for natural
 carbon which also contains C-13 and C-14.
 
 - Overriding I-value:
-  Instead of using the default, I value for a compound, determined by either the 
+  Instead of using the default, I value for a compound, determined by either the
   predefined ICRU material list or Braggs additivity rule of the compound, you
   can specify the I-value manually for the BETHE-type algorithms:
 
@@ -395,7 +395,7 @@ Changes:
  - several bug fixes regarding the state of the compound when using Bragg's rule.
  - better testing of library
  - completed the ICRU material list on which elements is on the gas phase, see
-   Appendix 
+   Appendix
 
 Version: 1.2
 ============
@@ -461,12 +461,12 @@ A.2 Error codes
 - 4 Unable to access binary data file
 - 5 Unable to access binary energy file
 - 6 Unable to write to disk
-- 7 Unable to read energy file 
-- 8 Unable to read data file 
+- 7 Unable to read energy file
+- 8 Unable to read data file
 - 9 Unable to read short_names file
 - 10 Unable to read composition file
 
-- 101 Energy out of bounds 
+- 101 Energy out of bounds
 
 - 201 Target is not in composition file
 - 202 Target and ion combination is not in data file
@@ -494,18 +494,18 @@ List all known data tables and algorithms:
 |   5 ICRU73_OLD
 |   6 ICRU73
 |   7 ICRU49
-|   8 
-|   9 
+|   8
+|   9
 | 100 BETHE_EXT00
-| 101 
-| 102 
-| 103 
-| 104 
-| 105 
-| 106 
-| 107 
-| 108 
-| 109 
+| 101
+| 102
+| 103
+| 104
+| 105
+| 106
+| 107
+| 108
+| 109
 
 
 List all known ions:
@@ -945,11 +945,11 @@ Enums are defined in ``dedx.h``, but are listed here for convenience:
 .. code-block:: C
 
   enum {DEDX_ASTAR=1, DEDX_PSTAR, DEDX_ESTAR,
-        DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008, 
+        DEDX_MSTAR, DEDX_ICRU73_OLD, DEDX_ICRU73, DEDX_ICRU49, _DEDX_0008,
         DEDX_ICRU, DEDX_DEFAULT=100, DEDX_BETHE_EXT00};
-  
+
   enum {DEDX_DEFAULT_STATE=0,DEDX_GAS,DEDX_CONDENSED};
-  
+
   enum {DEDX_HYDROGEN=1, DEDX_HELIUM, DEDX_LITHIUM, DEDX_BERYLLIUM, DEDX_BORON,
         DEDX_CARBON, DEDX_GRAPHITE=906, DEDX_NITROGEN=7, DEDX_OXYGEN,
         DEDX_FLUORINE, DEDX_NEON, DEDX_SODIUM, DEDX_MAGNESIUM,
@@ -995,7 +995,7 @@ Enums are defined in ``dedx.h``, but are listed here for convenience:
         DEDX_FERROUS_OXIDE, DEDX_FERROUS_SULFATE_DOSIMETER_SOLUTION,
         DEDX_FREON_12, DEDX_FREON_12B2, DEDX_FREON_13, DEDX_FREON_13B1,
         DEDX_FREON_13I1, DEDX_GADOLINIUM_OXYSULFIDE, DEDX_GALLIUM_ARSENIDE,
-        DEDX_GEL_IN_PHOTOGRAPHIC_EMULSION, 
+        DEDX_GEL_IN_PHOTOGRAPHIC_EMULSION,
         DEDX_GLASS_PYREX, DEDX_GLASS_LEAD, DEDX_GLASS_PLATE, /* 169,170,171 */
         DEDX_GLUCOSE, DEDX_GLUTAMINE, DEDX_GLYCEROL,
         DEDX_GUANINE, DEDX_GYPSUM_PLASTER_OF_PARIS, DEDX_N_HEPTANE, DEDX_N_HEXANE,
@@ -1038,7 +1038,7 @@ Enums are defined in ``dedx.h``, but are listed here for convenience:
         DEDX_URANIUM_MONOCARBIDE, DEDX_URANIUM_OXIDE, DEDX_UREA, DEDX_VALINE,
         DEDX_VITON_FLUOROELASTOMER, DEDX_WATER_LIQUID, DEDX_WATER_VAPOR,
         DEDX_XYLENE};
-  
+
   /* aliases */
   #define DEDX_PROTON     1
   #define DEDX_ELECTRON   1001
@@ -1047,7 +1047,7 @@ Enums are defined in ``dedx.h``, but are listed here for convenience:
   #define DEDX_PIPLUS     1004
   #define DEDX_PIZERO     1005
   #define DEDX_ANTIPROTON 1006
-  
+
   #define DEDX_WATER    DEDX_WATER_LIQUID
   #define DEDX_AIR      DEDX_AIR_DRY_NEAR_SEA_LEVEL
   #define DEDX_PMMA     DEDX_LUCITE_PERSPEX_PMMA

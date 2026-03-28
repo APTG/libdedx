@@ -23,7 +23,7 @@ float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int * e
 
 float _dedx_calculate_bethe_energy(_dedx_bethe_coll_struct * ws, float energy, float PZ, float PA, float TZ, float TA, float rho, float Io_Pot)
 {
-	
+
 	float dedx;
 	_dedx_gold_struct * gold = ws->gold;
 	_dedx_bethe_struct * bet = ws->bet;

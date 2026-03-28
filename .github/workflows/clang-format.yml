@@ -1,0 +1,20 @@
+name: clang-format
+
+on: [push, pull_request]
+
+jobs:
+  clang_format:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Check clang-format version (requires >= 14 for QualifierAlignment)
+      run: |
+        clang-format --version
+        MAJOR=$(clang-format --version | grep -oP '\d+' | head -1)
+        if [ "$MAJOR" -lt 14 ]; then echo "clang-format >= 14 required"; exit 1; fi
+
+    - name: Check formatting
+      run: |
+        find . -name '*.c' -o -name '*.h' | grep -v build | xargs clang-format --dry-run --Werror

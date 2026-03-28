@@ -5,6 +5,7 @@ TabWidth: 4
 ColumnLimit: 120
 
 PointerAlignment: Right
+QualifierAlignment: Left
 AlignTrailingComments: true
 ReflowComments: true
 

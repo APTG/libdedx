@@ -9,6 +9,7 @@
 #define RANGE_H_
 
 #include <dedx.h>
+
 #include "adapt.h"
 
 #define real float

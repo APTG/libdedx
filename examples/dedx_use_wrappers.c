@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <dedx.h>
+#include <stdio.h>
 
 #include "dedx_wrappers.h"
 

@@ -16,8 +16,9 @@
 */
 
 #include "dedx_wrappers.h"
-#include "dedx_tools.h"
+
 #include "dedx_periodic_table.h"
+#include "dedx_tools.h"
 
 void dedx_fill_program_list(int *program_list) {
     /* fill list of available programs, terminated with -1 */
@@ -52,11 +53,10 @@ void dedx_fill_ion_list(int program, int *ion_list) {
     ion_list[i] = -1;
 }
 
-
-//energy - in MeV/nucleon, unless  program is ESTAR, then MeV
-//stp - in MeVcm2/g
-int dedx_get_stp_table(const int program, const int ion, const int target, const int no_of_points,
-                       const float *energies, float *stps) {
+// energy - in MeV/nucleon, unless  program is ESTAR, then MeV
+// stp - in MeVcm2/g
+int dedx_get_stp_table(
+    const int program, const int ion, const int target, const int no_of_points, const float *energies, float *stps) {
     int err = 0;
     dedx_config *config = (dedx_config *) calloc(1, sizeof(dedx_config));
     config->target = target;
@@ -64,7 +64,8 @@ int dedx_get_stp_table(const int program, const int ion, const int target, const
     config->program = program;
     dedx_workspace *ws = dedx_allocate_workspace(1, &err);
 
-    if (err != 0) return err;
+    if (err != 0)
+        return err;
     dedx_load_config(ws, config, &err);
 
     for (int i = 0; i < no_of_points; i++) {
@@ -123,7 +124,8 @@ int dedx_get_stp_table_size(const int program, const int ion, const int target) 
     return result;
 };
 
-int dedx_fill_default_energy_stp_table(const int program, const int ion, const int target, float *energies, float *stps) {
+int dedx_fill_default_energy_stp_table(
+    const int program, const int ion, const int target, float *energies, float *stps) {
     int err = 0;
     int i;
 
@@ -154,21 +156,26 @@ int dedx_fill_default_energy_stp_table(const int program, const int ion, const i
     }
 
     return 0;
-
 };
 
-int dedx_get_csda_range_table(const int program, const int ion, const int target, const int no_of_points,
-                       const float *energies, double *csda_ranges) {
+int dedx_get_csda_range_table(const int program,
+                              const int ion,
+                              const int target,
+                              const int no_of_points,
+                              const float *energies,
+                              double *csda_ranges) {
     int err = 0;
     dedx_config *config = (dedx_config *) calloc(1, sizeof(dedx_config));
     config->target = target;
     config->ion = ion;
     config->program = program;
     config->ion_a = _dedx_get_nucleon(config->ion, &err);
-    if (err != 0) return err;
+    if (err != 0)
+        return err;
     dedx_workspace *ws = dedx_allocate_workspace(1, &err);
 
-    if (err != 0) return err;
+    if (err != 0)
+        return err;
     dedx_load_config(ws, config, &err);
 
     for (int i = 0; i < no_of_points; i++) {

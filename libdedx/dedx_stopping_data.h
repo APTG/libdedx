@@ -3,8 +3,7 @@
 
 #include "dedx.h"
 
-typedef struct
-{
+typedef struct {
     int target;
     int ion;
     unsigned int length;

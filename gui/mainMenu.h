@@ -2,15 +2,13 @@
 #define DEDXGUI_MAINMENU_INCLUDED
 #include <wx/wx.h>
 
-enum
-{
+enum {
     ID_Quit = 1,
     ID_About,
 };
 
-class MainMenu: public wxMenuBar
-{
-	public:
-		MainMenu();
+class MainMenu : public wxMenuBar {
+  public:
+    MainMenu();
 };
 #endif
