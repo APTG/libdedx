@@ -1,0 +1,29 @@
+PROJECT_NAME           = "libdedx"
+PROJECT_BRIEF          = "Stopping power (dE/dx) library"
+PROJECT_NUMBER         =
+
+INPUT                  = ../../libdedx/dedx.h ../../libdedx/dedx_wrappers.h ../../libdedx/dedx_tools.h
+RECURSIVE              = NO
+
+OUTPUT_DIRECTORY       = .
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+
+HIDE_UNDOC_MEMBERS     = YES
+HIDE_UNDOC_CLASSES     = YES
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = NO
+
+OPTIMIZE_OUTPUT_FOR_C  = YES
+
+ALPHABETICAL_INDEX     = YES

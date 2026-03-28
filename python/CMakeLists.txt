@@ -37,7 +37,7 @@ if(DO_PYTHON_BINDINGS)
     COMMAND echo "       description = \\'Wrapper for stopping power library libdedx\\'," >> setup.py
     COMMAND echo "       author = \\'Jakob Toftegaard\\'," >> setup.py
     COMMAND echo "       author_email = \\'jakob.toftegaard@gmail.com\\'," >> setup.py
-    COMMAND echo "       url = \\'http://libdedx.sourceforge.net/\\'," >> setup.py
+    COMMAND echo "       url = \\'https://github.com/APTG/libdedx\\'," >> setup.py
     COMMAND echo "       long_description = \\'\\'," >> setup.py
     COMMAND echo "       ext_modules = [module1]\\)" >> setup.py
     COMMAND echo "" >> setup.py

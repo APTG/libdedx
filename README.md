@@ -1,7 +1,79 @@
 # libdedx
 
-libdEdx is a physics library for stopping power calculations.
-Stopping power is the energy loss of a particle per unit length (dE/dx).
-libdedx is supposed to be both fast and easy to use, and features multiple standard dE/dx lists (ICRU, MSTAR...)
+[![CI](https://github.com/APTG/libdedx/actions/workflows/ci.yml/badge.svg)](https://github.com/APTG/libdedx/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/APTG/libdedx/graph/badge.svg)](https://codecov.io/gh/APTG/libdedx)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-For the documentation see: https://aptg.github.io/libdedx/
+A C library for stopping power calculations (dE/dx) — the energy loss of a charged particle per unit length of material.
+
+Full documentation: https://aptg.github.io/libdedx/
+
+## Supported programs
+
+| Program         | Description                                      | Ions          |
+|-----------------|--------------------------------------------------|---------------|
+| `DEDX_PSTAR`    | NIST PSTAR database                              | Protons       |
+| `DEDX_ASTAR`    | NIST ASTAR database                              | Alpha particles |
+| `DEDX_MSTAR`    | MSTAR code                                       | Heavy ions    |
+| `DEDX_ICRU49`   | ICRU Report 49 (1993)                            | p, He         |
+| `DEDX_ICRU73`   | ICRU Report 73 (2005)                            | Heavy ions    |
+| `DEDX_ICRU73_OLD` | ICRU Report 73, older parametrization          | Heavy ions    |
+| `DEDX_BETHE_EXT00` | Bethe formula with extensions                 | All ions      |
+| `DEDX_ICRU`     | Auto-selects ICRU49 or ICRU73 by ion type        | p, He, heavy  |
+
+## Quick start
+
+One-call API for a single stopping power value:
+
+```c
+#include <dedx.h>
+
+int err = 0;
+float stp = dedx_get_simple_stp(DEDX_PROTON, DEDX_WATER, 100.0f, &err);
+// stp in MeV cm² / g at 100 MeV/u
+```
+
+Full API with workspace for repeated evaluations:
+
+```c
+#include <dedx.h>
+#include <stdlib.h>
+
+int err = 0;
+dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+dedx_config *cfg   = calloc(1, sizeof(dedx_config));
+
+cfg->program = DEDX_PSTAR;
+cfg->ion     = DEDX_PROTON;
+cfg->target  = DEDX_WATER;
+
+dedx_load_config(ws, cfg, &err);
+float stp = dedx_get_stp(ws, cfg, 100.0f, &err);
+
+dedx_free_config(cfg, &err);
+dedx_free_workspace(ws, &err);
+```
+
+See the [examples/](examples/) directory for more usage patterns.
+
+## Building
+
+Requires CMake 3.21+ and a C11 compiler.
+
+```bash
+cmake --preset debug
+cmake --build --preset debug
+ctest --preset debug
+```
+
+To install:
+
+```bash
+cmake --preset release -DCMAKE_INSTALL_PREFIX=/your/prefix
+cmake --build --preset release
+cmake --install build-release
+```
+
+## License
+
+libdedx is free software, distributed under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0).
