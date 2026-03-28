@@ -108,8 +108,14 @@ int _dedx_validate_config(dedx_config *config, int *err) {
     if (config->program >= 100) {
         // Order is important
         _dedx_evaluate_compound(config, err);
+        if (*err != 0)
+            return -1;
         _dedx_validate_state(config, err);
+        if (*err != 0)
+            return -1;
         _dedx_evaluate_i_pot(config, err);
+        if (*err != 0)
+            return -1;
     }
     if (config->target == 0 && config->elements_id != NULL) {
         _dedx_evaluate_compound(config, err);

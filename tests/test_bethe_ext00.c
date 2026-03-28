@@ -11,7 +11,6 @@ static dedx_config *make_bethe_default_config(int ion, int target) {
         cfg->elements_i_value = calloc(2, sizeof(float));
         cfg->elements_i_value[0] = 21.8f;
         cfg->elements_i_value[1] = 106.0f;
-        cfg->elements_length = 2;
         cfg->rho = 1.000f;
         break;
     case DEDX_PMMA:
