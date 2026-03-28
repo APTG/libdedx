@@ -20,6 +20,10 @@ jobs:
           cmake -S . -B build  # cmake -S <path-to-source> -B <path-to-build>
           cmake --build build
 
+      - name: Run CTest
+        if: ${{ runner.os == 'Linux' }}
+        run: ctest --test-dir build --output-on-failure
+
       - name: Run compiled programs on Linux
         if: ${{ runner.os == 'Linux' }}
         run: |

@@ -27,5 +27,4 @@ add_custom_command(
   COMMAND dedx_build_bin
   COMMENT "Execute command to build platform dependent binary data tables..."
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libdedx
-  DEPENDS dedx dedx_build_bin
 )
