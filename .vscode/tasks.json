@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Configure",
+            "type": "shell",
+            "command": "cmake -S . -B build",
+            "group": "build",
+            "presentation": { "reveal": "always" }
+        },
+        {
+            "label": "CMake: Build",
+            "type": "shell",
+            "command": "cmake --build build --parallel",
+            "group": { "kind": "build", "isDefault": true },
+            "presentation": { "reveal": "always" },
+            "dependsOn": "CMake: Configure"
+        },
+        {
+            "label": "CTest: Run",
+            "type": "shell",
+            "command": "ctest --test-dir build --output-on-failure",
+            "group": { "kind": "test", "isDefault": true },
+            "presentation": { "reveal": "always" },
+            "dependsOn": "CMake: Build"
+        }
+    ]
+}

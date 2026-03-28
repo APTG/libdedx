@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug loadTest",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test/loadTest",
+            "args": ["1"],
+            "cwd": "${workspaceFolder}/libdedx",
+            "MIMode": "gdb",
+            "preLaunchTask": "CMake: Build"
+        },
+        {
+            "name": "Debug dedx_example",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/examples/dedx_example",
+            "args": [],
+            "cwd": "${workspaceFolder}/libdedx",
+            "MIMode": "gdb",
+            "preLaunchTask": "CMake: Build"
+        }
+    ]
+}

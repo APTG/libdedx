@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "llvm-vs-code-extensions.vscode-clangd",  // C language server (clangd)
+        "ms-vscode.cmake-tools",                   // CMake integration + CTest
+        "twxs.cmake"                               // CMake syntax highlighting
+    ]
+}
