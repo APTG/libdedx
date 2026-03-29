@@ -18,7 +18,7 @@
         "editor.formatOnSave": true
     },
 
-    // Python — add python/ to the analysis path so Pylance finds libdedx.py and libdedx.pyi
+    // Python — add python/ to the analysis path so Pylance finds the libdedx package (__init__.py / __init__.pyi)
     "python.analysis.extraPaths": ["python"],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
