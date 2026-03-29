@@ -1,14 +1,23 @@
 import os
+import sys
 from pathlib import Path
 
 
 def _candidate_library_paths(repo_root: Path) -> list[Path]:
-    return [
-        repo_root / "build" / "libdedx" / "libdedx.so",
-        repo_root / "build-debug" / "libdedx" / "libdedx.so",
-        repo_root / "build-release" / "libdedx" / "libdedx.so",
-        repo_root / "build-coverage" / "libdedx" / "libdedx.so",
-    ]
+    if sys.platform.startswith("linux"):
+        lib_names = ["libdedx.so"]
+    elif sys.platform == "darwin":
+        lib_names = ["libdedx.dylib"]
+    elif os.name == "nt":
+        lib_names = ["dedx.dll", "libdedx.dll"]
+    else:
+        lib_names = ["libdedx.so"]
+
+    candidates = []
+    for build_dir in ("build", "build-debug", "build-release", "build-coverage"):
+        for lib_name in lib_names:
+            candidates.append(repo_root / build_dir / "libdedx" / lib_name)
+    return candidates
 
 
 def pytest_configure() -> None:

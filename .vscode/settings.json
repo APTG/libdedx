@@ -19,7 +19,6 @@
     },
 
     // Python — add python/ to the analysis path so Pylance finds libdedx.py and libdedx.pyi
-    "python.defaultInterpreterPath": "${workspaceFolder}/python/.venv/bin/python",
     "python.analysis.extraPaths": ["python"],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,

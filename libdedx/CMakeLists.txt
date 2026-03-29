@@ -34,14 +34,27 @@ endif()
 
 # Shared library — for Python ctypes and other dynamic consumers.
 add_library(dedx_shared SHARED)
-target_link_libraries(dedx_shared PRIVATE dedx_objects)
-set_target_properties(dedx_shared PROPERTIES OUTPUT_NAME dedx)
+target_link_libraries(dedx_shared PUBLIC dedx_objects)
+if(WIN32)
+    set_target_properties(dedx_shared PROPERTIES
+        OUTPUT_NAME dedx
+        ARCHIVE_OUTPUT_NAME dedx_shared
+    )
+else()
+    set_target_properties(dedx_shared PROPERTIES OUTPUT_NAME dedx)
+endif()
 if(NOT WIN32)
-    target_link_libraries(dedx_shared PRIVATE m)
+    target_link_libraries(dedx_shared PUBLIC m)
 endif()
 
 install(FILES dedx.h dedx_tools.h dedx_wrappers.h DESTINATION include)
-install(TARGETS dedx dedx_shared DESTINATION lib)
+
+install(TARGETS dedx dedx_shared
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
 if(WIN32)
     install(FILES ${dedx_data_bin} DESTINATION data)
 else()

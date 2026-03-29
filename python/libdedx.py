@@ -108,7 +108,9 @@ def get_default_table(program, ion, target):
     stps     — list of stopping powers in MeV cm²/g
     """
     n = _lib.dedx_get_stp_table_size(program, ion, target)
-    if n <= 0:
+    if n < 0:
+        raise RuntimeError(f"libdedx error code {n}")
+    if n == 0:
         raise RuntimeError(
             f"No tabulated data for program={program}, ion={ion}, target={target}"
         )
