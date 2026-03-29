@@ -12,6 +12,14 @@ ION = 1  # Hydrogen (Z=1)
 TARGET = 276  # Liquid water
 
 
+def test_get_version(capsys):
+    version = libdedx.get_version()
+    print(version)
+    captured = capsys.readouterr()
+    assert version.count(".") == 2
+    assert captured.out.strip() == version
+
+
 def test_get_stp_returns_positive():
     stp = libdedx.get_stp(PROGRAM, ION, TARGET, 10.0)
     assert stp > 0.0

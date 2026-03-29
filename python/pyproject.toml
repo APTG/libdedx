@@ -1,17 +1,18 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "libdedx"
-version = "0.1.0"
 description = "Python ctypes binding for the libdedx stopping-power library"
-readme = "README.md"
+readme = "../README.md"
 requires-python = ">=3.8"
 license = {text = "LGPL-2.0-or-later"}
+dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest>=8"]
+dev = ["ruff>=0.5.0", "libdedx[test]"]
 
 [tool.setuptools]
 py-modules = ["libdedx"]
@@ -19,3 +20,18 @@ include-package-data = true
 
 [tool.setuptools.data-files]
 "" = ["libdedx.pyi"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+
+[tool.setuptools_scm]
+root = ".."
+version_scheme = "post-release"
+local_scheme = "node-and-date"

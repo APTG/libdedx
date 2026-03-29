@@ -1,10 +1,15 @@
 # Custom ignores
+.codex
 *.bin
+
 build/
 build-release/
 build-coverage/
+
+Testing/
+
 docs/doxygen/html/
-.codex
+
 python/.venv/
 python/__pycache__/
 python/.pytest_cache/

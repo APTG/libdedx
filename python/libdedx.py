@@ -62,10 +62,22 @@ _lib.dedx_get_csda_range_table.argtypes = [
 ]
 _lib.dedx_get_csda_range_table.restype = ctypes.c_int
 
+_lib.dedx_get_version.argtypes = [_c_int_p, _c_int_p, _c_int_p]
+_lib.dedx_get_version.restype = None
+
 
 def _check(err):
     if err.value != 0:
         raise RuntimeError(f"libdedx error code {err.value}")
+
+
+def get_version():
+    """Return the libdedx version as a ``major.minor.patch`` string."""
+    major = ctypes.c_int(0)
+    minor = ctypes.c_int(0)
+    patch = ctypes.c_int(0)
+    _lib.dedx_get_version(ctypes.byref(major), ctypes.byref(minor), ctypes.byref(patch))
+    return f"{major.value}.{minor.value}.{patch.value}"
 
 
 def get_stp(program, ion, target, energy):

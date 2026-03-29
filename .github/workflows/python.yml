@@ -10,11 +10,19 @@ jobs:
 
       - name: Configure and build (shared library)
         run: |
-          cmake -S . -B build
+          cmake -S . -B build -DBUILD_SHARED_LIBS=ON
           cmake --build build --parallel
 
-      - name: Install Python binding and test dependencies
-        run: pip install --break-system-packages pytest python/
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python package and dev dependencies
+        run: python -m pip install -e "python[dev]"
+
+      - name: Run ruff
+        run: python -m ruff check python
 
       - name: Run tests
         run: |
