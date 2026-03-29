@@ -12,7 +12,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
-dev = ["ruff>=0.5.0", "libdedx[test]"]
+dev = ["ruff>=0.5.0", "pytest>=8"]
 
 [tool.setuptools]
 include-package-data = true
