@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "libdedx"
 description = "Python ctypes binding for the libdedx stopping-power library"
-readme = "../README.md"
+readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "LGPL-2.0-or-later"}
 dynamic = ["version"]
