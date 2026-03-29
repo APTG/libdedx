@@ -15,11 +15,14 @@ test = ["pytest>=8"]
 dev = ["ruff>=0.5.0", "libdedx[test]"]
 
 [tool.setuptools]
-py-modules = ["libdedx"]
 include-package-data = true
 
-[tool.setuptools.data-files]
-"" = ["libdedx.pyi"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["libdedx"]
+
+[tool.setuptools.package-data]
+libdedx = ["__init__.pyi", "py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

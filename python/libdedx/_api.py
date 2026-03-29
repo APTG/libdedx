@@ -1,17 +1,4 @@
-"""
-libdedx — ctypes binding for the libdedx stopping-power library.
-
-The shared library (libdedx.so / libdedx.dylib / dedx.dll) must be built
-and locatable before importing this module. Set the LIBDEDX_SO environment
-variable to the full path of the shared library to override library search,
-which is useful during development or CI before the library is installed.
-
-Example usage::
-
-    import libdedx
-    # PSTAR program (2), Hydrogen ion (1), Liquid water target (276)
-    stp = libdedx.get_stp(2, 1, 276, 10.0)   # MeV cm²/g at 10 MeV/u
-"""
+"""Public ctypes-backed API for libdedx."""
 
 import ctypes
 import ctypes.util
@@ -104,8 +91,8 @@ def get_stp_table(program, ion, target, energies):
 def get_default_table(program, ion, target):
     """Return (energies, stps) for the built-in tabulated data points.
 
-    energies — list of energies in MeV/u
-    stps     — list of stopping powers in MeV cm²/g
+    energies -- list of energies in MeV/u
+    stps     -- list of stopping powers in MeV cm^2/g
     """
     n = _lib.dedx_get_stp_table_size(program, ion, target)
     if n < 0:
@@ -123,7 +110,7 @@ def get_default_table(program, ion, target):
 
 
 def get_csda_table(program, ion, target, energies):
-    """Return CSDA ranges (g/cm²) for a list of energies (MeV/u)."""
+    """Return CSDA ranges (g/cm^2) for a list of energies (MeV/u)."""
     n = len(energies)
     e_arr = (ctypes.c_float * n)(*energies)
     r_arr = (ctypes.c_double * n)()
