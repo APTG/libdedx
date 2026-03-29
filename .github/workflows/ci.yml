@@ -87,9 +87,11 @@ jobs:
 
       - name: Run ruff
         if: ${{ matrix.python-version == '3.13' }}
-        run: python -m ruff check python
+        working-directory: python
+        run: python -m ruff check .
 
       - name: Run Python tests
+        working-directory: python
         env:
           LIBDEDX_SO: ${{ github.workspace }}/build/libdedx/libdedx.so
-        run: python -m pytest python/tests -q
+        run: python -m pytest tests -q
