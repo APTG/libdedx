@@ -1,8 +1,7 @@
 # libdedx
 
 [![CI](https://github.com/APTG/libdedx/actions/workflows/ci.yml/badge.svg)](https://github.com/APTG/libdedx/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/APTG/libdedx/graph/badge.svg)](https://codecov.io/gh/APTG/libdedx)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Coverage](https://codecov.io/gh/APTG/libdedx/graph/badge.svg?branch=main)](https://codecov.io/gh/APTG/libdedx)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 A C library for stopping power calculations (dE/dx) — the energy loss of a charged particle per unit length of material.
 
