@@ -49,7 +49,21 @@ if(NOT rc EQUAL 0)
     message(FATAL_ERROR "install smoke consumer compile failed: ${rc}")
 endif()
 
-execute_process(COMMAND "${smoke_consumer}"
+set(runtime_env)
+if(APPLE)
+    list(APPEND runtime_env
+        "DYLD_LIBRARY_PATH=${smoke_prefix}/lib:$ENV{DYLD_LIBRARY_PATH}"
+    )
+else()
+    list(APPEND runtime_env
+        "LD_LIBRARY_PATH=${smoke_prefix}/lib:$ENV{LD_LIBRARY_PATH}"
+    )
+endif()
+
+execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E env
+            ${runtime_env}
+            "${smoke_consumer}"
     RESULT_VARIABLE rc)
 if(NOT rc EQUAL 0)
     message(FATAL_ERROR "install smoke consumer run failed: ${rc}")
