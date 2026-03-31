@@ -75,7 +75,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
             length = 0;
             i = 0;
             memset(&data, 0, DEDX_MAX_ELEMENTS);
-            temp = _dedx_split(line, ':', &length, 100);
+            temp = dedx_internal_split(line, ':', &length, 100);
             temp[0][0] = ' ';
             datalines = atoi(temp[2]);
             while (i++ < datalines && !feof(fp)) {
@@ -90,7 +90,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
             fwrite(&container, sizeof(container), 1, out);
         }
     }
-    free(temp);
+    dedx_internal_free_split_temp(temp, 10);
     fclose(fp);
     fclose(out);
 }
@@ -223,13 +223,13 @@ float _dedx_read_effective_charge(int id, int *err) {
     while (!feof(fp)) {
         if (fgets(line, 100, fp) != NULL) {
         }
-        temp = _dedx_split(line, '\t', &items, 100);
+        temp = dedx_internal_split(line, '\t', &items, 100);
         if (atoi(temp[0]) == id) {
             charge = atof(temp[1]);
-            _dedx_free_split_temp(temp);
+            dedx_internal_free_split_temp(temp, 10);
             break;
         }
-        _dedx_free_split_temp(temp);
+        dedx_internal_free_split_temp(temp, 10);
     }
     fclose(fp);
     return charge;
@@ -286,13 +286,13 @@ float _dedx_read_density(int id, int *err) {
     while (!feof(fp)) {
         if (fgets(str, 100, fp) == NULL) {
         }
-        temp = _dedx_split(str, '\t', &items, 100);
+        temp = dedx_internal_split(str, '\t', &items, 100);
         if (atoi(temp[0]) == id) {
             density = atof(temp[1]);
-            _dedx_free_split_temp(temp);
+            dedx_internal_free_split_temp(temp, 10);
             break;
         }
-        _dedx_free_split_temp(temp);
+        dedx_internal_free_split_temp(temp, 10);
     }
     fclose(fp);
     if (density == 0.0) {
@@ -323,7 +323,7 @@ float _dedx_get_i_value(int target, int state, int *err) {
     while (!feof(fp)) {
         if (fgets(str, 100, fp) == NULL) {
         }
-        temp = _dedx_split(str, '\t', &items, 100);
+        temp = dedx_internal_split(str, '\t', &items, 100);
         if (atoi(temp[0]) == target) {
             if (items == 4) {
                 if (state == atoi(temp[3])) {
@@ -335,7 +335,7 @@ float _dedx_get_i_value(int target, int state, int *err) {
                     pot = pot * 1.13;
             }
         }
-        _dedx_free_split_temp(temp);
+        dedx_internal_free_split_temp(temp, 10);
     }
     fclose(fp);
     if (pot == 0.0) {
@@ -373,10 +373,10 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int *len
                         f_temp = atof(str);
                         if (f_temp == 0.0)
                             break;
-                        temp = _dedx_split(str, ':', &items, 100);
+                        temp = dedx_internal_split(str, ':', &items, 100);
                         composition[(*length)][0] = atof(temp[0]);
                         composition[(*length)++][1] = atof(temp[1]);
-                        _dedx_free_split_temp(temp);
+                        dedx_internal_free_split_temp(temp, 10);
                     }
 
                     break;

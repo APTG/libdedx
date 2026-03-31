@@ -184,7 +184,12 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
         return -1;
     set.cfg = config;
     set.ws = ws;
-    range = adapt(adapt_stp, &set, dedx_get_min_energy(config->program, config->ion) * A, energy * A, acc, eps,
+    range = adapt(adapt_stp,
+                  &set,
+                  dedx_get_min_energy(config->program, config->ion) * A,
+                  energy * A,
+                  acc,
+                  eps,
                   &calculation_error);
     return range;
 }
