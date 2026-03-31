@@ -303,7 +303,7 @@ int dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err) {
 
     config->loaded = 0;
     config->cfg_id = -1;
-    _dedx_validate_config(config, err);
+    dedx_internal_validate_config(config, err);
     if (*err != 0)
         return -1;
     if (config->elements_id != NULL)
@@ -312,7 +312,7 @@ int dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err) {
         cfg_id = load_config_clean(ws, config, err);
     if (*err != 0 || cfg_id < 0)
         return -1;
-    _dedx_set_names(config, err);
+    dedx_internal_set_names(config, err);
     if (*err != 0)
         return -1;
     config->cfg_id = cfg_id;
@@ -516,7 +516,7 @@ static int load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) 
     if (*err != 0) {
         if (*err == DEDX_ERR_COMBINATION_NOT_FOUND && target > 99) {
             *err = DEDX_OK;
-            _dedx_evaluate_compound(config, err);
+            dedx_internal_evaluate_compound(config, err);
             if (*err != 0)
                 return -1;
             if (config->elements_length == 0) {
