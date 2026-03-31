@@ -1,10 +1,9 @@
 #ifndef DEDX_PROGRAM_CONST_H_INCLUDED
 #define DEDX_PROGRAM_CONST_H_INCLUDED
 
-/* ok, this is a bit overkill... */
+/* Internal lookup tables for program names, versions, and supported IDs. */
 
-/* Hey Jakob, whats the purpose with  "" placeholder ? */
-const char dedx_program_table[110][20] = {
+static const char dedx_program_table[110][20] = {
     // clang-format off
   "(N/A)","ASTAR","PSTAR","ESTAR","MSTAR","ICRU73_OLD","ICRU73","ICRU49","","ICRU", // 0 - 9
   "","","","","","","","","","",  // 10-19
@@ -18,7 +17,7 @@ const char dedx_program_table[110][20] = {
   "","","","","","","","","","",  // 90-99
   "DEFAULT","BETHE_EXT00","","","","","","","",""   // 100-109  // clang-format on
 };
-const char dedx_program_version_table[110][20] = {  // clang-format off
+static const char dedx_program_version_table[110][20] = {  // clang-format off
   "(N/A)","1.2","1.2","ESTAR","3.12","2005/06","2005/06-REV","ICRU Report 49 D","","1.0", // 0 - 9
   "","","","","","","","","","",  // 10-19
   "","","","","","","","","","",  // 20-29
@@ -32,14 +31,14 @@ const char dedx_program_version_table[110][20] = {  // clang-format off
   "1.0","","","","","","","","",""   // 100-109  // clang-format on
 };
 
-const int dedx_available_programs[20] = {
+static const int dedx_available_programs[20] = {
   DEDX_ASTAR, DEDX_PSTAR,
   DEDX_ESTAR, DEDX_MSTAR,
   DEDX_ICRU73_OLD, DEDX_ICRU73,
   DEDX_ICRU49, DEDX_ICRU, DEDX_DEFAULT,
   DEDX_BETHE_EXT00, -1};
 
-const int dedx_program_available_ions[110][20] = {
+static const int dedx_program_available_ions[110][20] = {
   // currently excluding BETHE, which is handled in dedx.c
   {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,-1}, // all ions
   {2,-1}, // ASTAR
@@ -49,10 +48,10 @@ const int dedx_program_available_ions[110][20] = {
   {3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,-1}, // ICRU73_OLD
   {3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,-1}, // ICRU73
   {1,2,-1}, // ICRU49
-  {-1}, // Jakobs magic placeholder
+  {-1}, // reserved internal slot
   {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,-1} // ICRU
 };
-const int dedx_program_available_materials[110][290] = {
+static const int dedx_program_available_materials[110][290] = {
   // currently excluding BETHE, which is handled in dedx.c
   {1,2,3,4,5,6,7,8,9,
    10,11,12,13,14,15,16,17,18,19,
@@ -121,14 +120,14 @@ const int dedx_program_available_materials[110][290] = {
    73,74,78,79,82,92,99,101,103,104,106,111,119,120,126,130,134,138,139,
    141,155,160,169,179,185,189,191,197,200,201,202,203,204,209,213,215,216,219,
    221,222,223,225,226,227,232,238,245,252,255,263,264,266,276,277,906,-1},
-  {-1}, // Jakobs magic placeholder
+  {-1}, // reserved internal slot
   {1,2,4,5,6,7,8,10,13,14,18,22,26,28,29,32,36,40,42,47,50,54,64, // ICRU
    73,74,78,79,82,92,99,101,103,104,106,111,119,120,126,130,134,138,139,
    141,155,160,169,179,185,189,191,197,200,201,202,203,204,209,213,215,216,219,
    221,222,223,225,226,227,232,238,245,252,255,263,264,266,276,277,906,-1}
 };
 
-const char dedx_material_table[1000][40] = {
+static const char dedx_material_table[1000][40] = {
   "(N/A)",
   "HYDROGEN", "HELIUM", "LITHIUM", "BERYLLIUM", "BORON", "CARBON",
   "NITROGEN", "OXYGEN", "FLUORINE", "NEON", "SODIUM", "MAGNESIUM",
@@ -242,7 +241,7 @@ const char dedx_material_table[1000][40] = {
   "","","","","","","","","",""  // last element is 999
 };
 
-const char dedx_ion_table[120][40] = {
+static const char dedx_ion_table[120][40] = {
   "(N/A)",
   "HYDROGEN", "HELIUM", "LITHIUM", "BERYLLIUM", "BORON", "CARBON",
   "NITROGEN", "OXYGEN", "FLUORINE", "NEON", "SODIUM", "MAGNESIUM",

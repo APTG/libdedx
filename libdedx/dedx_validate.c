@@ -59,9 +59,9 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
         float charge_avg = 0.0;
         for (i = 0; i < config->elements_length; i++) {
             config->i_value += config->elements_mass_fraction[i] * log(config->elements_i_value[i])
-                               * config->elements_id[i] / _dedx_get_atom_mass(config->elements_id[i], err);
+                               * config->elements_id[i] / dedx_internal_get_atom_mass(config->elements_id[i], err);
             charge_avg += config->elements_mass_fraction[i] * config->elements_id[i]
-                          / _dedx_get_atom_mass(config->elements_id[i], err);
+                          / dedx_internal_get_atom_mass(config->elements_id[i], err);
             if (*err != 0)
                 return -1;
         }
@@ -128,7 +128,7 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
             return -1;
         }
         for (i = 0; i < length; i++) {
-            f = _dedx_get_atom_mass(config->elements_id[i], err);
+            f = dedx_internal_get_atom_mass(config->elements_id[i], err);
             if (*err != 0) {
                 free(density);
                 free(weight);
@@ -202,8 +202,8 @@ int dedx_internal_calculate_element_i_pot(dedx_config *config, int *err) {
 
     for (i = 0; i < config->elements_length; i++) {
         target = config->elements_id[i];
-        charge_avg += config->elements_mass_fraction[i] * target / _dedx_get_atom_mass(target, err);
-        avg_pot += config->elements_mass_fraction[i] * target / _dedx_get_atom_mass(target, err)
+        charge_avg += config->elements_mass_fraction[i] * target / dedx_internal_get_atom_mass(target, err);
+        avg_pot += config->elements_mass_fraction[i] * target / dedx_internal_get_atom_mass(target, err)
                    * log(_dedx_get_i_value(target, config->compound_state, err));
         if (*err != 0)
             return -1;

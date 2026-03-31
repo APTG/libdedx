@@ -664,10 +664,10 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
         return -1;
     }
 
-    PZ = _dedx_get_atom_charge(config->ion, err);
-    PA = _dedx_get_atom_mass(config->ion, err);
-    TZ = _dedx_get_atom_charge(config->target, err);
-    TA = _dedx_get_atom_mass(config->target, err);
+    PZ = dedx_internal_get_atom_charge(config->ion, err);
+    PA = dedx_internal_get_atom_mass(config->ion, err);
+    TZ = dedx_internal_get_atom_charge(config->target, err);
+    TA = dedx_internal_get_atom_mass(config->target, err);
     rho = config->rho;
     pot = config->_temp_i_value;
     data->length = 122;

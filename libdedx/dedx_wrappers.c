@@ -224,7 +224,7 @@ int dedx_get_csda_range_table(const int program,
 
     if (err != 0)
         return err;
-    config->ion_a = _dedx_get_nucleon(config->ion, &err);
+    config->ion_a = dedx_internal_get_nucleon(config->ion, &err);
     if (err != 0) {
         dedx_free_config(config, &cleanup_err);
         return err;

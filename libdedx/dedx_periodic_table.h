@@ -17,9 +17,9 @@ static const float dedx_amu[112] = {
     258,         259,       262,        267,      268,         271,     272,       270,     276,        281,
     280,         285};
 
-float _dedx_get_atom_charge(int id, int *err);
+float dedx_internal_get_atom_charge(int id, int *err);
 
-float _dedx_get_atom_mass(int id, int *err);
+float dedx_internal_get_atom_mass(int id, int *err);
 
 static const int dedx_nucl[112] = {
     1,   4,   7,   9,   11,  12,  14,  16,  19,  20,  23,  24,  27,  28,  31,  32,  35,  40,  39,  40,  45,  48,  51,
@@ -28,6 +28,6 @@ static const int dedx_nucl[112] = {
     174, 175, 180, 181, 184, 185, 192, 193, 195, 197, 202, 205, 208, 209, 209, 210, 222, 223, 226, 227, 232, 231, 238,
     237, 244, 243, 247, 247, 251, 252, 257, 258, 259, 262, 267, 268, 271, 272, 270, 276, 281, 280, 285};
 
-int _dedx_get_nucleon(int id, int *err);
+int dedx_internal_get_nucleon(int id, int *err);
 
 #endif // DEDX_PERIODIC_TABLE_H_INCLUDED
