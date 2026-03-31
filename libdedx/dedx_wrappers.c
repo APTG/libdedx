@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 
+#include "dedx_lookup_data.h"
 #include "dedx_periodic_table.h"
 #include "dedx_tools.h"
 

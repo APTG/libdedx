@@ -160,32 +160,7 @@ float dedx_get_min_energy(int program, int ion);
  */
 float dedx_get_max_energy(int program, int ion);
 
-/** @cond INTERNAL */
-typedef struct {
-    int cache;
-    int hits;
-    int miss;
-} _dedx_lookup_accelerator;
-
-typedef struct {
-    float a;
-    float b;
-    float c;
-    float d;
-    float x;
-} _dedx_spline_base;
-
-typedef struct {
-    _dedx_spline_base base[DEDX_MAX_ELEMENTS];
-    int n;
-    int prog;
-    int target;
-    int ion;
-    int datapoints;
-    _dedx_lookup_accelerator acc;
-} _dedx_lookup_data;
-
-/** @endcond */
+typedef struct _dedx_lookup_data _dedx_lookup_data;
 
 /**
  * @brief Workspace holding preloaded stopping power datasets.
