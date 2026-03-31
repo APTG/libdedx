@@ -17,6 +17,9 @@
 #include "dedx.h"
 
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "dedx_bethe.h"
 #include "dedx_config.h"
@@ -29,7 +32,6 @@
 #include "dedx_spline.h"
 #include "dedx_stopping_data.h"
 #include "dedx_validate.h"
-#include "dedx_lookup_data.h"
 
 static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int prog, int *err);
 static int check_energy_bounds(_dedx_lookup_data *data, float energy);
@@ -190,11 +192,11 @@ void dedx_get_version(int *major, int *minor, int *patch) {
 }
 
 void dedx_get_composition(int target, float composition[][2], unsigned int *comp_len, int *err) {
-    _dedx_get_composition(target, composition, comp_len, err);
+    dedx_internal_get_composition(target, composition, comp_len, err);
 }
 
 float dedx_get_i_value(int target, int *err) {
-    return _dedx_get_i_value(target, DEDX_GAS, err);
+    return dedx_internal_get_i_value(target, DEDX_GAS, err);
 }
 
 const int *dedx_get_program_list(void) {
@@ -576,18 +578,18 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
         int prog_temp = config->program;
 
         prog_load = 101;
-        _dedx_read_energy_data(energy, prog_load, err);
+        dedx_internal_read_energy_data(energy, prog_load, err);
         config->program = prog_load;
         load_bethe_2(data, config, energy, err);
         config->program = prog_temp;
         return 0;
     }
 
-    _dedx_read_binary_data(data, prog_load, ion_load, target_load, err);
+    dedx_internal_read_binary_data(data, prog_load, ion_load, target_load, err);
     if (*err != 0)
         return -1;
 
-    _dedx_read_energy_data(energy, prog_load, err);
+    dedx_internal_read_energy_data(energy, prog_load, err);
     if (prog == DEDX_MSTAR) {
         stopping_data out;
         char mode = 'b';
@@ -671,7 +673,7 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
     rho = config->rho;
     pot = config->_temp_i_value;
     data->length = 122;
-    _dedx_read_energy_data(energy, DEDX_BETHE_EXT00, err);
+    dedx_internal_read_energy_data(energy, DEDX_BETHE_EXT00, err);
     if (*err != 0)
         return -1;
 

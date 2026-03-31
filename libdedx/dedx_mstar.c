@@ -26,7 +26,7 @@ static char resolve_mstar_mode(char state, dedx_config *config) {
         return state;
 
     if (target_state == DEDX_DEFAULT_STATE) {
-        if (_dedx_target_is_gas(config->target, &err) != 0) {
+        if (dedx_internal_target_is_gas(config->target, &err) != 0) {
             target_state = DEDX_GAS;
         } else {
             target_state = DEDX_CONDENSED;

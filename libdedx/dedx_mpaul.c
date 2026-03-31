@@ -22,7 +22,7 @@ float dedx_internal_calculate_mspaul_coef(char mode, int ion, int target, float 
     float output;
     int err = 0;
     float f;
-    f = _dedx_read_effective_charge(target, &err);
+    f = dedx_internal_read_effective_charge(target, &err);
 
     double a = 5.0;
     double b = -1;

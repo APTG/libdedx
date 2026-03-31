@@ -195,7 +195,7 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
 }
 
 static float conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
-    const float density = _dedx_read_density(material, err);
+    const float density = dedx_internal_read_density(material, err);
 
     float conversion_rate;
 

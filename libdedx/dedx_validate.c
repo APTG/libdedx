@@ -18,7 +18,7 @@ int dedx_internal_set_names(dedx_config *config, int *err) {
 
 int dedx_internal_validate_rho(dedx_config *config, int *err) {
     if (config->rho <= 0.0 && config->target != 0) {
-        config->rho = _dedx_read_density(config->target, err);
+        config->rho = dedx_internal_read_density(config->target, err);
     } else if (config->rho <= 0.0 && config->target == 0 && config->program >= 100) {
         *err = DEDX_ERR_RHO_REQUIRED;
     }
@@ -30,7 +30,7 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
 
     if (config->elements_i_value == NULL && config->target != 0) {
         if (config->i_value == 0.0) {
-            config->i_value = _dedx_get_i_value(config->target, config->compound_state, err);
+            config->i_value = dedx_internal_get_i_value(config->target, config->compound_state, err);
         }
         if (*err != 0)
             return -1;
@@ -45,7 +45,7 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
             return -1;
         }
         for (i = 0; i < config->elements_length; i++) {
-            config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i], config->compound_state, err);
+            config->elements_i_value[i] = dedx_internal_get_i_value(config->elements_id[i], config->compound_state, err);
             if (*err != 0)
                 return -1;
         }
@@ -83,7 +83,7 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
         unsigned int compos_len;
         float composition[20][2];
 
-        _dedx_get_composition(config->target, composition, &compos_len, err);
+        dedx_internal_get_composition(config->target, composition, &compos_len, err);
         if (*err != 0) {
             return -1;
         }
@@ -179,7 +179,7 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
 
 int dedx_internal_validate_state(dedx_config *config, int *err) {
     if (config->compound_state == DEDX_DEFAULT_STATE) {
-        if (_dedx_target_is_gas(config->target, err)) {
+        if (dedx_internal_target_is_gas(config->target, err)) {
             config->compound_state = DEDX_GAS;
         } else {
             config->compound_state = DEDX_CONDENSED;
@@ -204,7 +204,7 @@ int dedx_internal_calculate_element_i_pot(dedx_config *config, int *err) {
         target = config->elements_id[i];
         charge_avg += config->elements_mass_fraction[i] * target / dedx_internal_get_atom_mass(target, err);
         avg_pot += config->elements_mass_fraction[i] * target / dedx_internal_get_atom_mass(target, err)
-                   * log(_dedx_get_i_value(target, config->compound_state, err));
+                   * log(dedx_internal_get_i_value(target, config->compound_state, err));
         if (*err != 0)
             return -1;
     }
@@ -219,7 +219,7 @@ int dedx_internal_calculate_element_i_pot(dedx_config *config, int *err) {
     }
 
     for (i = 0; i < config->elements_length; i++) {
-        config->elements_i_value[i] = _dedx_get_i_value(config->elements_id[i], config->compound_state, err) * i_pot_x;
+        config->elements_i_value[i] = dedx_internal_get_i_value(config->elements_id[i], config->compound_state, err) * i_pot_x;
         if (*err != 0)
             return -1;
     }

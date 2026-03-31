@@ -16,6 +16,7 @@
 #include "dedx_bethe.h"
 
 #include <math.h>
+#include <stdlib.h>
 
 void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *err);
 float _dedx_m(float PT, _dedx_bethe_struct bet, int *err);
