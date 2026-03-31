@@ -1,5 +1,5 @@
-#ifndef DEDX_TOOLS_H_INCLUDED
-#define DEDX_TOOLS_H_INCLUDED
+#ifndef DEDX_TOOLS_H
+#define DEDX_TOOLS_H
 
 /**
  * @file dedx_tools.h
@@ -71,4 +71,4 @@ int convert_units(const int old_unit,
                   const float *old_values,
                   float *new_values);
 
-#endif // DEDX_TOOLS_H_INCLUDED
+#endif // DEDX_TOOLS_H

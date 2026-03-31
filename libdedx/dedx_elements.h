@@ -1,5 +1,5 @@
-#ifndef DEDX_ELEMENTS_H_INCLUDED
-#define DEDX_ELEMENTS_H_INCLUDED
+#ifndef DEDX_ELEMENTS_H
+#define DEDX_ELEMENTS_H
 
 /** Maximum number of tabulated energy points stored per dataset. */
 #define DEDX_MAX_ELEMENTS 150
@@ -326,4 +326,4 @@ enum {
 #define DEDX_CAESIUM DEDX_CESIUM
 /** @} */
 
-#endif // DEDX_ELEMENTS_H_INCLUDED
+#endif // DEDX_ELEMENTS_H

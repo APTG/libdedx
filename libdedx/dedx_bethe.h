@@ -1,39 +1,20 @@
-#ifndef DEDX_BETHE_H_INCLUDED
-#define DEDX_BETHE_H_INCLUDED
+#ifndef DEDX_BETHE_H
+#define DEDX_BETHE_H
 
-#include "dedx.h"
-#include "dedx_file_access.h"
+#include "dedx_bethe_struct.h"
 
-// #include "dedx_gold_struct.h"
-// #include "dedx_bethe_struct.h"
-
-typedef struct {
-    double TZ0;
-    double TA0;
-    double potentiale;
-    double rho;
-    double PZ0;
-    double PA0;
-} _dedx_bethe_struct;
-
-typedef struct {
-    double e_min;
-    double e_max;
-    double epsilon;
-    double h;
-    double e_zero;
-    double e_extr;
-    double f_extr;
-    double e_sewn;
-    double f_sewn;
-} _dedx_gold_struct;
-
-typedef struct {
-    _dedx_bethe_struct *bet;
-    _dedx_gold_struct *gold;
-} _dedx_bethe_coll_struct;
-
-float _dedx_calculate_bethe_energy(
+/** @brief Evaluate Bethe stopping power for one energy using cached work buffers.
+ *  @param[in,out] ws      Cached Bethe/Gauss-search workspace.
+ *  @param[in]     energy  Projectile energy in MeV/u.
+ *  @param[in]     PZ      Projectile charge.
+ *  @param[in]     PA      Projectile mass number.
+ *  @param[in]     TZ      Target atomic number.
+ *  @param[in]     TA      Target mass number.
+ *  @param[in]     rho     Target density in g/cm^3.
+ *  @param[in]     Io_Pot  Mean excitation potential in eV.
+ *  @return Stopping power in MeV cm^2/g.
+ */
+float dedx_internal_calculate_bethe_energy(
     _dedx_bethe_coll_struct *ws, float energy, float PZ, float PA, float TZ, float TA, float rho, float Io_Pot);
 
-#endif // DEDX_BETHE_H_INCLUDED
+#endif // DEDX_BETHE_H

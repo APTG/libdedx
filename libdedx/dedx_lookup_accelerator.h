@@ -1,5 +1,5 @@
-#ifndef DEDX_LOOKUP_ACCELERATOR_H_INCLUDED
-#define DEDX_LOOKUP_ACCELERATOR_H_INCLUDED
+#ifndef DEDX_LOOKUP_ACCELERATOR_H
+#define DEDX_LOOKUP_ACCELERATOR_H
 
 /** @brief Cached interval index for repeated spline evaluations.
  *
@@ -13,4 +13,4 @@ typedef struct {
     int miss;
 } _dedx_lookup_accelerator;
 
-#endif // DEDX_LOOKUP_ACCELERATOR_H_INCLUDED
+#endif // DEDX_LOOKUP_ACCELERATOR_H

@@ -679,7 +679,7 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
 
     _dedx_bethe_coll_struct *bethe = (_dedx_bethe_coll_struct *) calloc(1, sizeof(_dedx_bethe_coll_struct));
     for (i = 0; i < data->length; i++) {
-        data->data[i] = _dedx_calculate_bethe_energy(bethe, energy[i], PZ, PA, TZ, TA, rho, pot);
+        data->data[i] = dedx_internal_calculate_bethe_energy(bethe, energy[i], PZ, PA, TZ, TA, rho, pot);
     }
     if (bethe->bet != NULL)
         free(bethe->bet);

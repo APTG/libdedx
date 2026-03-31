@@ -1,5 +1,5 @@
-#ifndef DEDX_CONST_H_INCLUDED
-#define DEDX_CONST_H_INCLUDED
+#ifndef DEDX_CONST_H
+#define DEDX_CONST_H
 
 /**
  * @file dedx_const.h
@@ -27,4 +27,4 @@
 /** e^2 / (4 pi epsilon_0) in eV*Angstrom units used by the Bethe code. */
 #define DEDX_ECHARGE2 14.399652
 
-#endif // DEDX_CONST_H_INCLUDED
+#endif // DEDX_CONST_H

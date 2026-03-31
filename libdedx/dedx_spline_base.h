@@ -1,5 +1,5 @@
-#ifndef DEDX_SPLINE_BASE_H_INCLUDED
-#define DEDX_SPLINE_BASE_H_INCLUDED
+#ifndef DEDX_SPLINE_BASE_H
+#define DEDX_SPLINE_BASE_H
 
 #include "dedx_elements.h"
 
@@ -11,4 +11,4 @@ typedef struct {
     float x;
 } _dedx_spline_base;
 
-#endif // DEDX_SPLINE_BASE_H_INCLUDED
+#endif // DEDX_SPLINE_BASE_H

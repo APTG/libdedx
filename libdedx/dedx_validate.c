@@ -45,7 +45,8 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
             return -1;
         }
         for (i = 0; i < config->elements_length; i++) {
-            config->elements_i_value[i] = dedx_internal_get_i_value(config->elements_id[i], config->compound_state, err);
+            config->elements_i_value[i] =
+                dedx_internal_get_i_value(config->elements_id[i], config->compound_state, err);
             if (*err != 0)
                 return -1;
         }
@@ -219,7 +220,8 @@ int dedx_internal_calculate_element_i_pot(dedx_config *config, int *err) {
     }
 
     for (i = 0; i < config->elements_length; i++) {
-        config->elements_i_value[i] = dedx_internal_get_i_value(config->elements_id[i], config->compound_state, err) * i_pot_x;
+        config->elements_i_value[i] =
+            dedx_internal_get_i_value(config->elements_id[i], config->compound_state, err) * i_pot_x;
         if (*err != 0)
             return -1;
     }

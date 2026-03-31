@@ -1,5 +1,5 @@
-#ifndef DEDX_H_INCLUDED
-#define DEDX_H_INCLUDED
+#ifndef DEDX_H
+#define DEDX_H
 
 #include "dedx_elements.h"
 #include "dedx_error.h"
@@ -274,4 +274,4 @@ float dedx_get_simple_stp(int ion, int target, float energy, int *err);
  */
 void dedx_free_config(dedx_config *config, int *err);
 
-#endif // DEDX_H_INCLUDED
+#endif // DEDX_H

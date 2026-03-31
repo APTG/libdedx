@@ -1,5 +1,5 @@
-#ifndef DEDX_ERROR_H_INCLUDED
-#define DEDX_ERROR_H_INCLUDED
+#ifndef DEDX_ERROR_H
+#define DEDX_ERROR_H
 
 /**
  * @file dedx_error.h
@@ -52,4 +52,4 @@
 #define DEDX_ERR_NO_MEMORY 301 /**< memory allocation failed */
 /** @} */
 
-#endif /* DEDX_ERROR_H_INCLUDED */
+#endif /* DEDX_ERROR_H */

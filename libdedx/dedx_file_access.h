@@ -1,5 +1,5 @@
-#ifndef DEDX_FILE_ACCESS_H_INCLUDED
-#define DEDX_FILE_ACCESS_H_INCLUDED
+#ifndef DEDX_FILE_ACCESS_H
+#define DEDX_FILE_ACCESS_H
 
 #include <stddef.h>
 
@@ -57,4 +57,4 @@ float dedx_internal_get_i_value(int target, int state, int *err);
  *  @param[out] err          Set to DEDX_OK or a file/data error code.
  */
 void dedx_internal_get_composition(int target, float composition[][2], unsigned int *length, int *err);
-#endif // DEDX_FILE_ACCESS_H_INCLUDED
+#endif // DEDX_FILE_ACCESS_H

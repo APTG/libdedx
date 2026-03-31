@@ -1,5 +1,5 @@
-#ifndef DEDX_MSTAR_H_INCLUDED
-#define DEDX_MSTAR_H_INCLUDED
+#ifndef DEDX_MSTAR_H
+#define DEDX_MSTAR_H
 
 #include "dedx.h"
 #include "dedx_mpaul.h"
@@ -25,4 +25,4 @@ void dedx_internal_evaluate_compound_state_mstar(dedx_config *config, int *err);
 void dedx_internal_convert_energy_to_mstar(
     stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy);
 
-#endif // DEDX_MSTAR_H_INCLUDED
+#endif // DEDX_MSTAR_H

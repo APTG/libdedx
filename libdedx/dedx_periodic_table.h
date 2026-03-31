@@ -1,5 +1,5 @@
-#ifndef DEDX_PERIODIC_TABLE_H_INCLUDED
-#define DEDX_PERIODIC_TABLE_H_INCLUDED
+#ifndef DEDX_PERIODIC_TABLE_H
+#define DEDX_PERIODIC_TABLE_H
 
 #include "dedx_error.h"
 
@@ -30,4 +30,4 @@ static const int dedx_nucl[112] = {
 
 int dedx_internal_get_nucleon(int id, int *err);
 
-#endif // DEDX_PERIODIC_TABLE_H_INCLUDED
+#endif // DEDX_PERIODIC_TABLE_H

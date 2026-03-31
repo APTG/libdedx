@@ -1,5 +1,5 @@
-#ifndef DEDX_SPLINE_H_INCLUDED
-#define DEDX_SPLINE_H_INCLUDED
+#ifndef DEDX_SPLINE_H
+#define DEDX_SPLINE_H
 
 #include "dedx_lookup_accelerator.h"
 #include "dedx_spline_base.h"
@@ -21,4 +21,4 @@ void dedx_internal_calculate_coefficients(_dedx_spline_base *coef, float *energy
  */
 float dedx_internal_evaluate_spline(_dedx_spline_base *coef, float x, _dedx_lookup_accelerator *acc, int n);
 
-#endif // DEDX_SPLINE_H_INCLUDED
+#endif // DEDX_SPLINE_H

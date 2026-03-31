@@ -1,5 +1,5 @@
-#ifndef DEDX_STOPPING_DATA_H_INCLUDED
-#define DEDX_STOPPING_DATA_H_INCLUDED
+#ifndef DEDX_STOPPING_DATA_H
+#define DEDX_STOPPING_DATA_H
 
 #include "dedx_elements.h"
 
@@ -10,4 +10,4 @@ typedef struct {
     float data[DEDX_MAX_ELEMENTS];
 } stopping_data;
 
-#endif // DEDX_STOPPING_DATA_H_INCLUDED
+#endif // DEDX_STOPPING_DATA_H

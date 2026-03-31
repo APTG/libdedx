@@ -1,5 +1,5 @@
-#ifndef DEDX_PROGRAM_CONST_H_INCLUDED
-#define DEDX_PROGRAM_CONST_H_INCLUDED
+#ifndef DEDX_PROGRAM_CONST_H
+#define DEDX_PROGRAM_CONST_H
 
 /* Internal lookup tables for program names, versions, and supported IDs. */
 
@@ -264,4 +264,4 @@ static const char dedx_ion_table[120][40] = {
   "ROENTGENIUM", "COPERNICUM" // Copernicum = 112
 };
 
-#endif // DEDX_PROGRAM_CONST_H_INCLUDED
+#endif // DEDX_PROGRAM_CONST_H

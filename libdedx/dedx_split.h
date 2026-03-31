@@ -1,5 +1,5 @@
-#ifndef DEDX_SPLIT_H_INCLUDED
-#define DEDX_SPLIT_H_INCLUDED
+#ifndef DEDX_SPLIT_H
+#define DEDX_SPLIT_H
 
 /** @brief Split a fixed-width line buffer into heap-allocated tokens.
  *  @param[in]  string           Input buffer to split.
@@ -19,4 +19,4 @@ char **dedx_internal_split(char *string, char split_character, unsigned int *ite
  */
 void dedx_internal_free_split_temp(char **temp, unsigned int count);
 
-#endif // DEDX_SPLIT_H_INCLUDED
+#endif // DEDX_SPLIT_H

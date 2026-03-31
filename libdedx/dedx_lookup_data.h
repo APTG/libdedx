@@ -1,5 +1,5 @@
-#ifndef DEDX_LOOKUP_DATA_H_INCLUDED
-#define DEDX_LOOKUP_DATA_H_INCLUDED
+#ifndef DEDX_LOOKUP_DATA_H
+#define DEDX_LOOKUP_DATA_H
 
 #include "dedx_elements.h"
 #include "dedx_lookup_accelerator.h"
@@ -20,4 +20,4 @@ typedef struct _dedx_lookup_data {
     _dedx_lookup_accelerator acc;
 } _dedx_lookup_data;
 
-#endif // DEDX_LOOKUP_DATA_H_INCLUDED
+#endif // DEDX_LOOKUP_DATA_H

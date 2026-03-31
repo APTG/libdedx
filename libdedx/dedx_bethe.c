@@ -18,11 +18,15 @@
 #include <math.h>
 #include <stdlib.h>
 
-void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *err);
-float _dedx_m(float PT, _dedx_bethe_struct bet, int *err);
-float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *err);
+static void gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *err);
 
-float _dedx_calculate_bethe_energy(
+/* Raw Bethe-model evaluator without the stitched low-energy extension. */
+static float evaluate_bethe_model(float PT, _dedx_bethe_struct bet, int *err);
+
+/* Full evaluator with Lindhard-Scharff behavior below the sewn transition. */
+static float evaluate_bethe_model_LEext(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *err);
+
+float dedx_internal_calculate_bethe_energy(
     _dedx_bethe_coll_struct *ws, float energy, float PZ, float PA, float TZ, float TA, float rho, float Io_Pot) {
 
     float dedx;
@@ -32,7 +36,7 @@ float _dedx_calculate_bethe_energy(
     if (gold != NULL && bet != NULL
         && (bet->PZ0 == PZ && bet->PA0 == PA && bet->TZ0 == TZ && bet->TA0 == TA && bet->rho == rho
             && bet->potentiale == Io_Pot)) {
-        dedx = _dedx_mm(energy * PA, *bet, *gold, &err);
+        dedx = evaluate_bethe_model_LEext(energy * PA, *bet, *gold, &err);
         return dedx;
     } else {
         if (ws->gold != NULL)
@@ -60,14 +64,14 @@ float _dedx_calculate_bethe_energy(
     bet->TZ0 = TZ;
     bet->PA0 = PA;
 
-    _dedx_gold_section(*bet, gold, &err);
+    gold_section(*bet, gold, &err);
 
-    dedx = _dedx_mm(energy * PA, *bet, *gold, &err);
+    dedx = evaluate_bethe_model_LEext(energy * PA, *bet, *gold, &err);
 
     return dedx;
 }
 
-float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *err) {
+static float evaluate_bethe_model_LEext(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *err) {
     double T = PT;
     float dedx;
     double mass = 940 * bet.PA0;
@@ -136,19 +140,18 @@ float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *er
     return dedx;
 }
 
-void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *err) {
+static void gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *err) {
 
     double e_min = gold->e_min;
     double e_max = gold->e_max;
-    double e_zero = gold->e_zero;
 
     double rla = e_min + 0.3819661 * (e_max - e_min);
     double rmu = e_min + 0.6180339 * (e_max - e_min);
-    double tla = _dedx_m(rla * bet.PA0, bet, err);
-    double tmu = _dedx_m(rmu * bet.PA0, bet, err);
+    double tla = evaluate_bethe_model(rla * bet.PA0, bet, err);
+    double tmu = evaluate_bethe_model(rmu * bet.PA0, bet, err);
     while (1) {
         if ((e_max - e_min) < gold->epsilon) {
-            e_zero = (e_max + e_min) * 0.5;
+            gold->e_zero = (e_max + e_min) * 0.5;
             break;
         } else {
             if (tla > 0.0) {
@@ -157,30 +160,30 @@ void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *er
                 tmu = tla;
                 rla = e_min + 0.3819661 * (e_max - e_min);
 
-                tla = _dedx_m(rla * bet.PA0, bet, err);
+                tla = evaluate_bethe_model(rla * bet.PA0, bet, err);
             } else {
 
                 e_min = rla;
                 rla = rmu;
                 tla = tmu;
                 rmu = e_min + 0.6180339 * (e_max - e_min);
-                tmu = _dedx_m(rmu * bet.PA0, bet, err);
+                tmu = evaluate_bethe_model(rmu * bet.PA0, bet, err);
             }
         }
     }
 
-    e_min = e_zero;
+    e_min = gold->e_zero;
     e_max = gold->e_max;
 
     rla = e_min + 0.3819661 * (e_max - e_min);
     rmu = e_min + 0.6180339 * (e_max - e_min);
-    tla = _dedx_m(rla * bet.PA0, bet, err);
-    tmu = _dedx_m(rmu * bet.PA0, bet, err);
+    tla = evaluate_bethe_model(rla * bet.PA0, bet, err);
+    tmu = evaluate_bethe_model(rmu * bet.PA0, bet, err);
 
     while (1) {
         if ((e_max - e_min) < gold->epsilon) {
             gold->e_extr = (e_min + e_max) * 0.5;
-            gold->f_extr = _dedx_m(gold->e_extr * bet.PA0, bet, err);
+            gold->f_extr = evaluate_bethe_model(gold->e_extr * bet.PA0, bet, err);
             break;
         } else {
             if (tla > tmu) {
@@ -188,13 +191,13 @@ void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *er
                 rmu = rla;
                 tmu = tla;
                 rla = e_min + 0.3819661 * (e_max - e_min);
-                tla = _dedx_m(rla * bet.PA0, bet, err);
+                tla = evaluate_bethe_model(rla * bet.PA0, bet, err);
             } else {
                 e_min = rla;
                 rla = rmu;
                 tla = tmu;
                 rmu = e_min + 0.6180339 * (e_max - e_min);
-                tmu = _dedx_m(rmu * bet.PA0, bet, err);
+                tmu = evaluate_bethe_model(rmu * bet.PA0, bet, err);
             }
         }
     }
@@ -203,14 +206,18 @@ void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *er
 
     rla = e_min + 0.3819661 * (e_max - e_min);
     rmu = e_min + 0.6180339 * (e_max - e_min);
-    tla = (_dedx_m((rla + gold->h) * bet.PA0, bet, err) - _dedx_m((rla - gold->h) * bet.PA0, bet, err)) / gold->h
-          - _dedx_m(rla * bet.PA0, bet, err) / rla;
-    tmu = (_dedx_m((rmu + gold->h) * bet.PA0, bet, err) - _dedx_m((rmu - gold->h) * bet.PA0, bet, err)) / gold->h
-          - _dedx_m(rmu * bet.PA0, bet, err) / rmu;
+    tla = (evaluate_bethe_model((rla + gold->h) * bet.PA0, bet, err)
+           - evaluate_bethe_model((rla - gold->h) * bet.PA0, bet, err))
+              / gold->h
+          - evaluate_bethe_model(rla * bet.PA0, bet, err) / rla;
+    tmu = (evaluate_bethe_model((rmu + gold->h) * bet.PA0, bet, err)
+           - evaluate_bethe_model((rmu - gold->h) * bet.PA0, bet, err))
+              / gold->h
+          - evaluate_bethe_model(rmu * bet.PA0, bet, err) / rmu;
     while (1) {
         if ((e_max - e_min) < gold->epsilon) {
             gold->e_sewn = (e_min + e_max) * 0.5;
-            gold->f_sewn = _dedx_m(gold->e_sewn * bet.PA0, bet, err);
+            gold->f_sewn = evaluate_bethe_model(gold->e_sewn * bet.PA0, bet, err);
             break;
         } else {
             if (tla <= 0) {
@@ -218,24 +225,26 @@ void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *er
                 rmu = rla;
                 tmu = tla;
                 rla = e_min + 0.3819661 * (e_max - e_min);
-                tla = (_dedx_m((rla + gold->h) * bet.PA0, bet, err) - _dedx_m((rla - gold->h) * bet.PA0, bet, err))
+                tla = (evaluate_bethe_model((rla + gold->h) * bet.PA0, bet, err)
+                       - evaluate_bethe_model((rla - gold->h) * bet.PA0, bet, err))
                           / gold->h
-                      - _dedx_m(rla * bet.PA0, bet, err) / rla;
+                      - evaluate_bethe_model(rla * bet.PA0, bet, err) / rla;
 
             } else {
                 e_min = rla;
                 rla = rmu;
                 tla = tmu;
                 rmu = e_min + 0.6180339 * (e_max - e_min);
-                tmu = (_dedx_m((rmu + gold->h) * bet.PA0, bet, err) - _dedx_m((rmu - gold->h) * bet.PA0, bet, err))
+                tmu = (evaluate_bethe_model((rmu + gold->h) * bet.PA0, bet, err)
+                       - evaluate_bethe_model((rmu - gold->h) * bet.PA0, bet, err))
                           / gold->h
-                      - _dedx_m(rmu * bet.PA0, bet, err) / rmu;
+                      - evaluate_bethe_model(rmu * bet.PA0, bet, err) / rmu;
             }
         }
     }
 }
 
-float _dedx_m(float PT, _dedx_bethe_struct bet, int *err) {
+static float evaluate_bethe_model(float PT, _dedx_bethe_struct bet, int *err) {
     double T = PT;
     double mass = 940 * bet.PA0;
 
