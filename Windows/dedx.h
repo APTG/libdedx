@@ -1,5 +1,6 @@
 #ifndef DEDX_H_INCLUDED
 #define DEDX_H_INCLUDED
+
 // #include "dedx_workspace.h"
 /* available data tables */
 enum {

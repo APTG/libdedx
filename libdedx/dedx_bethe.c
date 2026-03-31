@@ -65,6 +65,7 @@ float _dedx_calculate_bethe_energy(
 
     return dedx;
 }
+
 float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *err) {
     double T = PT;
     float dedx;
@@ -133,6 +134,7 @@ float _dedx_mm(float PT, _dedx_bethe_struct bet, _dedx_gold_struct gold, int *er
            * (log((1.022E+06 / bet.potentiale) * beta_gamma) - beta_2 - delta / 2.0);
     return dedx;
 }
+
 void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *err) {
 
     double e_min = gold->e_min;
@@ -231,6 +233,7 @@ void _dedx_gold_section(_dedx_bethe_struct bet, _dedx_gold_struct *gold, int *er
         }
     }
 }
+
 float _dedx_m(float PT, _dedx_bethe_struct bet, int *err) {
     double T = PT;
     double mass = 940 * bet.PA0;

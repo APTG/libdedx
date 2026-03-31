@@ -1,6 +1,7 @@
 #include "dedx_calculate_charge.h"
 
 #include "dedx_periodic_table.h"
+
 float _dedx_get_avg_charge(float composition[][2], int length) {
     int i = 0;
     int err = 0;
@@ -15,6 +16,7 @@ float _dedx_get_avg_charge(float composition[][2], int length) {
     }
     return charge;
 }
+
 float _dedx_get_weight_charge(float composition[][2], int length) {
     int err = 0;
     float charge = 0.0;

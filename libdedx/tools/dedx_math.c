@@ -1,4 +1,5 @@
 #include "dedx_math.h"
+
 float _dedx_max(float a, float b) {
     if (a > b)
         return a;
