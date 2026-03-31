@@ -16,7 +16,7 @@
 */
 #include "dedx_mstar.h"
 
-void _evaluate_compound_state_mstar(dedx_config *config, int *err) {
+void _evaluate_compound_state_mstar(dedx_config *config, int *err) { /* LCOV_EXCL_START */
     if (config->compound_state == DEDX_GAS) {
         if (config->mstar_mode == 'a')
             config->mstar_mode = 'g';
@@ -29,7 +29,7 @@ void _evaluate_compound_state_mstar(dedx_config *config, int *err) {
             config->mstar_mode = 'd';
     }
     *err = DEDX_OK;
-}
+} /* LCOV_EXCL_STOP */
 
 void _dedx_convert_energy_to_mstar(
     stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy) {

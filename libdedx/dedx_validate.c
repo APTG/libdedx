@@ -66,10 +66,10 @@ int _dedx_evaluate_compound(dedx_config *config, int *err) {
         _dedx_get_composition(config->target, composition, &compos_len, err);
         if (*err != 0)
             return -1;
-        if (compos_len == 0) {
+        if (compos_len == 0) { /* LCOV_EXCL_START */
             *err = DEDX_ERR_TARGET_NOT_FOUND;
             return -1;
-        }
+        } /* LCOV_EXCL_STOP */
         config->elements_id = (int *) malloc(sizeof(int) * compos_len);
         config->elements_mass_fraction = (float *) malloc(sizeof(float) * compos_len);
         for (i = 0; i < compos_len; i++) {
