@@ -96,7 +96,7 @@ double _dedx_find_min(double (*func)(double x, _dedx_tools_settings *set), _dedx
 }
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err) {
     if (config->ion_a <= 0) {
-        *err = 209;
+        *err = DEDX_ERR_ION_A_REQUIRED;
         return -1;
     }
     double acc = 1e-5;
@@ -122,7 +122,7 @@ double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float rang
 }
 double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, int side, int *err) {
     if (config->ion_a <= 0) {
-        *err = 209;
+        *err = DEDX_ERR_ION_A_REQUIRED;
         return -1;
     }
     double acc = 1e-5;
@@ -163,7 +163,7 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
 }
 double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int *err) {
     if (config->ion_a <= 0) {
-        *err = 209;
+        *err = DEDX_ERR_ION_A_REQUIRED;
         return -1;
     }
     double calculation_error = 0;

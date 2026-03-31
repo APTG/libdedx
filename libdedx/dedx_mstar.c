@@ -28,7 +28,7 @@ void _evaluate_compound_state_mstar(dedx_config *config, int *err) {
         else
             config->mstar_mode = 'd';
     }
-    *err = 0;
+    *err = DEDX_OK;
 }
 
 void _dedx_convert_energy_to_mstar(

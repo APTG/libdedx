@@ -1,6 +1,8 @@
 #ifndef DEDX_H_INCLUDED
 #define DEDX_H_INCLUDED
 
+#include "dedx_error.h"
+
 /**
  * @file dedx.h
  * @brief Public API for libdedx — a stopping power (dE/dx) library.

@@ -17,7 +17,7 @@ int _dedx_validate_rho(dedx_config *config, int *err) {
     if (config->rho <= 0.0 && config->target != 0) {
         config->rho = _dedx_read_density(config->target, err);
     } else if (config->rho <= 0.0 && config->target == 0 && config->program >= 100) {
-        *err = 208;
+        *err = DEDX_ERR_RHO_REQUIRED;
     }
     return 0;
 }
@@ -64,7 +64,7 @@ int _dedx_evaluate_compound(dedx_config *config, int *err) {
         if (*err != 0)
             return -1;
         if (compos_len == 0) {
-            *err = 201;
+            *err = DEDX_ERR_TARGET_NOT_FOUND;
             return -1;
         }
         config->elements_id = (int *) malloc(sizeof(int) * compos_len);
