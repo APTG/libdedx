@@ -55,10 +55,9 @@ option(DEDX_BUILD_BINARY_TABLE "Build the binary data tables (requires a working
 if(DEDX_BUILD_BINARY_TABLE)
     add_subdirectory(buildbins)
 endif()
+enable_testing()
 add_subdirectory(examples)
 add_subdirectory(libdedx)
-
-enable_testing()
 add_subdirectory(tests)
 
 # add uninstall target according to CMAKE FAQ:
