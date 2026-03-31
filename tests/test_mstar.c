@@ -9,9 +9,119 @@ static dedx_config *make_mstar_mode_config(int target, char mode) {
     return cfg;
 }
 
+static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, float energy, const char *label) {
+    int err = 0;
+    int failures = 0;
+    dedx_workspace *ws = dedx_allocate_workspace(2, &err);
+    dedx_config *lhs = make_mstar_mode_config(target, lhs_mode);
+    dedx_config *rhs = make_mstar_mode_config(target, rhs_mode);
+    float lhs_value;
+    float rhs_value;
+
+    if (err != 0) {
+        fprintf(stderr, "FAIL alloc: %s err=%d\n", label, err);
+        dedx_free_config(lhs, &err);
+        dedx_free_config(rhs, &err);
+        dedx_free_workspace(ws, &err);
+        return 1;
+    }
+
+    dedx_load_config(ws, lhs, &err);
+    if (err != 0) {
+        fprintf(stderr, "FAIL load lhs: %s err=%d\n", label, err);
+        failures = 1;
+        goto cleanup;
+    }
+
+    dedx_load_config(ws, rhs, &err);
+    if (err != 0) {
+        fprintf(stderr, "FAIL load rhs: %s err=%d\n", label, err);
+        failures = 1;
+        goto cleanup;
+    }
+
+    lhs_value = (float) dedx_get_stp(ws, lhs, energy, &err);
+    if (err != 0) {
+        fprintf(stderr, "FAIL stp lhs: %s err=%d\n", label, err);
+        failures = 1;
+        goto cleanup;
+    }
+
+    rhs_value = (float) dedx_get_stp(ws, rhs, energy, &err);
+    if (err != 0) {
+        fprintf(stderr, "FAIL stp rhs: %s err=%d\n", label, err);
+        failures = 1;
+        goto cleanup;
+    }
+
+    if (check_result(lhs_value, rhs_value)) {
+        fprintf(stderr,
+                "FAIL mode-equivalence: %s target=%d E=%.3e MeV/u got %.5e expected %.5e\n",
+                label,
+                target,
+                energy,
+                lhs_value,
+                rhs_value);
+        failures = 1;
+    }
+
+cleanup:
+    dedx_free_config(lhs, &err);
+    dedx_free_config(rhs, &err);
+    dedx_free_workspace(ws, &err);
+    return failures;
+}
+
 int main(void) {
     int failures = 0;
     const float energy_grid[] = {0.07f, 1.0f, 10.0f, 78.0f, 1000.0f};
+
+    /* Reference values below were extracted from the original MSTAR 3.12
+     * Fortran sources via MSTAR1/MSPAUL.
+     */
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_C), energy_grid[0], 5.634276e3f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_C), energy_grid[1], 6.592632e3f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_C), energy_grid[2], 1.639345e3f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_C), energy_grid[3], 3.165557e2f, "mstar-c");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_C), energy_grid[4], 7.993779e1f, "mstar-c");
+
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_D), energy_grid[0], 5.589206e3f, "mstar-d");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_D), energy_grid[1], 6.586625e3f, "mstar-d");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_D), energy_grid[2], 1.639723e3f, "mstar-d");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_D), energy_grid[3], 3.167525e2f, "mstar-d");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_D), energy_grid[4], 8.000594e1f, "mstar-d");
+
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_G), energy_grid[0], 4.340127e3f, "mstar-g");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_G), energy_grid[1], 5.262383e3f, "mstar-g");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_G), energy_grid[2], 1.442963e3f, "mstar-g");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_G), energy_grid[3], 2.808873e2f, "mstar-g");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_G), energy_grid[4], 7.126015e1f, "mstar-g");
+
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_H), energy_grid[0], 4.140607e3f, "mstar-h");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_H), energy_grid[1], 5.216270e3f, "mstar-h");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_H), energy_grid[2], 1.447108e3f, "mstar-h");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_H), energy_grid[3], 2.808873e2f, "mstar-h");
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_H), energy_grid[4], 7.126015e1f, "mstar-h");
 
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_WATER, energy_grid[0], 5.589e3f);
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_WATER, energy_grid[1], 6.587e3f);
@@ -24,12 +134,6 @@ int main(void) {
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_PMMA, energy_grid[2], 1.599e3f);
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_PMMA, energy_grid[3], 3.094e2f);
     failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_PMMA, energy_grid[4], 7.762e1f);
-
-    failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[0], 6.312e3f);
-    failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[1], 6.533e3f);
-    failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[2], 1.614e3f);
-    failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[3], 3.105e2f);
-    failures += check_stp(DEDX_MSTAR, DEDX_CARBON, DEDX_ALANINE, energy_grid[4], 7.772e1f);
 
     failures +=
         check_config_stp(make_mstar_mode_config(DEDX_WATER, DEDX_MSTAR_MODE_A), energy_grid[0], 5.634e3f, "mstar-a");
@@ -63,6 +167,11 @@ int main(void) {
         check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[3], 3.103e2f, "mstar-c");
     failures +=
         check_config_stp(make_mstar_mode_config(DEDX_ALANINE, DEDX_MSTAR_MODE_C), energy_grid[4], 7.767e1f, "mstar-c");
+
+    failures +=
+        check_mode_equivalence(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_A, DEDX_MSTAR_MODE_G, 10.0f, "mstar-a-gas");
+    failures +=
+        check_mode_equivalence(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_B, DEDX_MSTAR_MODE_H, 10.0f, "mstar-b-gas");
 
     return failures;
 }

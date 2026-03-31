@@ -20,6 +20,11 @@ Full documentation: https://aptg.github.io/libdedx/
 | `DEDX_BETHE_EXT00` | Bethe formula with extensions                 | All ions      |
 | `DEDX_ICRU`     | Auto-selects ICRU49 or ICRU73 by ion type        | p, He, heavy  |
 
+Note:
+For compound targets, `libdedx` currently extends the native coverage of some original programs by falling back to Bragg/stoichiometric weighting when the upstream database does not provide that compound directly. This applies in particular to programs such as `DEDX_PSTAR`, `DEDX_ASTAR`, and `DEDX_MSTAR`, whose original target coverage is more limited than the full set of ICRU/ESTAR-style materials exposed by `libdedx`.
+
+This behavior is useful, but it means that a result returned under a given program label is not always a direct value from the original upstream program. Future releases may separate native program coverage more explicitly from these weighted extension modes.
+
 ## Quick start
 
 One-call API for a single stopping power value:

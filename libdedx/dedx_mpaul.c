@@ -16,7 +16,7 @@
 */
 #include "dedx_mpaul.h"
 
-float _dedx_calculate_mspaul_coef(char mode, int ion, int target, float energy) {
+float dedx_internal_calculate_mspaul_coef(char mode, int ion, int target, float energy) {
     if (ion == 2)
         return 1;
     float output;
