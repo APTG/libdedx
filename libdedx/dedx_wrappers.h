@@ -9,9 +9,6 @@
  * for one-off queries. For repeated evaluations use the core API in dedx.h.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "dedx.h"
 
 /** @brief Fill an array with all supported program identifiers.
