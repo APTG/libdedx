@@ -66,12 +66,12 @@ enum {
  * @{
  */
 enum {
-    DEDX_MSTAR_MODE_A = 'a', /**< Automatic state selection; use condensed/gas base mode (`c` or `g`). */
-    DEDX_MSTAR_MODE_B = 'b', /**< Automatic state selection; prefer special state mode (`d` or `h`). */
-    DEDX_MSTAR_MODE_G = 'g', /**< Gaseous target mode. */
-    DEDX_MSTAR_MODE_H = 'h', /**< Special gaseous-target mode for supported ions. */
-    DEDX_MSTAR_MODE_C = 'c', /**< Condensed target mode. */
-    DEDX_MSTAR_MODE_D = 'd', /**< Special condensed-target mode. */
+    DEDX_MSTAR_MODE_A = 'a',      /**< Automatic state selection; use condensed/gas base mode (`c` or `g`). */
+    DEDX_MSTAR_MODE_B = 'b',      /**< Automatic state selection; prefer special state mode (`d` or `h`). */
+    DEDX_MSTAR_MODE_G = 'g',      /**< Gaseous target mode. */
+    DEDX_MSTAR_MODE_H = 'h',      /**< Special gaseous-target mode for supported ions. */
+    DEDX_MSTAR_MODE_C = 'c',      /**< Condensed target mode. */
+    DEDX_MSTAR_MODE_D = 'd',      /**< Special condensed-target mode. */
     DEDX_MSTAR_MODE_DEFAULT = 'b' /**< Recommended by Helmut Paul */
 };
 

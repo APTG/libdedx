@@ -29,7 +29,7 @@
 #include "dedx_spline.h"
 #include "dedx_stopping_data.h"
 #include "dedx_validate.h"
-#include "dedx_workspace.h"
+#include "dedx_lookup_data.h"
 
 static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int prog, int *err);
 static int check_energy_bounds(_dedx_lookup_data *data, float energy);
