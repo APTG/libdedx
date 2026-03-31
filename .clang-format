@@ -18,6 +18,7 @@ BraceWrapping:
 
 AllowShortFunctionsOnASingleLine: None
 AllowShortBlocksOnASingleLine: false
+SeparateDefinitionBlocks: Always
 
 SpaceAfterCStyleCast: true
 SpaceBeforeParens: ControlStatements

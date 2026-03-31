@@ -12,6 +12,7 @@ typedef struct {
     dedx_workspace *ws;
     dedx_config *cfg;
 } _dedx_tools_settings;
+
 double _dedx_adapt24(double (*func)(double x, _dedx_tools_settings *set),
                      _dedx_tools_settings *set,
                      double a,
@@ -41,6 +42,7 @@ double _dedx_adapt24(double (*func)(double x, _dedx_tools_settings *set),
         return ql + qr;
     }
 }
+
 double _dedx_adapt(double (*func)(double x, _dedx_tools_settings *set),
                    _dedx_tools_settings *set,
                    double a,
@@ -65,6 +67,7 @@ double _dedx_find_min_stp_func(double x, _dedx_tools_settings *set) {
         return INFINITY;
     return stp;
 }
+
 double _dedx_find_min(double (*func)(double x, _dedx_tools_settings *set), _dedx_tools_settings *set, double acc) {
     double x[] = {0.01, 10};
     double f[] = {func(x[0], set), func(x[1], set)};
@@ -94,6 +97,7 @@ double _dedx_find_min(double (*func)(double x, _dedx_tools_settings *set), _dedx
     }
     return (x[0] + x[1]) / 2;
 }
+
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err) {
     if (config->ion_a <= 0) {
         *err = DEDX_ERR_ION_A_REQUIRED;
@@ -120,6 +124,7 @@ double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float rang
     }
     return (min + max) / 2;
 }
+
 double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, int side, int *err) {
     if (config->ion_a <= 0) {
         *err = DEDX_ERR_ION_A_REQUIRED;
@@ -161,6 +166,7 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
     // free(cfg); might be used later again
     return (x1 + x2) / 2;
 }
+
 double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int *err) {
     if (config->ion_a <= 0) {
         *err = DEDX_ERR_ION_A_REQUIRED;

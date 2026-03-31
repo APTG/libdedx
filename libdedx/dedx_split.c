@@ -17,6 +17,7 @@
 #include "dedx_split.h"
 
 #include <stdlib.h>
+
 char **_dedx_split(char *string, char splitCaracter, unsigned int *items, unsigned int strLength) {
     int i = 0;
     int j = 0;
@@ -53,6 +54,7 @@ char **_dedx_split(char *string, char splitCaracter, unsigned int *items, unsign
     (*items)++;
     return words;
 }
+
 void _dedx_free_split_temp(char **temp) {
     int i = 0;
     for (i = 0; i < 10; i++)

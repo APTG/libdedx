@@ -74,6 +74,7 @@ dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
     temp->active_datasets = 0;
     return temp;
 }
+
 void dedx_free_workspace(dedx_workspace *workspace, int *err) {
     int i = 0;
     *err = DEDX_OK;
@@ -84,6 +85,7 @@ void dedx_free_workspace(dedx_workspace *workspace, int *err) {
     free(workspace->loaded_data);
     free(workspace);
 }
+
 int _dedx_load_data(dedx_workspace *ws, stopping_data *data, float *energy, int prog, int *err) {
     int active_dataset = ws->active_datasets;
     *err = DEDX_OK;
@@ -100,6 +102,7 @@ int _dedx_load_data(dedx_workspace *ws, stopping_data *data, float *energy, int 
     ws->active_datasets++;
     return active_dataset;
 }
+
 /*Check the whether the energy are inside the boundary*/
 int _dedx_check_energy_bounds(_dedx_lookup_data *data, float energy) {
     int length = data->datapoints;
@@ -215,9 +218,11 @@ void dedx_get_version(int *major, int *minor, int *patch) {
     *patch = DEDX_VERSION_PATCH;
     return;
 }
+
 void dedx_get_composition(int target, float composition[][2], unsigned int *comp_len, int *err) {
     _dedx_get_composition(target, composition, comp_len, err);
 }
+
 float dedx_get_i_value(int target, int *err) {
     return _dedx_get_i_value(target, DEDX_GAS, err);
 }
@@ -226,6 +231,7 @@ const int *dedx_get_program_list(void) {
     /* returns a list of available programs, terminated with -1 */
     return dedx_available_programs;
 }
+
 const int *dedx_get_material_list(int program) {
     /* returns a list of available materials, terminated with -1 */
     if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT)
@@ -283,6 +289,7 @@ float dedx_get_min_energy(int program, int ion) {
     }
     return energy_min;
 }
+
 float dedx_get_max_energy(int program, int ion) {
     float energy_max = 0;
 
@@ -387,6 +394,7 @@ void dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err) {
     config->cfg_id = cfg_id;
     config->loaded = 1;
 }
+
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) {
     float energy[_DEDX_MAXELEMENTS];
     int cfg;
@@ -501,6 +509,7 @@ int _dedx_find_data(stopping_data *data, dedx_config *config, float *energy, int
     }
     return 0;
 }
+
 int _dedx_load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     int i = 0;
     int j = 0;
@@ -583,6 +592,7 @@ int _dedx_load_bethe_2(stopping_data *data, dedx_config *config, float *energy, 
     free(bethe);
     return 0;
 }
+
 int _dedx_load_atima(stopping_data *data, dedx_config *config, float *energy, int *err) {
     *err = DEDX_OK;
     return 0;
@@ -603,6 +613,7 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
     return _dedx_evaluate_spline(
         ws->loaded_data[id]->base, energy, &(ws->loaded_data[id]->acc), ws->loaded_data[id]->n);
 }
+
 void dedx_free_config(dedx_config *config, int *err) {
     if (config != NULL) {
         if (config->elements_id != NULL)

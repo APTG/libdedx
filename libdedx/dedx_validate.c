@@ -13,6 +13,7 @@ int _dedx_set_names(dedx_config *config, int *err) {
     config->program_name = dedx_get_program_name(config->program);
     return 0;
 }
+
 int _dedx_validate_rho(dedx_config *config, int *err) {
     if (config->rho <= 0.0 && config->target != 0) {
         config->rho = _dedx_read_density(config->target, err);
@@ -21,6 +22,7 @@ int _dedx_validate_rho(dedx_config *config, int *err) {
     }
     return 0;
 }
+
 int _dedx_evaluate_i_pot(dedx_config *config, int *err) {
     int i;
     if (config->elements_i_value == NULL && config->target != 0) {
@@ -50,6 +52,7 @@ int _dedx_evaluate_i_pot(dedx_config *config, int *err) {
     }
     return 0;
 }
+
 int _dedx_evaluate_compound(dedx_config *config, int *err) {
     int i = 0;
     if (config->target > 0 && config->target <= 99) {
@@ -101,6 +104,7 @@ int _dedx_evaluate_compound(dedx_config *config, int *err) {
     }
     return 0;
 }
+
 int _dedx_validate_config(dedx_config *config, int *err) {
     _dedx_validate_rho(config, err);
     if (*err != 0)
@@ -122,6 +126,7 @@ int _dedx_validate_config(dedx_config *config, int *err) {
     }
     return 0;
 }
+
 int _dedx_validate_state(dedx_config *config, int *err) {
     if (config->compound_state == DEDX_DEFAULT_STATE) {
         if (_dedx_target_is_gas(config->target, err)) {
@@ -132,6 +137,7 @@ int _dedx_validate_state(dedx_config *config, int *err) {
     }
     return 0;
 }
+
 int _dedx_calculate_element_i_pot(dedx_config *config, int *err) {
     int i;
     float charge_avg = 0;
