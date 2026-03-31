@@ -32,3 +32,14 @@ int foo(int x) {
 
 Declarations at the top of an inner block (e.g. inside an `if` or `for`) are
 fine when the variable is genuinely local to that scope.
+
+## Thread safety
+
+libdedx is currently **not thread-safe**. There is no synchronization around
+the static path cache in `_dedx_get_data_path()`, nor around workspace mutation
+in `dedx_load_config()` / `_dedx_load_data()`. Do not share a `dedx_workspace`
+across threads without external locking.
+
+The intended fix is to replace the `done` flag in `_dedx_get_data_path()` with
+C11 `call_once()`, and audit the rest of the library for shared mutable state.
+This is tracked as a known issue.

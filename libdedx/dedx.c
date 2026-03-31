@@ -63,9 +63,19 @@ dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
         return NULL;
     }
     temp->loaded_data = malloc(count * sizeof(_dedx_lookup_data *));
+    if (temp->loaded_data == NULL) {
+        *err = DEDX_ERR_NO_MEMORY;
+        free(temp);
+        return NULL;
+    }
     for (i = 0; i < count; i++) {
         temp->loaded_data[i] = malloc(sizeof(_dedx_lookup_data));
         if (temp->loaded_data[i] == NULL) {
+            int j;
+            for (j = 0; j < i; j++)
+                free(temp->loaded_data[j]);
+            free(temp->loaded_data);
+            free(temp);
             *err = DEDX_ERR_NO_MEMORY;
             return NULL;
         }

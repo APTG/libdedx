@@ -40,6 +40,7 @@ int main(int argv, char *argc[]) {
     fclose(out);
     return 0;
 }
+
 int parser(FILE *in, FILE *out) {
     build_functions();
     set_output(out);
@@ -59,6 +60,7 @@ int parser(FILE *in, FILE *out) {
     }
     return 0;
 }
+
 /*Remove Comments, lineshift, tabs, white spaces, */
 int clean(FILE *in, FILE *out) {
     char line[read_c];

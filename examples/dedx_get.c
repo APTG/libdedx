@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 /* gcc -g -lm dedx_get.c -o dedx -Wall -ldedx*/
 
 int main(int argc, char *argv[]) {

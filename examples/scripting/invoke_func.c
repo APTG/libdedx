@@ -41,10 +41,12 @@ int get_data_type(data_item *item);
 char *get_variable_name(char *params, int *offset);
 
 void add_function(char *cmd, int (*func_p)(char *params));
+
 int set_output(FILE *out) {
     fp_out = out;
     return 0;
 }
+
 int write_line(char *str) {
     fprintf(fp_out, "%s", str);
     return 0;
@@ -66,6 +68,7 @@ int get_stp(data_item *config, data_item *energy, float *stp) {
 
     return 0;
 }
+
 data_item *create_data_item(char *name) {
     data_item *curr = get_data_item(name);
     if (curr != NULL) {
@@ -78,6 +81,7 @@ data_item *create_data_item(char *name) {
     data_head = curr;
     return curr;
 }
+
 data_item *get_data_item(char *name) {
     data_item *curr = data_head;
     while (curr != NULL) {
@@ -88,9 +92,11 @@ data_item *get_data_item(char *name) {
     }
     return NULL;
 }
+
 int get_data_type(data_item *item) {
     return item->type;
 }
+
 char *get_variable_name(char *params, int *offset) {
     char *name = (char *) calloc(20, sizeof(char));
     int i = 0;
@@ -103,6 +109,7 @@ char *get_variable_name(char *params, int *offset) {
     *offset = i + 1;
     return name;
 }
+
 int build_functions() {
     add_function("CONFIG", &config);
     add_function("CLONE", &clone);
@@ -111,6 +118,7 @@ int build_functions() {
     add_function("PRINT", &print);
     return 0;
 }
+
 int invoke_function(char *cmd, char *params) {
     func_item *curr = func_head;
     do {
@@ -122,6 +130,7 @@ int invoke_function(char *cmd, char *params) {
     } while (curr != NULL);
     return -1;
 }
+
 void add_function(char *cmd, int (*func_p)(char *params)) {
     func_item *curr = (func_item *) malloc(sizeof(func_item));
     strcpy(curr->cmd, cmd);
@@ -129,6 +138,7 @@ void add_function(char *cmd, int (*func_p)(char *params)) {
     curr->next = func_head;
     func_head = curr;
 }
+
 int clone(char *params) {
     char a[20];
     char b[20];
@@ -172,6 +182,7 @@ int clone(char *params) {
     }
     return 0;
 }
+
 int clone_config(data_item *a, data_item *b) {
     memcpy(a->config, b->config, sizeof(dedx_config));
     dedx_config *a_conf = a->config;
@@ -179,6 +190,7 @@ int clone_config(data_item *a, data_item *b) {
     clone_dedx_config(a_conf, b_conf);
     return 0;
 }
+
 int clone_dedx_config(dedx_config *a_conf, dedx_config *b_conf) {
     memcpy(a_conf, b_conf, sizeof(dedx_config));
     int length = b_conf->elements_length;
@@ -200,12 +212,14 @@ int clone_dedx_config(dedx_config *a_conf, dedx_config *b_conf) {
     }
     return 0;
 }
+
 int clone_energy(data_item *a, data_item *b) {
     a->energy = malloc(sizeof(float) * b->e_length);
     b->e_length = a->e_length;
     memcpy(a->energy, b->energy, sizeof(float) * b->e_length);
     return 0;
 }
+
 int set(char *params) {
     int i = 0;
     int offset = 0;
@@ -233,6 +247,7 @@ int set(char *params) {
     }
     return 0;
 }
+
 int energy(char *params) {
     int offset = 0;
     char *name = get_variable_name(params, &offset);
@@ -245,6 +260,7 @@ int energy(char *params) {
     set_energy(&(item->energy), &(item->e_length), &params[offset]);
     return 0;
 }
+
 int set_energy(float **energy, int *n, char *params) {
     int i;
     int j = 0;
@@ -274,6 +290,7 @@ int set_energy(float **energy, int *n, char *params) {
     *n = items;
     return 0;
 }
+
 int print(char *params) {
     int offset = 0;
     int i;
@@ -318,6 +335,7 @@ int print(char *params) {
         write_line(text);
     return 0;
 }
+
 int replace_signs(char *str) {
     int i = 0;
     int j = 0;
@@ -343,6 +361,7 @@ int replace_signs(char *str) {
     }
     return 0;
 }
+
 int print_list(char *text, int argv, char **args) {
     int i, j, k;
 
@@ -389,6 +408,7 @@ int print_list(char *text, int argv, char **args) {
     print_values(text, argv, items);
     return 0;
 }
+
 int print_values(char *text, int items_n, data_item ***items) {
     int i, j, k;
     int dim = 0;
@@ -439,6 +459,7 @@ int print_values(char *text, int items_n, data_item ***items) {
     }
     return 0;
 }
+
 int config(char *params) {
     int offset = 0;
     char *name;
@@ -457,6 +478,7 @@ int config(char *params) {
     }
     return 0;
 }
+
 int set_config_value(dedx_config *config, char *name, char *value) {
     if (strcmp("prog", name) == 0) {
         config->prog = atoi(value);
@@ -473,6 +495,7 @@ int set_config_value(dedx_config *config, char *name, char *value) {
     }
     return 0;
 }
+
 int set_config_list(dedx_config *config, char *name, char *list) {
     char params[10][20];
     int i = 0;
@@ -516,6 +539,7 @@ int set_config_list(dedx_config *config, char *name, char *list) {
     config->elements_length = items;
     return 0;
 }
+
 int set_config(dedx_config *config, char *params) {
     int i = 1;
     int j = 0;
