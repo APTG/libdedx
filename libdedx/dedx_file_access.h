@@ -14,6 +14,8 @@
 #include "dedx_config.h"
 #include "dedx_split.h"
 
+#define DEDX_PATH_SIZE 512
+
 void _dedx_convert_to_binary(char *path, char *output, int *err);
 void _dedx_read_binary_data(stopping_data *data, int prog, int ion, int target, int *err);
 

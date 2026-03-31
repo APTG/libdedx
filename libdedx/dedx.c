@@ -55,28 +55,39 @@ int _dedx_load_atima(stopping_data *data, dedx_config *config, float *energy, in
 
 dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
     int i = 0;
-    *err = 0;
+    *err = DEDX_OK;
 
     dedx_workspace *temp = malloc(sizeof(dedx_workspace));
     if (temp == NULL) {
-        *err = 301;
+        *err = DEDX_ERR_NO_MEMORY;
         return NULL;
     }
     temp->loaded_data = malloc(count * sizeof(_dedx_lookup_data *));
+    if (temp->loaded_data == NULL) {
+        *err = DEDX_ERR_NO_MEMORY;
+        free(temp);
+        return NULL;
+    }
     for (i = 0; i < count; i++) {
         temp->loaded_data[i] = malloc(sizeof(_dedx_lookup_data));
-        if (temp->loaded_data[i] == NULL) {
-            *err = 301;
+        if (temp->loaded_data[i] == NULL) { /* LCOV_EXCL_START */
+            int j;
+            for (j = 0; j < i; j++)
+                free(temp->loaded_data[j]);
+            free(temp->loaded_data);
+            free(temp);
+            *err = DEDX_ERR_NO_MEMORY;
             return NULL;
-        }
+        } /* LCOV_EXCL_STOP */
     }
     temp->datasets = count;
     temp->active_datasets = 0;
     return temp;
 }
+
 void dedx_free_workspace(dedx_workspace *workspace, int *err) {
     int i = 0;
-    *err = 0;
+    *err = DEDX_OK;
 
     for (i = 0; i < workspace->datasets; i++) {
         free(workspace->loaded_data[i]);
@@ -84,9 +95,10 @@ void dedx_free_workspace(dedx_workspace *workspace, int *err) {
     free(workspace->loaded_data);
     free(workspace);
 }
+
 int _dedx_load_data(dedx_workspace *ws, stopping_data *data, float *energy, int prog, int *err) {
     int active_dataset = ws->active_datasets;
-    *err = 0;
+    *err = DEDX_OK;
 
     _dedx_calculate_coefficients(ws->loaded_data[active_dataset]->base, energy, data->data, data->length);
     ws->loaded_data[active_dataset]->acc.cache = 0;
@@ -100,13 +112,14 @@ int _dedx_load_data(dedx_workspace *ws, stopping_data *data, float *energy, int 
     ws->active_datasets++;
     return active_dataset;
 }
+
 /*Check the whether the energy are inside the boundary*/
 int _dedx_check_energy_bounds(_dedx_lookup_data *data, float energy) {
     int length = data->datapoints;
     float low = data->base[0].x;
     float high = data->base[length - 1].x;
     if (energy < low || energy > high) {
-        return 101;
+        return DEDX_ERR_ENERGY_OUT_OF_RANGE;
     }
     return 0;
 }
@@ -114,76 +127,76 @@ int _dedx_check_energy_bounds(_dedx_lookup_data *data, float energy) {
 /*Return an explanation to the error code*/
 void dedx_get_error_code(char *err_str, int err) {
     switch (err) {
-    case 0:
+    case DEDX_OK:
         strcpy(err_str, "No error.");
         break;
-    case 1:
+    case DEDX_ERR_NO_COMPOS_FILE:
         strcpy(err_str, "Composition file compos.txt does not exist.");
         break;
-    case 2:
+    case DEDX_ERR_NO_GAS_FILE:
         strcpy(err_str, "MSTAR file mstar_gas_states.dat does not exist.");
         break;
-    case 3:
+    case DEDX_ERR_NO_CHARGE_FILE:
         strcpy(err_str, "MSTAR effective_charge.dat file does not exist.");
         break;
-    case 4:
+    case DEDX_ERR_NO_BINARY_DATA:
         strcpy(err_str, "Unable to access binary data file.");
         break;
-    case 5:
+    case DEDX_ERR_NO_BINARY_ENERGY:
         strcpy(err_str, "Unable to access binary energy file.");
         break;
-    case 6:
+    case DEDX_ERR_WRITE_FAILED:
         strcpy(err_str, "Unable to write to disk.");
         break;
-    case 7:
+    case DEDX_ERR_NO_ENERGY_FILE:
         strcpy(err_str, "Unable to read energy file.");
         break;
-    case 8:
+    case DEDX_ERR_NO_DATA_FILE:
         strcpy(err_str, "Unable to read data file.");
         break;
-    case 9:
+    case DEDX_ERR_NO_NAMES_FILE:
         strcpy(err_str, "Unable to read short_names file.");
         break;
-    case 10:
+    case DEDX_ERR_NO_COMPOSITION:
         strcpy(err_str, "Unable to read composition file.");
         break;
-    case 11:
+    case DEDX_ERR_NO_ATIMA_FILE:
         strcpy(err_str, "Unable to read atima composition file.");
         break;
-    case 101:
+    case DEDX_ERR_ENERGY_OUT_OF_RANGE:
         strcpy(err_str, "Energy out of bounds.");
         break;
-    case 201:
+    case DEDX_ERR_TARGET_NOT_FOUND:
         strcpy(err_str, "Target is not in composition file.");
         break;
-    case 202:
+    case DEDX_ERR_COMBINATION_NOT_FOUND:
         strcpy(err_str, "Target and ion combination is not in data file.");
         break;
-    case 203:
+    case DEDX_ERR_INVALID_DATASET_ID:
         strcpy(err_str, "ID does not exist.");
         break;
-    case 204:
+    case DEDX_ERR_NOT_AN_ELEMENT:
         strcpy(err_str, "Target is not an atomic element.");
         break;
-    case 205:
+    case DEDX_ERR_ESTAR_NOT_IMPL:
         strcpy(err_str, "ESTAR is not implemented yet.");
         break;
-    case 206:
+    case DEDX_ERR_ION_NOT_SUPPORTED_MSTAR:
         strcpy(err_str, "Ion is not supported for MSTAR.");
         break;
-    case 207:
+    case DEDX_ERR_ION_NOT_SUPPORTED:
         strcpy(err_str, "Ion is not supported for requested table.");
         break;
-    case 208:
+    case DEDX_ERR_RHO_REQUIRED:
         strcpy(err_str, "Rho must be specified in this configuration.");
         break;
-    case 209:
+    case DEDX_ERR_ION_A_REQUIRED:
         strcpy(err_str, "ion_a must be specified in this configuration.");
         break;
-    case 210:
+    case DEDX_ERR_INVALID_I_VALUE:
         strcpy(err_str, "I value must be larger than zero.");
         break;
-    case 301:
+    case DEDX_ERR_NO_MEMORY:
         strcpy(err_str, "Out of memory");
         break;
 
@@ -215,9 +228,11 @@ void dedx_get_version(int *major, int *minor, int *patch) {
     *patch = DEDX_VERSION_PATCH;
     return;
 }
+
 void dedx_get_composition(int target, float composition[][2], unsigned int *comp_len, int *err) {
     _dedx_get_composition(target, composition, comp_len, err);
 }
+
 float dedx_get_i_value(int target, int *err) {
     return _dedx_get_i_value(target, DEDX_GAS, err);
 }
@@ -226,6 +241,7 @@ const int *dedx_get_program_list(void) {
     /* returns a list of available programs, terminated with -1 */
     return dedx_available_programs;
 }
+
 const int *dedx_get_material_list(int program) {
     /* returns a list of available materials, terminated with -1 */
     if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT)
@@ -283,6 +299,7 @@ float dedx_get_min_energy(int program, int ion) {
     }
     return energy_min;
 }
+
 float dedx_get_max_energy(int program, int ion) {
     float energy_max = 0;
 
@@ -387,6 +404,7 @@ void dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err) {
     config->cfg_id = cfg_id;
     config->loaded = 1;
 }
+
 int _dedx_load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) {
     float energy[_DEDX_MAXELEMENTS];
     int cfg;
@@ -394,12 +412,12 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) {
     int ion = config->ion;
     int target = config->target;
     config->bragg_used = 0;
-    *err = 0;
+    *err = DEDX_OK;
     stopping_data data;
 
     // check if ion is available in requested program
     if (!_dedx_check_ion(prog, ion)) {
-        *err = 207;
+        *err = DEDX_ERR_ION_NOT_SUPPORTED;
         return -1;
     }
     config->_temp_i_value = config->i_value;
@@ -409,14 +427,14 @@ int _dedx_load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) {
     if (*err != 0) {
         // Check whether the error was that the combination wasn't in the data files and target is a compound
 
-        if (*err == 202 && target > 99) {
-            *err = 0;
+        if (*err == DEDX_ERR_COMBINATION_NOT_FOUND && target > 99) {
+            *err = DEDX_OK;
             _dedx_evaluate_compound(config, err);
             if (*err != 0)
                 return -1;
             if (config->elements_length == 0) {
                 printf("error \n");
-                *err = 201;
+                *err = DEDX_ERR_TARGET_NOT_FOUND;
                 return -1;
             }
             cfg = _dedx_load_compound(ws, config, err);
@@ -440,7 +458,7 @@ int _dedx_find_data(stopping_data *data, dedx_config *config, float *energy, int
     int ion_load = ion;
     int target_load = target;
 
-    *err = 0;
+    *err = DEDX_OK;
 
     if (prog == DEDX_ICRU) {
         if (ion == 1) {
@@ -460,14 +478,14 @@ int _dedx_find_data(stopping_data *data, dedx_config *config, float *energy, int
         } else if (ion == 2) {
             prog_load = DEDX_ICRU49;
         } else {
-            *err = 202;
+            *err = DEDX_ERR_COMBINATION_NOT_FOUND;
             return -1;
         }
     }
 
     // ESTAR not supported
     else if (prog == DEDX_ESTAR) {
-        *err = 205;
+        *err = DEDX_ERR_ESTAR_NOT_IMPL;
         return -1;
     } else if (prog == DEDX_ICRU73 && !(target == 276 || target == 104)) {
         prog_load = DEDX_ICRU73_OLD;
@@ -501,6 +519,7 @@ int _dedx_find_data(stopping_data *data, dedx_config *config, float *energy, int
     }
     return 0;
 }
+
 int _dedx_load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     int i = 0;
     int j = 0;
@@ -513,10 +532,10 @@ int _dedx_load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     stopping_data data;
     stopping_data *compound_data = malloc(sizeof(stopping_data) * length);
 
-    *err = 0;
+    *err = DEDX_OK;
 
     if (compound_data == NULL) {
-        *err = 301;
+        *err = DEDX_ERR_NO_MEMORY;
         return -1;
     }
     weight = config->elements_mass_fraction;
@@ -528,7 +547,7 @@ int _dedx_load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
         if (config->elements_i_value != NULL) {
             config->_temp_i_value = config->elements_i_value[i];
             if (config->elements_i_value[i] <= 0.0) {
-                *err = 210;
+                *err = DEDX_ERR_INVALID_I_VALUE;
                 return -1;
             }
         }
@@ -554,9 +573,9 @@ int _dedx_load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
 
 int _dedx_load_bethe_2(stopping_data *data, dedx_config *config, float *energy, int *err) {
     int i = 0;
-    *err = 0;
+    *err = DEDX_OK;
     if (config->target > 99) {
-        *err = 202;
+        *err = DEDX_ERR_COMBINATION_NOT_FOUND;
         return -1;
     }
     float PZ, PA, TZ, TA, rho, pot;
@@ -583,26 +602,28 @@ int _dedx_load_bethe_2(stopping_data *data, dedx_config *config, float *energy, 
     free(bethe);
     return 0;
 }
+
 int _dedx_load_atima(stopping_data *data, dedx_config *config, float *energy, int *err) {
-    *err = 0;
+    *err = DEDX_OK;
     return 0;
 }
 
 float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *err) {
     int id = config->cfg_id;
-    *err = 0;
+    *err = DEDX_OK;
     // Check that the energy is within the boundary
-    if ((*err = _dedx_check_energy_bounds(ws->loaded_data[id], energy)) != 0)
+    if ((*err = _dedx_check_energy_bounds(ws->loaded_data[id], energy)) != DEDX_OK)
         return 0;
     if (id > ws->active_datasets) // Check that the dataset is loaded.
     {
-        *err = 203;
+        *err = DEDX_ERR_INVALID_DATASET_ID;
         return 0;
     }
     // Evaluating the spline function
     return _dedx_evaluate_spline(
         ws->loaded_data[id]->base, energy, &(ws->loaded_data[id]->acc), ws->loaded_data[id]->n);
 }
+
 void dedx_free_config(dedx_config *config, int *err) {
     if (config != NULL) {
         if (config->elements_id != NULL)
@@ -615,7 +636,7 @@ void dedx_free_config(dedx_config *config, int *err) {
             free(config->elements_i_value);
         free(config);
     }
-    *err = 0;
+    *err = DEDX_OK;
 }
 
 float dedx_get_simple_stp(int ion, int target, float energy, int *err) {

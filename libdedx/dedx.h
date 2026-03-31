@@ -1,6 +1,8 @@
 #ifndef DEDX_H_INCLUDED
 #define DEDX_H_INCLUDED
 
+#include "dedx_error.h"
+
 /**
  * @file dedx.h
  * @brief Public API for libdedx — a stopping power (dE/dx) library.
@@ -43,6 +45,7 @@ enum {
     DEDX_DEFAULT = 100, /**< Default program (Bethe formula) */
     DEDX_BETHE_EXT00    /**< Bethe formula with extensions */
 };
+
 /** @} */
 
 /**
@@ -54,6 +57,7 @@ enum {
     DEDX_GAS,               /**< Force gas state */
     DEDX_CONDENSED          /**< Force condensed state */
 };
+
 /** @} */
 
 /**
@@ -71,6 +75,7 @@ enum {
     DEDX_MSTAR_MODE_D = 'd',
     DEDX_MSTAR_MODE_DEFAULT = 'b' /**< Recommended by Helmut Paul */
 };
+
 /** @} */
 
 /**
@@ -366,6 +371,7 @@ enum {
     DEDX_WATER_VAPOR,
     DEDX_XYLENE
 };
+
 /** @} */ /* ions_and_materials */
 
 /** @defgroup special_ions Special particle identifiers
@@ -501,6 +507,7 @@ typedef struct {
     int datapoints;
     _dedx_lookup_accelerator acc;
 } _dedx_lookup_data;
+
 /** @endcond */
 
 /**

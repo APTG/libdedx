@@ -1,6 +1,8 @@
 #ifndef DEDX_PERIODIC_TABLE_H_INCLUDED
 #define DEDX_PERIODIC_TABLE_H_INCLUDED
 
+#include "dedx_error.h"
+
 static const float dedx_amu[112] = {
     1.00794,     4.002602,  6.941,      9.012182, 10.811,      12.0107, 14.0067,   15.9994, 18.9984032, 20.1797,
     22.98976928, 24.3050,   26.9815386, 28.0855,  30.973762,   32.065,  35.453,    39.948,  39.0983,    40.078,

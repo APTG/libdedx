@@ -28,6 +28,7 @@ float _dedx_calculate_atima_energy(float energy, dedx_config *config) {
     }
     return dedx;
 }
+
 float _dedx_bethek(float energy, int PZ, int PA, int TZ, float TA, float pot, float rho) {
     float e = energy / PA;
     float e1 = energy / (1000 * PA);
@@ -53,9 +54,11 @@ float _dedx_bethek(float energy, int PZ, int PA, int TZ, float TA, float pot, fl
     f6 = 2 * log(gamma) - bsq;
     return 0;
 }
+
 float _dedx_bf4(int TZ, float eta, float zpeff) {
     return 0;
 }
+
 float _dedx_dedxela(float energy, int PZ, int PA, int TZ, float TA) {
     float sn, a;
     float epsil = 32.53 * TA * energy / (PZ * TZ * (PA + TA) * (pow(PZ, 0.23) + pow(TZ, .23)));
@@ -69,6 +72,7 @@ float _dedx_dedxela(float energy, int PZ, int PA, int TZ, float TA) {
     sn = sn * .1 * DEDX_N_AVO / TA;
     return sn;
 }
+
 float _dedx_sezi(float energy, int PZ, int PA, int TZ, float TA) {
     float dedx = 0;
     ;

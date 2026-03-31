@@ -15,6 +15,7 @@
     along with libdedx.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "dedx_spline.h"
+
 int _dedx_linear_search(_dedx_spline_base *coef, float value) {
     int i;
     for (i = 0; i < _DEDX_MAXELEMENTS; i++) {
@@ -24,6 +25,7 @@ int _dedx_linear_search(_dedx_spline_base *coef, float value) {
     }
     return i;
 }
+
 int _dedx_binary_search(_dedx_spline_base *coef, float value, int n) {
     int head = n - 1;
     int tail = 0;
