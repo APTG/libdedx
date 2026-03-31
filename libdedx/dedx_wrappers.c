@@ -83,6 +83,7 @@ int dedx_get_stp_table(
     const int program, const int ion, const int target, const int no_of_points, const float *energies, float *stps) {
     int err = 0;
     int cleanup_err = DEDX_OK;
+    int i;
     dedx_config *config = allocate_wrapper_config(program, ion, target, &err);
     dedx_workspace *ws;
 
@@ -100,7 +101,7 @@ int dedx_get_stp_table(
         return err;
     }
 
-    for (int i = 0; i < no_of_points; i++) {
+    for (i = 0; i < no_of_points; i++) {
         stps[i] = dedx_get_stp(ws, config, energies[i], &err);
         if (err != 0)
             break;
@@ -219,6 +220,7 @@ int dedx_get_csda_range_table(const int program,
                               double *csda_ranges) {
     int err = 0;
     int cleanup_err = DEDX_OK;
+    int i;
     dedx_config *config = allocate_wrapper_config(program, ion, target, &err);
     dedx_workspace *ws;
 
@@ -241,7 +243,7 @@ int dedx_get_csda_range_table(const int program,
         return err;
     }
 
-    for (int i = 0; i < no_of_points; i++) {
+    for (i = 0; i < no_of_points; i++) {
         csda_ranges[i] = dedx_get_csda(ws, config, energies[i], &err);
         if (err != 0)
             break;

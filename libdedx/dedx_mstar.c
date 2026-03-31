@@ -18,17 +18,18 @@
 
 #include "dedx_file_access.h"
 
-static char resolve_mstar_mode(char state, dedx_config *config) {
-    int err = 0;
+static char resolve_mstar_mode(char state, dedx_config *config, int *err) {
     int target_state = config->compound_state;
 
     if (state != DEDX_MSTAR_MODE_A && state != DEDX_MSTAR_MODE_B)
         return state;
 
     if (target_state == DEDX_DEFAULT_STATE) {
-        if (dedx_internal_target_is_gas(config->target, &err) != 0) {
+        if (dedx_internal_target_is_gas(config->target, err) != 0) {
             target_state = DEDX_GAS;
         } else {
+            if (*err != DEDX_OK)
+                return state;
             target_state = DEDX_CONDENSED;
         }
     }
@@ -40,13 +41,16 @@ static char resolve_mstar_mode(char state, dedx_config *config) {
 }
 
 void dedx_internal_evaluate_compound_state_mstar(dedx_config *config, int *err) { /* LCOV_EXCL_START */
-    config->mstar_mode = resolve_mstar_mode(config->mstar_mode, config);
     *err = DEDX_OK;
+    config->mstar_mode = resolve_mstar_mode(config->mstar_mode, config, err);
 } /* LCOV_EXCL_STOP */
 
 void dedx_internal_convert_energy_to_mstar(
-    stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy) {
-    state = resolve_mstar_mode(state, config);
+    stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy, int *err) {
+    *err = DEDX_OK;
+    state = resolve_mstar_mode(state, config, err);
+    if (*err != DEDX_OK)
+        return;
     int n = in->length;
     int i;
     for (i = 0; i < n; i++) {

@@ -11,6 +11,10 @@ int main() {
     const int ions[] = {DEDX_HYDROGEN, DEDX_HELIUM, DEDX_OXYGEN, DEDX_CARBON, DEDX_URANIUM, DEDX_IRON, -1};
 
     FILE *file = fopen("result.txt", "a");
+    if (file == NULL) {
+        fprintf(stderr, "Unable to open result.txt for writing.\n");
+        return 1;
+    }
     fprintf(file, "Program, Material, Ion, Energy, Stopping Power \n");
     for (int i = 0; programs[i] != -1; i++) {
         const char *prog_name = dedx_get_program_name(programs[i]);

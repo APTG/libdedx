@@ -598,7 +598,9 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
             mode = config->mstar_mode;
         }
         data->ion = config->ion;
-        dedx_internal_convert_energy_to_mstar(data, &out, mode, config, energy);
+        dedx_internal_convert_energy_to_mstar(data, &out, mode, config, energy, err);
+        if (*err != 0)
+            return -1;
         memcpy(data, &out, sizeof(stopping_data));
         data->ion = ion;
     }

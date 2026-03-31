@@ -57,6 +57,10 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
             return -1;
     }
     if (config->elements_i_value != NULL && config->i_value == 0.0) {
+        if (config->elements_id == NULL || config->elements_mass_fraction == NULL) {
+            *err = DEDX_ERR_INCONSISTENT_COMPOUND;
+            return -1;
+        }
         float charge_avg = 0.0;
         for (i = 0; i < config->elements_length; i++) {
             config->i_value += config->elements_mass_fraction[i] * log(config->elements_i_value[i])

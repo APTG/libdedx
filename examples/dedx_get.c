@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[]) {
     int err = 0;
+    int exit_code = 0;
     int prog = -1;
     int target = DEDX_WATER;
     int z = -1;
@@ -16,9 +17,16 @@ int main(int argc, char *argv[]) {
     int i = 0;
     float energy = -1.0;
     float stp = 0;
-    dedx_workspace *ws;
+    dedx_workspace *ws = NULL;
     dedx_config *cfg = (dedx_config *) calloc(1, sizeof(dedx_config));
     char *str = (char *) malloc(100);
+
+    if (cfg == NULL || str == NULL) {
+        free(cfg);
+        free(str);
+        fprintf(stderr, "Allocation failure.\n");
+        return 1;
+    }
 
     if (argc != 5) {
         dedx_get_version(&vmaj, &vmin, &vpatch);
@@ -35,7 +43,7 @@ int main(int argc, char *argv[]) {
         printf("   %s MSTAR CARBON WATER 100\n", argv[0]);
         printf("   %s PSTAR HYDROGEN -1 100\n", argv[0]);
         printf("\n");
-        return 0;
+        goto cleanup;
     }
 
     if (isdigit(*argv[1]))
@@ -98,7 +106,7 @@ int main(int argc, char *argv[]) {
             i++;
         }
         printf("\n");
-        return 0;
+        goto cleanup;
     }
 
     if (z == -1) {
@@ -110,7 +118,7 @@ int main(int argc, char *argv[]) {
             i++;
         }
         printf("\n");
-        return 0;
+        goto cleanup;
     }
 
     if (target == -1) {
@@ -124,7 +132,7 @@ int main(int argc, char *argv[]) {
         printf("\nAdditional materials are possible by Braggs additivity rule,\n");
         printf("as long as the constituent elements are availble in the list above.");
         printf("\n");
-        return 0;
+        goto cleanup;
     }
 
     if (energy == -1) {
@@ -133,7 +141,7 @@ int main(int argc, char *argv[]) {
                dedx_get_ion_name(z),
                dedx_get_min_energy(prog, z),
                dedx_get_max_energy(prog, z));
-        return 0;
+        goto cleanup;
     }
 
     if ((energy < dedx_get_min_energy(prog, z)) || (energy > dedx_get_max_energy(prog, z))) {
@@ -142,7 +150,8 @@ int main(int argc, char *argv[]) {
                dedx_get_ion_name(z),
                dedx_get_min_energy(prog, z),
                dedx_get_max_energy(prog, z));
-        exit(-1);
+        exit_code = 1;
+        goto cleanup;
     }
 
     if (prog == DEDX_ESTAR) {
@@ -166,7 +175,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "dedx_initialize, error %i:", err);
         dedx_get_error_code(str, err);
         fprintf(stderr, "  %s\n", str);
-        exit(1);
+        exit_code = 1;
+        goto cleanup;
     }
 
     /* load configuration */
@@ -179,7 +189,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "dedx_load_config, error %i:", err);
         dedx_get_error_code(str, err);
         fprintf(stderr, "  %s\n", str);
-        exit(1);
+        exit_code = 1;
+        goto cleanup;
     }
 
     /* get stopping power */
@@ -188,7 +199,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "dedx_read_energy, error %i:", err);
         dedx_get_error_code(str, err);
         fprintf(stderr, "  %s\n", str);
-        exit(1);
+        exit_code = 1;
+        goto cleanup;
     }
 
     /* check if braggs additivity rule was used */
@@ -198,9 +210,11 @@ int main(int argc, char *argv[]) {
     }
     printf("1/rho dE/dx = %6.3E MeV cm2/g\n", stp);
 
-    dedx_free_workspace(ws, &err);
+cleanup:
+    if (ws != NULL)
+        dedx_free_workspace(ws, &err);
     dedx_free_config(cfg, &err);
     free(str);
 
-    return 0;
+    return exit_code;
 }

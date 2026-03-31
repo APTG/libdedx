@@ -238,11 +238,12 @@ int convert_units(const int old_unit,
                   const float *old_values,
                   float *new_values) {
     int err = 0;
+    int i;
     if (old_unit == new_unit)
         return err;
 
     float conversion_rate = conversion_factor(old_unit, new_unit, material, &err);
-    for (int i = 0; i < no_of_points; i++) {
+    for (i = 0; i < no_of_points; i++) {
         new_values[i] = old_values[i] * conversion_rate;
     }
     return err;

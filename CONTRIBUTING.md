@@ -61,7 +61,7 @@ fine when the variable is genuinely local to that scope.
 
 libdedx is currently **not thread-safe**. There is no synchronization around
 the static path cache in the file-local data-path helper in
-[`libdedx/dedx_file_access.c`](/home/bassler/Projects/libdedx/libdedx/dedx_file_access.c),
+[`libdedx/dedx_file_access.c`](libdedx/dedx_file_access.c),
 nor around workspace mutation in `dedx_load_config()` / the internal dataset
 loading helpers. Do not share a `dedx_workspace`
 across threads without external locking.

@@ -21,8 +21,9 @@ void dedx_internal_evaluate_compound_state_mstar(dedx_config *config, int *err);
  *  @param[in]     state   Requested MSTAR mode (`a`,`b`,`c`,`d`,`g`,`h`).
  *  @param[in]     config  Resolved configuration, including target state when available.
  *  @param[in,out] energy  Energy grid, converted in place from alpha to ion scaling.
+ *  @param[out]    err     Error code; 0 on success.
  */
 void dedx_internal_convert_energy_to_mstar(
-    stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy);
+    stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy, int *err);
 
 #endif // DEDX_MSTAR_H

@@ -61,9 +61,11 @@ static int test_validate_config_custom_atoms(void) {
     failures += check_int(err, DEDX_OK, "validate_config custom atoms err");
     failures += check_true(cfg->bragg_used == 1, "validate_config should enable Bragg rule");
     failures += check_true(cfg->elements_mass_fraction != NULL, "validate_config should derive mass fractions");
-    failures += check_true(cfg->elements_mass_fraction[0] > 0.0f, "derived hydrogen mass fraction");
-    failures += check_true(cfg->elements_mass_fraction[1] > cfg->elements_mass_fraction[0],
-                           "oxygen mass fraction should dominate water-like mixture");
+    if (cfg->elements_mass_fraction != NULL) {
+        failures += check_true(cfg->elements_mass_fraction[0] > 0.0f, "derived hydrogen mass fraction");
+        failures += check_true(cfg->elements_mass_fraction[1] > cfg->elements_mass_fraction[0],
+                               "oxygen mass fraction should dominate water-like mixture");
+    }
 
     dedx_free_config(cfg, &err);
     return failures;
@@ -88,8 +90,10 @@ static int test_evaluate_i_pot_custom_elements(void) {
     dedx_internal_evaluate_i_pot(cfg, &err);
     failures += check_int(err, DEDX_OK, "evaluate_i_pot custom err");
     failures += check_true(cfg->elements_i_value != NULL, "evaluate_i_pot should allocate element I values");
-    failures += check_true(cfg->elements_i_value[0] > 0.0f, "hydrogen I value");
-    failures += check_true(cfg->elements_i_value[1] > 0.0f, "oxygen I value");
+    if (cfg->elements_i_value != NULL) {
+        failures += check_true(cfg->elements_i_value[0] > 0.0f, "hydrogen I value");
+        failures += check_true(cfg->elements_i_value[1] > 0.0f, "oxygen I value");
+    }
     failures += check_true(cfg->i_value > 0.0f, "compound I value");
 
     dedx_free_config(cfg, &err);
