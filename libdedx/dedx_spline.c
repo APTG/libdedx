@@ -16,17 +16,10 @@
 */
 #include "dedx_spline.h"
 
-int _dedx_linear_search(_dedx_spline_base *coef, float value) {
-    int i;
-    for (i = 0; i < DEDX_MAX_ELEMENTS; i++) {
-        if (coef[i].x >= value) {
-            break;
-        }
-    }
-    return i;
-}
+#include <math.h>
+#include <stddef.h>
 
-int _dedx_binary_search(_dedx_spline_base *coef, float value, int n) {
+static int binary_search(_dedx_spline_base *coef, float value, int n) {
     int head = n - 1;
     int tail = 0;
     int guess = n / 2;
@@ -41,13 +34,16 @@ int _dedx_binary_search(_dedx_spline_base *coef, float value, int n) {
     return guess;
 }
 
-void _dedx_calculate_coefficients(_dedx_spline_base *coef, float *energy, float *stopping, int n) {
+void dedx_internal_calculate_coefficients(_dedx_spline_base *coef, float *energy, float *stopping, int n) {
     int i;
     float h[DEDX_MAX_ELEMENTS];
     float alpha[DEDX_MAX_ELEMENTS];
     float l[DEDX_MAX_ELEMENTS];
     float my[DEDX_MAX_ELEMENTS];
     float z[DEDX_MAX_ELEMENTS];
+
+    if (n < 2)
+        return;
 
     l[0] = 1;
     my[0] = 0;
@@ -79,20 +75,17 @@ void _dedx_calculate_coefficients(_dedx_spline_base *coef, float *energy, float 
     }
 }
 
-float _dedx_evaluate_spline(_dedx_spline_base *coef, float x, _dedx_lookup_accelerator *acc, int n) {
+float dedx_internal_evaluate_spline(_dedx_spline_base *coef, float x, _dedx_lookup_accelerator *acc, int n) {
     int i;
     int lookup = 1;
     if (acc != NULL) {
-        // Next line looks weird.
-        // if((coef[acc->cache].x <= x) & x < coef[acc->cache+1].x)
-        // TBC: Just a guess what Jakob meant?
         if ((coef[acc->cache].x <= x) && (x < coef[acc->cache + 1].x)) {
             lookup = 0;
             i = acc->cache;
         }
     }
     if (lookup) {
-        i = _dedx_binary_search(coef, x, n);
+        i = binary_search(coef, x, n);
         if (acc != NULL)
             acc->cache = i;
     }

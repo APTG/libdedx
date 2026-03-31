@@ -337,7 +337,7 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
     }
 
     // Evaluating the spline function
-    return _dedx_evaluate_spline(
+    return dedx_internal_evaluate_spline(
         ws->loaded_data[id]->base, energy, &(ws->loaded_data[id]->acc), ws->loaded_data[id]->n);
 }
 
@@ -418,7 +418,7 @@ static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int
         return -1;
     }
 
-    _dedx_calculate_coefficients(ws->loaded_data[active_dataset]->base, energy, data->data, data->length);
+    dedx_internal_calculate_coefficients(ws->loaded_data[active_dataset]->base, energy, data->data, data->length);
 
     ws->loaded_data[active_dataset]->acc.cache = 0;
     ws->loaded_data[active_dataset]->n = data->length;
