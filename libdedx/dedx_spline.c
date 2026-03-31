@@ -18,7 +18,7 @@
 
 int _dedx_linear_search(_dedx_spline_base *coef, float value) {
     int i;
-    for (i = 0; i < _DEDX_MAXELEMENTS; i++) {
+    for (i = 0; i < DEDX_MAX_ELEMENTS; i++) {
         if (coef[i].x >= value) {
             break;
         }
@@ -43,11 +43,11 @@ int _dedx_binary_search(_dedx_spline_base *coef, float value, int n) {
 
 void _dedx_calculate_coefficients(_dedx_spline_base *coef, float *energy, float *stopping, int n) {
     int i;
-    float h[_DEDX_MAXELEMENTS];
-    float alpha[_DEDX_MAXELEMENTS];
-    float l[_DEDX_MAXELEMENTS];
-    float my[_DEDX_MAXELEMENTS];
-    float z[_DEDX_MAXELEMENTS];
+    float h[DEDX_MAX_ELEMENTS];
+    float alpha[DEDX_MAX_ELEMENTS];
+    float l[DEDX_MAX_ELEMENTS];
+    float my[DEDX_MAX_ELEMENTS];
+    float z[DEDX_MAX_ELEMENTS];
 
     l[0] = 1;
     my[0] = 0;

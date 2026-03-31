@@ -496,7 +496,7 @@ static int check_ion(int prog, int ion) {
 }
 
 static int load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) {
-    float energy[_DEDX_MAXELEMENTS];
+    float energy[DEDX_MAX_ELEMENTS];
     int cfg;
     int prog = config->program;
     int ion = config->ion;
@@ -609,7 +609,7 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     int length = config->elements_length;
     int *targets = config->elements_id;
     float *weight;
-    float energy[_DEDX_MAXELEMENTS];
+    float energy[DEDX_MAX_ELEMENTS];
     float i_value;
     int target;
     stopping_data data;

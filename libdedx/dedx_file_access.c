@@ -50,7 +50,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
     int datalines = 0;
     int i;
     unsigned int length;
-    float data[_DEDX_MAXELEMENTS];
+    float data[DEDX_MAX_ELEMENTS];
     char **temp = NULL;
     stopping_data container;
 
@@ -74,7 +74,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
         if (line[0] == '#') {
             length = 0;
             i = 0;
-            memset(&data, 0, _DEDX_MAXELEMENTS);
+            memset(&data, 0, DEDX_MAX_ELEMENTS);
             temp = _dedx_split(line, ':', &length, 100);
             temp[0][0] = ' ';
             datalines = atoi(temp[2]);
@@ -86,7 +86,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
             container.target = atoi(temp[0]);
             container.ion = atoi(temp[1]);
             container.length = datalines;
-            memcpy(&container.data, &data, _DEDX_MAXELEMENTS * sizeof(float));
+            memcpy(&container.data, &data, DEDX_MAX_ELEMENTS * sizeof(float));
             fwrite(&container, sizeof(container), 1, out);
         }
     }
@@ -136,7 +136,7 @@ void _dedx_convert_energy_binary(char *path, char *output, int *err) {
     char line[100];
     int datalines;
     int i;
-    float data[_DEDX_MAXELEMENTS];
+    float data[DEDX_MAX_ELEMENTS];
 
     *err = DEDX_OK;
     fp = fopen(path, "r");
@@ -191,7 +191,7 @@ void _dedx_read_energy_data(float *energy, int prog, int *err) {
             return;
         }
     }
-    if (fread(energy, sizeof(float) * _DEDX_MAXELEMENTS, 1, fp) == 0) {
+    if (fread(energy, sizeof(float) * DEDX_MAX_ELEMENTS, 1, fp) == 0) {
     }
     fclose(fp);
 }

@@ -47,7 +47,7 @@ if(NOT WIN32)
     target_link_libraries(dedx_shared PUBLIC m)
 endif()
 
-install(FILES dedx.h dedx_error.h dedx_tools.h dedx_wrappers.h DESTINATION include)
+install(FILES dedx.h dedx_elements.h dedx_error.h dedx_tools.h dedx_wrappers.h DESTINATION include)
 
 install(TARGETS dedx dedx_shared
     RUNTIME DESTINATION bin
