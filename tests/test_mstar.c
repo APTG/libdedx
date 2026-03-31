@@ -9,52 +9,51 @@ static dedx_config *make_mstar_mode_config(int target, char mode) {
     return cfg;
 }
 
+static int report_mode_equivalence_error(const char *stage, const char *label, int err) {
+    fprintf(stderr, "FAIL %s: %s err=%d\n", stage, label, err);
+    return 1;
+}
+
 static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, float energy, const char *label) {
     int err = 0;
     int failures = 0;
     dedx_workspace *ws = dedx_allocate_workspace(2, &err);
     dedx_config *lhs = make_mstar_mode_config(target, lhs_mode);
     dedx_config *rhs = make_mstar_mode_config(target, rhs_mode);
-    float lhs_value;
-    float rhs_value;
+    float lhs_value = 0.0f;
+    float rhs_value = 0.0f;
 
-    if (err != 0) {
-        fprintf(stderr, "FAIL alloc: %s err=%d\n", label, err);
+    if (err != 0 || ws == NULL || lhs == NULL || rhs == NULL) {
+        failures = report_mode_equivalence_error("alloc", label, err);
         dedx_free_config(lhs, &err);
         dedx_free_config(rhs, &err);
         dedx_free_workspace(ws, &err);
-        return 1;
+        return failures;
     }
 
     dedx_load_config(ws, lhs, &err);
-    if (err != 0) {
-        fprintf(stderr, "FAIL load lhs: %s err=%d\n", label, err);
-        failures = 1;
-        goto cleanup;
+    if (err != 0)
+        failures = report_mode_equivalence_error("load lhs", label, err);
+
+    if (failures == 0) {
+        dedx_load_config(ws, rhs, &err);
+        if (err != 0)
+            failures = report_mode_equivalence_error("load rhs", label, err);
     }
 
-    dedx_load_config(ws, rhs, &err);
-    if (err != 0) {
-        fprintf(stderr, "FAIL load rhs: %s err=%d\n", label, err);
-        failures = 1;
-        goto cleanup;
+    if (failures == 0) {
+        lhs_value = (float) dedx_get_stp(ws, lhs, energy, &err);
+        if (err != 0)
+            failures = report_mode_equivalence_error("stp lhs", label, err);
     }
 
-    lhs_value = (float) dedx_get_stp(ws, lhs, energy, &err);
-    if (err != 0) {
-        fprintf(stderr, "FAIL stp lhs: %s err=%d\n", label, err);
-        failures = 1;
-        goto cleanup;
+    if (failures == 0) {
+        rhs_value = (float) dedx_get_stp(ws, rhs, energy, &err);
+        if (err != 0)
+            failures = report_mode_equivalence_error("stp rhs", label, err);
     }
 
-    rhs_value = (float) dedx_get_stp(ws, rhs, energy, &err);
-    if (err != 0) {
-        fprintf(stderr, "FAIL stp rhs: %s err=%d\n", label, err);
-        failures = 1;
-        goto cleanup;
-    }
-
-    if (check_result(lhs_value, rhs_value)) {
+    if (failures == 0 && check_result(lhs_value, rhs_value)) {
         fprintf(stderr,
                 "FAIL mode-equivalence: %s target=%d E=%.3e MeV/u got %.5e expected %.5e\n",
                 label,
@@ -63,9 +62,9 @@ static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, floa
                 lhs_value,
                 rhs_value);
         failures = 1;
+        failures = 1;
     }
 
-cleanup:
     dedx_free_config(lhs, &err);
     dedx_free_config(rhs, &err);
     dedx_free_workspace(ws, &err);
