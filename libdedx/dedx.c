@@ -57,19 +57,19 @@ dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
     int i = 0;
     *err = DEDX_OK;
 
-    dedx_workspace *temp = malloc(sizeof(dedx_workspace));
+    dedx_workspace *temp = calloc(1, sizeof(dedx_workspace));
     if (temp == NULL) {
         *err = DEDX_ERR_NO_MEMORY;
         return NULL;
     }
-    temp->loaded_data = malloc(count * sizeof(_dedx_lookup_data *));
+    temp->loaded_data = calloc(count, sizeof(_dedx_lookup_data *));
     if (temp->loaded_data == NULL) {
         *err = DEDX_ERR_NO_MEMORY;
         free(temp);
         return NULL;
     }
     for (i = 0; i < count; i++) {
-        temp->loaded_data[i] = malloc(sizeof(_dedx_lookup_data));
+        temp->loaded_data[i] = calloc(1, sizeof(_dedx_lookup_data));
         if (temp->loaded_data[i] == NULL) { /* LCOV_EXCL_START */
             int j;
             for (j = 0; j < i; j++)
@@ -88,6 +88,9 @@ dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
 void dedx_free_workspace(dedx_workspace *workspace, int *err) {
     int i = 0;
     *err = DEDX_OK;
+
+    if (workspace == NULL)
+        return;
 
     for (i = 0; i < workspace->datasets; i++) {
         free(workspace->loaded_data[i]);

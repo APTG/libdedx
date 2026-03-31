@@ -34,7 +34,7 @@ static const char *_dedx_get_data_path(void) {
 
     if (!done) {
         snprintf(probe, sizeof(probe), "%s%s", DEDX_DATA_PATH_LOCAL, "icru_pstarEng.dat");
-        if (stat(probe, &st) == 0)
+        if (DEDX_DATA_PATH_LOCAL[0] != '\0' && stat(probe, &st) == 0)
             snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH_LOCAL);
         else
             snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH); /* LCOV_EXCL_LINE */
@@ -140,7 +140,6 @@ void _dedx_convert_energy_binary(char *path, char *output, int *err) {
 
     *err = DEDX_OK;
     fp = fopen(path, "r");
-    // TODO: Next line wont work after installation, unless user is root.
     out = fopen(output, "wb+");
     if (fp == NULL || out == NULL) { /* LCOV_EXCL_START */
         if (out == NULL) {

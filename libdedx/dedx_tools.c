@@ -56,7 +56,6 @@ double _dedx_adapt(double (*func)(double x, _dedx_tools_settings *set),
 
 double _dedx_adapt_stp(double energy, _dedx_tools_settings *set) {
     int err = 0;
-    // TODO: i am sure sure if its cfg->ion_a or ion_A !!
     return 1 / dedx_get_stp(set->ws, set->cfg, energy / (set->cfg->ion_a), &err);
 }
 
@@ -177,7 +176,7 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
     double eps = 1e-6;
     _dedx_tools_settings set;
     double range = 0.0;
-    double A = config->ion_a; // TODO: or nucleon number?
+    double A = config->ion_a;
 
     if (*err != 0)
         return -1;
