@@ -1,5 +1,5 @@
-#ifndef DEDX_TOOLS_H_INCLUDED
-#define DEDX_TOOLS_H_INCLUDED
+#ifndef DEDX_TOOLS_H
+#define DEDX_TOOLS_H
 
 /**
  * @file dedx_tools.h
@@ -54,10 +54,6 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
  */
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err);
 
-/** @cond INTERNAL */
-float _conversion_factor(const int old_unit, const int new_unit, const int material, int *err);
-/** @endcond */
-
 /** @brief Convert an array of stopping power values between unit systems.
  *
  *  @param[in]  old_unit      Source unit (dedx_stp_units).
@@ -75,4 +71,4 @@ int convert_units(const int old_unit,
                   const float *old_values,
                   float *new_values);
 
-#endif // DEDX_TOOLS_H_INCLUDED
+#endif // DEDX_TOOLS_H

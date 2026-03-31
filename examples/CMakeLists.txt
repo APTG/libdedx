@@ -36,4 +36,7 @@ foreach(example dedx_example dedx_bethe dedx_list dedx_use_wrappers dedx_get_sam
     add_test(NAME ${example} COMMAND ${example})
 endforeach()
 
+add_test(NAME getdedx_lookup COMMAND getdedx 2 1 276 100)
+add_test(NAME getdedx_list_programs COMMAND getdedx -1 1 276 100)
+
 install (TARGETS getdedx DESTINATION bin)

@@ -17,6 +17,17 @@
 
 #include "dedx_file_access.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+
+#include "dedx_config.h"
+#include "dedx_file.h"
+#include "dedx_split.h"
+
+#define DEDX_PATH_SIZE 512
+
 /* Resolve the data directory once per process.
  * Prefers DEDX_DATA_PATH_LOCAL (build tree) if it contains the sentinel file,
  * otherwise falls back to DEDX_DATA_PATH (install prefix).
@@ -26,7 +37,7 @@
  * concurrent first calls. The library as a whole is not thread-safe; this
  * function should be fixed with call_once() as part of a broader thread-safety
  * effort. See https://github.com/APTG/libdedx/issues (thread-safety issue). */
-static const char *_dedx_get_data_path(void) {
+static const char *get_data_path(void) {
     static char resolved[DEDX_PATH_SIZE];
     static int done = 0;
     struct stat st;
@@ -34,7 +45,7 @@ static const char *_dedx_get_data_path(void) {
 
     if (!done) {
         snprintf(probe, sizeof(probe), "%s%s", DEDX_DATA_PATH_LOCAL, "icru_pstarEng.dat");
-        if (stat(probe, &st) == 0)
+        if (DEDX_DATA_PATH_LOCAL[0] != '\0' && stat(probe, &st) == 0)
             snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH_LOCAL);
         else
             snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH); /* LCOV_EXCL_LINE */
@@ -43,14 +54,14 @@ static const char *_dedx_get_data_path(void) {
     return resolved;
 }
 
-void _dedx_convert_to_binary(char *path, char *output, int *err) {
+static void convert_to_binary(char *path, char *output, int *err) {
     FILE *fp;
     FILE *out;
     char line[100];
     int datalines = 0;
     int i;
     unsigned int length;
-    float data[_DEDX_MAXELEMENTS];
+    float data[DEDX_MAX_ELEMENTS];
     char **temp = NULL;
     stopping_data container;
 
@@ -68,34 +79,44 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
         }
         return;
     } /* LCOV_EXCL_STOP */
-    while (!feof(fp)) {
-        if (fgets(line, 100, fp) == NULL) {
-        }
+    while (fgets(line, sizeof(line), fp) != NULL) {
         if (line[0] == '#') {
             length = 0;
             i = 0;
-            memset(&data, 0, _DEDX_MAXELEMENTS);
-            temp = _dedx_split(line, ':', &length, 100);
+            memset(data, 0, sizeof(data));
+            temp = dedx_internal_split(line, ':', &length, 100);
+            if (temp == NULL) {
+                *err = DEDX_ERR_NO_MEMORY;
+                break;
+            }
             temp[0][0] = ' ';
             datalines = atoi(temp[2]);
-            while (i++ < datalines && !feof(fp)) {
-                if (fgets(line, 100, fp) == NULL) {
+            while (i++ < datalines) {
+                if (fgets(line, sizeof(line), fp) == NULL) {
+                    *err = DEDX_ERR_NO_DATA_FILE;
+                    dedx_internal_free_split_temp(temp, 10);
+                    temp = NULL;
+                    break;
                 }
                 data[i - 1] = atof(line);
             }
+            if (*err != DEDX_OK)
+                break;
             container.target = atoi(temp[0]);
             container.ion = atoi(temp[1]);
             container.length = datalines;
-            memcpy(&container.data, &data, _DEDX_MAXELEMENTS * sizeof(float));
+            memcpy(container.data, data, sizeof(data));
             fwrite(&container, sizeof(container), 1, out);
+            dedx_internal_free_split_temp(temp, 10);
+            temp = NULL;
         }
     }
-    free(temp);
+    dedx_internal_free_split_temp(temp, 10);
     fclose(fp);
     fclose(out);
 }
 
-void _dedx_read_binary_data(stopping_data *data, int prog, int ion, int target, int *err) {
+void dedx_internal_read_binary_data(stopping_data *data, int prog, int ion, int target, int *err) {
     const char *folder;
     char path[DEDX_PATH_SIZE];
     char input_path[DEDX_PATH_SIZE];
@@ -103,13 +124,13 @@ void _dedx_read_binary_data(stopping_data *data, int prog, int ion, int target, 
     stopping_data dat;
 
     *err = DEDX_OK;
-    folder = _dedx_get_data_path();
-    snprintf(path, sizeof(path), "%s%s.bin", folder, _dedx_get_program_file(prog));
+    folder = get_data_path();
+    snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_program_file(prog));
 
     fp = fopen(path, "rb");
     if (fp == NULL) {
-        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, _dedx_get_program_file(prog));
-        _dedx_convert_to_binary(input_path, path, err);
+        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, dedx_internal_get_program_file(prog));
+        convert_to_binary(input_path, path, err);
         if (*err != DEDX_OK) {
             *err = DEDX_ERR_NO_BINARY_DATA;
             return;
@@ -130,17 +151,16 @@ void _dedx_read_binary_data(stopping_data *data, int prog, int ion, int target, 
     fclose(fp);
 }
 
-void _dedx_convert_energy_binary(char *path, char *output, int *err) {
+static void convert_energy_binary(char *path, char *output, int *err) {
     FILE *fp;
     FILE *out;
     char line[100];
     int datalines;
     int i;
-    float data[_DEDX_MAXELEMENTS];
+    float data[DEDX_MAX_ELEMENTS];
 
     *err = DEDX_OK;
     fp = fopen(path, "r");
-    // TODO: Next line wont work after installation, unless user is root.
     out = fopen(output, "wb+");
     if (fp == NULL || out == NULL) { /* LCOV_EXCL_START */
         if (out == NULL) {
@@ -154,13 +174,23 @@ void _dedx_convert_energy_binary(char *path, char *output, int *err) {
         return;
     } /* LCOV_EXCL_STOP */
 
-    if (fgets(line, 100, fp) == NULL) {
+    memset(data, 0, sizeof(data));
+
+    if (fgets(line, sizeof(line), fp) == NULL) {
+        *err = DEDX_ERR_NO_ENERGY_FILE;
+        fclose(fp);
+        fclose(out);
+        return;
     }
     datalines = atoi(line);
 
     for (i = 0; i < datalines; i++) {
-        if (fgets(line, 100, fp) != NULL) {
-        };
+        if (fgets(line, sizeof(line), fp) == NULL) {
+            *err = DEDX_ERR_NO_ENERGY_FILE;
+            fclose(fp);
+            fclose(out);
+            return;
+        }
         data[i] = atof(line);
     }
     fwrite(&data, sizeof(data), 1, out);
@@ -168,20 +198,20 @@ void _dedx_convert_energy_binary(char *path, char *output, int *err) {
     fclose(out);
 }
 
-void _dedx_read_energy_data(float *energy, int prog, int *err) {
+void dedx_internal_read_energy_data(float *energy, int prog, int *err) {
     const char *folder;
     char path[DEDX_PATH_SIZE];
     char input_path[DEDX_PATH_SIZE];
     FILE *fp;
 
     *err = DEDX_OK;
-    folder = _dedx_get_data_path();
-    snprintf(path, sizeof(path), "%s%s.bin", folder, _dedx_get_energy_file(prog));
+    folder = get_data_path();
+    snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_energy_file(prog));
 
     fp = fopen(path, "rb");
     if (fp == NULL) {
-        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, _dedx_get_energy_file(prog));
-        _dedx_convert_energy_binary(input_path, path, err);
+        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, dedx_internal_get_energy_file(prog));
+        convert_energy_binary(input_path, path, err);
         if (*err != DEDX_OK) {
             *err = DEDX_ERR_NO_BINARY_ENERGY;
             return;
@@ -192,12 +222,12 @@ void _dedx_read_energy_data(float *energy, int prog, int *err) {
             return;
         }
     }
-    if (fread(energy, sizeof(float) * _DEDX_MAXELEMENTS, 1, fp) == 0) {
+    if (fread(energy, sizeof(float) * DEDX_MAX_ELEMENTS, 1, fp) == 0) {
     }
     fclose(fp);
 }
 
-float _dedx_read_effective_charge(int id, int *err) {
+float dedx_internal_read_effective_charge(int id, int *err) {
     const char *folder;
     char line[100];
     char **temp;
@@ -210,7 +240,7 @@ float _dedx_read_effective_charge(int id, int *err) {
     if (id < 99) {
         return (float) id;
     }
-    folder = _dedx_get_data_path();
+    folder = get_data_path();
     items = 0;
     temp = NULL;
     snprintf(path, sizeof(path), "%s%s", folder, "effective_charge.dat");
@@ -221,22 +251,24 @@ float _dedx_read_effective_charge(int id, int *err) {
         return 0;
     }
 
-    while (!feof(fp)) {
-        if (fgets(line, 100, fp) != NULL) {
-        }
-        temp = _dedx_split(line, '\t', &items, 100);
-        if (atoi(temp[0]) == id) {
-            charge = atof(temp[1]);
-            _dedx_free_split_temp(temp);
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        temp = dedx_internal_split(line, '\t', &items, 100);
+        if (temp == NULL) {
+            *err = DEDX_ERR_NO_MEMORY;
             break;
         }
-        _dedx_free_split_temp(temp);
+        if (atoi(temp[0]) == id) {
+            charge = atof(temp[1]);
+            dedx_internal_free_split_temp(temp, 10);
+            break;
+        }
+        dedx_internal_free_split_temp(temp, 10);
     }
     fclose(fp);
     return charge;
 }
 
-size_t _dedx_target_is_gas(int target, int *err) {
+size_t dedx_internal_target_is_gas(int target, int *err) {
     const char *folder;
     size_t is_gas;
     char str[100];
@@ -245,7 +277,7 @@ size_t _dedx_target_is_gas(int target, int *err) {
 
     *err = DEDX_OK;
     is_gas = 0;
-    folder = _dedx_get_data_path();
+    folder = get_data_path();
     snprintf(path, sizeof(path), "%s%s", folder, "gas_states.dat");
     fp = fopen(path, "r");
     if (fp == NULL) {
@@ -253,9 +285,7 @@ size_t _dedx_target_is_gas(int target, int *err) {
         return 0;
     }
 
-    while (!feof(fp)) {
-        if (fgets(str, 100, fp) == NULL) {
-        }
+    while (fgets(str, sizeof(str), fp) != NULL) {
         if (atoi(str) == target)
             is_gas = 1;
     }
@@ -263,7 +293,7 @@ size_t _dedx_target_is_gas(int target, int *err) {
     return is_gas;
 }
 
-float _dedx_read_density(int id, int *err) {
+float dedx_internal_read_density(int id, int *err) {
     const char *folder;
     float density;
     char str[100];
@@ -275,7 +305,7 @@ float _dedx_read_density(int id, int *err) {
     *err = DEDX_OK;
     density = 1.0;
     items = 0;
-    folder = _dedx_get_data_path();
+    folder = get_data_path();
     snprintf(path, sizeof(path), "%s%s", folder, "compos.txt");
     fp = fopen(path, "r");
 
@@ -284,16 +314,18 @@ float _dedx_read_density(int id, int *err) {
         return 0;
     }
 
-    while (!feof(fp)) {
-        if (fgets(str, 100, fp) == NULL) {
-        }
-        temp = _dedx_split(str, '\t', &items, 100);
-        if (atoi(temp[0]) == id) {
-            density = atof(temp[1]);
-            _dedx_free_split_temp(temp);
+    while (fgets(str, sizeof(str), fp) != NULL) {
+        temp = dedx_internal_split(str, '\t', &items, 100);
+        if (temp == NULL) {
+            *err = DEDX_ERR_NO_MEMORY;
             break;
         }
-        _dedx_free_split_temp(temp);
+        if (atoi(temp[0]) == id) {
+            density = atof(temp[1]);
+            dedx_internal_free_split_temp(temp, 10);
+            break;
+        }
+        dedx_internal_free_split_temp(temp, 10);
     }
     fclose(fp);
     if (density == 0.0) {
@@ -302,7 +334,7 @@ float _dedx_read_density(int id, int *err) {
     return density;
 }
 
-float _dedx_get_i_value(int target, int state, int *err) {
+float dedx_internal_get_i_value(int target, int state, int *err) {
     const char *folder;
     float pot;
     char path[DEDX_PATH_SIZE];
@@ -311,9 +343,10 @@ float _dedx_get_i_value(int target, int state, int *err) {
     unsigned int items;
     FILE *fp;
 
+    *err = DEDX_OK;
     pot = 0.0;
     items = 0;
-    folder = _dedx_get_data_path();
+    folder = get_data_path();
     snprintf(path, sizeof(path), "%s%s", folder, "compos.txt");
 
     fp = fopen(path, "r");
@@ -321,10 +354,12 @@ float _dedx_get_i_value(int target, int state, int *err) {
         *err = DEDX_ERR_NO_COMPOS_FILE;
         return 0;
     }
-    while (!feof(fp)) {
-        if (fgets(str, 100, fp) == NULL) {
+    while (fgets(str, sizeof(str), fp) != NULL) {
+        temp = dedx_internal_split(str, '\t', &items, 100);
+        if (temp == NULL) {
+            *err = DEDX_ERR_NO_MEMORY;
+            break;
         }
-        temp = _dedx_split(str, '\t', &items, 100);
         if (atoi(temp[0]) == target) {
             if (items == 4) {
                 if (state == atoi(temp[3])) {
@@ -332,11 +367,15 @@ float _dedx_get_i_value(int target, int state, int *err) {
                 }
             } else {
                 pot = atof(temp[2]);
-                if (state == 2 && _dedx_target_is_gas(target, err) == 0 && target <= 99)
+                if (state == 2 && dedx_internal_target_is_gas(target, err) == 0 && target <= 99)
                     pot = pot * 1.13;
+                if (*err != DEDX_OK) {
+                    dedx_internal_free_split_temp(temp, 10);
+                    break;
+                }
             }
         }
-        _dedx_free_split_temp(temp);
+        dedx_internal_free_split_temp(temp, 10);
     }
     fclose(fp);
     if (pot == 0.0) {
@@ -345,7 +384,7 @@ float _dedx_get_i_value(int target, int state, int *err) {
     return pot;
 }
 
-void _dedx_get_composition(int target, float composition[][2], unsigned int *length, int *err) {
+void dedx_internal_get_composition(int target, float composition[][2], unsigned int *length, int *err) {
     const char *folder;
     char path[DEDX_PATH_SIZE];
     char str[100];
@@ -356,7 +395,7 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int *len
 
     *err = DEDX_OK;
     *length = 0;
-    folder = _dedx_get_data_path();
+    folder = get_data_path();
     snprintf(path, sizeof(path), "%s%s", folder, "composition");
 
     fp = fopen(path, "r");
@@ -364,59 +403,26 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int *len
         *err = DEDX_ERR_NO_COMPOSITION;
         return;
     }
-    while (!feof(fp)) {
-        if (fgets(str, 100, fp) != NULL)
-            if (str[0] == '#') {
-                if (atoi(&str[1]) == target) {
-                    while (!feof(fp)) {
-                        if (fgets(str, 100, fp) != NULL) {
-                        }
-                        f_temp = atof(str);
-                        if (f_temp == 0.0)
-                            break;
-                        temp = _dedx_split(str, ':', &items, 100);
-                        composition[(*length)][0] = atof(temp[0]);
-                        composition[(*length)++][1] = atof(temp[1]);
-                        _dedx_free_split_temp(temp);
-                    }
+    while (fgets(str, sizeof(str), fp) != NULL) {
+        if (str[0] != '#')
+            continue;
+        if (atoi(&str[1]) != target)
+            continue;
 
-                    break;
-                }
+        while (fgets(str, sizeof(str), fp) != NULL) {
+            f_temp = atof(str);
+            if (f_temp == 0.0)
+                break;
+            temp = dedx_internal_split(str, ':', &items, 100);
+            if (temp == NULL) {
+                *err = DEDX_ERR_NO_MEMORY;
+                break;
             }
-    }
-    fclose(fp);
-}
-
-float *_dedx_get_atima_data(int target, int *err) {
-    const char *folder;
-    char path[DEDX_PATH_SIZE];
-    char str[100];
-    float *compos;
-    unsigned int items;
-    char **temp;
-    FILE *fp;
-
-    *err = DEDX_OK;
-    folder = _dedx_get_data_path();
-    snprintf(path, sizeof(path), "%s%s", folder, "atima_compos");
-
-    fp = fopen(path, "r");
-    if (fp == NULL) {
-        *err = DEDX_ERR_NO_COMPOSITION;
-        return NULL;
-    }
-    compos = (float *) malloc(sizeof(float) * 4);
-    while (!feof(fp) && fgets(str, 100, fp) != NULL) {
-        temp = _dedx_split(str, '\t', &items, 100);
-        if (atoi(temp[0]) == target) {
-            compos = (float *) malloc(sizeof(float) * 4);
-            compos[0] = atof(temp[1]);
-            compos[1] = atof(temp[2]);
-            compos[2] = atof(temp[3]);
-            compos[3] = atof(temp[4]);
+            composition[(*length)][0] = atof(temp[0]);
+            composition[(*length)++][1] = atof(temp[1]);
+            dedx_internal_free_split_temp(temp, 10);
         }
-        _dedx_free_split_temp(temp);
+        break;
     }
     fclose(fp);
-    return compos;
 }

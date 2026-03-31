@@ -18,21 +18,27 @@
 
 #include <stdlib.h>
 
-char **_dedx_split(char *string, char splitCaracter, unsigned int *items, unsigned int strLength) {
+char **dedx_internal_split(char *string, char split_character, unsigned int *items, unsigned int str_length) {
     int i = 0;
     int j = 0;
-    char **words;
-    words = malloc(10 * sizeof(char *));
+    char **words = (char **) malloc(10 * sizeof(char *));
     *items = 0;
     char word[20] = "";
 
+    if (words == NULL)
+        return NULL;
+
     for (i = 0; i < 10; i++) {
-        words[i] = (char *) malloc(20 * sizeof(char));
+        words[i] = malloc(20 * sizeof(char));
+        if (words[i] == NULL) {
+            dedx_internal_free_split_temp(words, i);
+            return NULL;
+        }
     }
 
-    for (i = 0; i < strLength; i++) {
+    for (i = 0; i < str_length; i++) {
 
-        if (string[i] == splitCaracter) {
+        if (string[i] == split_character) {
 
             for (j = 0; j < 20; j++) {
                 words[*items][j] = word[j];
@@ -55,9 +61,11 @@ char **_dedx_split(char *string, char splitCaracter, unsigned int *items, unsign
     return words;
 }
 
-void _dedx_free_split_temp(char **temp) {
-    int i = 0;
-    for (i = 0; i < 10; i++)
+void dedx_internal_free_split_temp(char **temp, unsigned int count) {
+    unsigned int i = 0;
+    if (temp == NULL)
+        return;
+    for (i = 0; i < count; i++)
         free(temp[i]);
-    free(temp);
+    free((void *) temp);
 }

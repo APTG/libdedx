@@ -7,21 +7,19 @@
 #include "dedx_file_access.h"
 
 typedef struct {
-    // int id;
-    //   double A;
     dedx_workspace *ws;
     dedx_config *cfg;
-} _dedx_tools_settings;
+} dedx_tools_settings;
 
-double _dedx_adapt24(double (*func)(double x, _dedx_tools_settings *set),
-                     _dedx_tools_settings *set,
-                     double a,
-                     double b,
-                     double f2,
-                     double f3,
-                     double acc,
-                     double eps,
-                     double *err) {
+static double adapt24(double (*func)(double x, dedx_tools_settings *set),
+                      dedx_tools_settings *set,
+                      double a,
+                      double b,
+                      double f2,
+                      double f3,
+                      double acc,
+                      double eps,
+                      double *err) {
     double h = b - a;
     double f1 = (*func)(a + h / 6, set);
     double f4 = (*func)(a + h * 5 / 6, set);
@@ -31,44 +29,45 @@ double _dedx_adapt24(double (*func)(double x, _dedx_tools_settings *set),
     *err = fabs(q4 - q2) / 3;
     if (*err < tol)
         return q4;
-    else {
-        acc /= sqrt(2);
-        double mid = (a + b) / 2;
-        double el = 0;
-        double er = 0;
-        double ql = _dedx_adapt24(func, set, a, mid, f1, f2, acc, eps, &el);
-        double qr = _dedx_adapt24(func, set, mid, b, f3, f4, acc, eps, &er);
-        *err = sqrt(el * el + er * er);
-        return ql + qr;
-    }
+
+    acc /= sqrt(2);
+    double mid = (a + b) / 2;
+    double el = 0;
+    double er = 0;
+    double ql = adapt24(func, set, a, mid, f1, f2, acc, eps, &el);
+    double qr = adapt24(func, set, mid, b, f3, f4, acc, eps, &er);
+    *err = sqrt(el * el + er * er);
+    return ql + qr;
 }
 
-double _dedx_adapt(double (*func)(double x, _dedx_tools_settings *set),
-                   _dedx_tools_settings *set,
-                   double a,
-                   double b,
-                   double acc,
-                   double eps,
-                   double *err) {
+static double adapt(double (*func)(double x, dedx_tools_settings *set),
+                    dedx_tools_settings *set,
+                    double a,
+                    double b,
+                    double acc,
+                    double eps,
+                    double *err) {
     double h = b - a;
-    return _dedx_adapt24(func, set, a, b, (*func)(a + h / 3, set), (*func)(a + 2 * h / 3, set), acc, eps, err);
+    return adapt24(func, set, a, b, (*func)(a + h / 3, set), (*func)(a + 2 * h / 3, set), acc, eps, err);
 }
 
-double _dedx_adapt_stp(double energy, _dedx_tools_settings *set) {
+static double adapt_stp(double energy, dedx_tools_settings *set) {
     int err = 0;
-    // TODO: i am sure sure if its cfg->ion_a or ion_A !!
-    return 1 / dedx_get_stp(set->ws, set->cfg, energy / (set->cfg->ion_a), &err);
-}
-
-double _dedx_find_min_stp_func(double x, _dedx_tools_settings *set) {
-    int err = 0;
-    float stp = 1 / dedx_get_stp(set->ws, set->cfg, x, &err);
-    if (err != 0)
+    double stp = dedx_get_stp(set->ws, set->cfg, energy / (set->cfg->ion_a), &err);
+    if (err != 0 || stp == 0.0)
         return INFINITY;
-    return stp;
+    return 1.0 / stp;
 }
 
-double _dedx_find_min(double (*func)(double x, _dedx_tools_settings *set), _dedx_tools_settings *set, double acc) {
+static double find_min_stp_func(double x, dedx_tools_settings *set) {
+    int err = 0;
+    double stp = dedx_get_stp(set->ws, set->cfg, x, &err);
+    if (err != 0 || stp == 0.0)
+        return INFINITY;
+    return 1.0 / stp;
+}
+
+static double find_min(double (*func)(double x, dedx_tools_settings *set), dedx_tools_settings *set, double acc) {
     double x[] = {0.01, 10};
     double f[] = {func(x[0], set), func(x[1], set)};
     int i = 0;
@@ -131,17 +130,16 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
         return -1;
     }
     double acc = 1e-5;
-    _dedx_tools_settings set;
+    dedx_tools_settings set;
     set.ws = ws;
     if (*err != 0)
         return -1;
     dedx_load_config(ws, config, err);
-    //	set.id = config->cfg_id;
     set.cfg = config;
 
     if (*err != 0)
         return -1;
-    double max = _dedx_find_min(_dedx_find_min_stp_func, &set, acc * 100);
+    double max = find_min(find_min_stp_func, &set, acc * 100);
     double x1;
     double x2;
     double x_temp;
@@ -163,7 +161,6 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
             x1 = x_temp;
         }
     }
-    // free(cfg); might be used later again
     return (x1 + x2) / 2;
 }
 
@@ -175,9 +172,9 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
     double calculation_error = 0;
     double acc = 1e-6;
     double eps = 1e-6;
-    _dedx_tools_settings set;
+    dedx_tools_settings set;
     double range = 0.0;
-    double A = config->ion_a; // TODO: or nucleon number?
+    double A = config->ion_a;
 
     if (*err != 0)
         return -1;
@@ -186,20 +183,19 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
     if (*err != 0)
         return -1;
     set.cfg = config;
-    // set.A = config->nucleon_number;
     set.ws = ws;
-    range = _dedx_adapt(_dedx_adapt_stp,
-                        &set,
-                        dedx_get_min_energy(config->program, config->ion) * A,
-                        energy * A,
-                        acc,
-                        eps,
-                        &calculation_error);
+    range = adapt(adapt_stp,
+                  &set,
+                  dedx_get_min_energy(config->program, config->ion) * A,
+                  energy * A,
+                  acc,
+                  eps,
+                  &calculation_error);
     return range;
 }
 
-float _conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
-    const float density = _dedx_read_density(material, err);
+static float conversion_factor(const int old_unit, const int new_unit, const int material, int *err) {
+    const float density = dedx_internal_read_density(material, err);
 
     float conversion_rate;
 
@@ -242,11 +238,12 @@ int convert_units(const int old_unit,
                   const float *old_values,
                   float *new_values) {
     int err = 0;
+    int i;
     if (old_unit == new_unit)
         return err;
 
-    float conversion_rate = _conversion_factor(old_unit, new_unit, material, &err);
-    for (int i = 0; i < no_of_points; i++) {
+    float conversion_rate = conversion_factor(old_unit, new_unit, material, &err);
+    for (i = 0; i < no_of_points; i++) {
         new_values[i] = old_values[i] * conversion_rate;
     }
     return err;

@@ -17,8 +17,14 @@
 
 #include "dedx_wrappers.h"
 
+#include <stdlib.h>
+
+#include "dedx_lookup_data.h"
 #include "dedx_periodic_table.h"
 #include "dedx_tools.h"
+
+static dedx_config *allocate_wrapper_config(int program, int ion, int target, int *err);
+static dedx_workspace *allocate_wrapper_workspace(int *err);
 
 void dedx_fill_program_list(int *program_list) {
     /* fill list of available programs, terminated with -1 */
@@ -53,23 +59,52 @@ void dedx_fill_ion_list(int program, int *ion_list) {
     ion_list[i] = -1;
 }
 
-// energy - in MeV/nucleon, unless  program is ESTAR, then MeV
-// stp - in MeVcm2/g
+static dedx_config *allocate_wrapper_config(int program, int ion, int target, int *err) {
+    dedx_config *config;
+
+    *err = DEDX_OK;
+    config = (dedx_config *) calloc(1, sizeof(dedx_config));
+    if (config == NULL) {
+        *err = DEDX_ERR_NO_MEMORY;
+        return NULL;
+    }
+
+    config->program = program;
+    config->ion = ion;
+    config->target = target;
+    return config;
+}
+
+static dedx_workspace *allocate_wrapper_workspace(int *err) {
+    return dedx_allocate_workspace(1, err);
+}
+
 int dedx_get_stp_table(
     const int program, const int ion, const int target, const int no_of_points, const float *energies, float *stps) {
     int err = 0;
-    dedx_config *config = (dedx_config *) calloc(1, sizeof(dedx_config));
-    config->target = target;
-    config->ion = ion;
-    config->program = program;
-    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+    int cleanup_err = DEDX_OK;
+    int i;
+    dedx_config *config = allocate_wrapper_config(program, ion, target, &err);
+    dedx_workspace *ws;
 
     if (err != 0)
         return err;
+    ws = allocate_wrapper_workspace(&err);
+    if (err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return err;
+    }
     dedx_load_config(ws, config, &err);
+    if (err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return err;
+    }
 
-    for (int i = 0; i < no_of_points; i++) {
+    for (i = 0; i < no_of_points; i++) {
         stps[i] = dedx_get_stp(ws, config, energies[i], &err);
+        if (err != 0)
+            break;
     }
     dedx_free_config(config, &err);
     dedx_free_workspace(ws, &err);
@@ -78,85 +113,104 @@ int dedx_get_stp_table(
 }
 
 float dedx_get_simple_stp_for_program(const int program, const int ion, const int target, float energy, int *err) {
+    int cleanup_err = DEDX_OK;
     float stp;
-    dedx_config *config = (dedx_config *) calloc(1, sizeof(dedx_config));
-    config->target = target;
-    config->ion = ion;
-    config->program = program;
-    dedx_workspace *ws = dedx_allocate_workspace(1, err);
+    dedx_config *config = allocate_wrapper_config(program, ion, target, err);
+    dedx_workspace *ws;
+
     if (*err != 0)
-        return 0;
+        return 0.0f;
+    ws = allocate_wrapper_workspace(err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return 0.0f;
+    }
     dedx_load_config(ws, config, err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return 0.0f;
+    }
 
     stp = dedx_get_stp(ws, config, energy, err);
+    dedx_free_config(config, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
     if (*err != 0)
-        return 0;
-    dedx_free_config(config, err);
-    dedx_free_workspace(ws, err);
+        return 0.0f;
+
     return stp;
 }
 
 int dedx_get_stp_table_size(const int program, const int ion, const int target) {
     int err = 0;
+    int cleanup_err = DEDX_OK;
     int result = -1;
-
+    dedx_config *cfg = allocate_wrapper_config(program, ion, target, &err);
     dedx_workspace *ws;
-    dedx_config *cfg = (dedx_config *) calloc(1, sizeof(dedx_config));
-    ws = dedx_allocate_workspace(1, &err);
 
-    // set program + ion + target combination
-    cfg->program = program;
-    cfg->ion = ion;
-    cfg->target = target;
-
-    // load spline database from the data files, it contains number of energy+stp samples
-    dedx_load_config(ws, cfg, &err);
-
-    // config loading failed, returning exit code
     if (err != 0)
         return -1;
-
-    // assume only one dataset is loaded, extract number of samples
-    if (ws->datasets == 1) {
-        result = ws->loaded_data[0]->n;
+    ws = allocate_wrapper_workspace(&err);
+    if (err != 0) {
+        dedx_free_config(cfg, &cleanup_err);
+        return -1;
     }
 
+    dedx_load_config(ws, cfg, &err);
+    if (err != 0) {
+        dedx_free_config(cfg, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return -1;
+    }
+
+    if (ws->active_datasets > 0) {
+        result = ws->loaded_data[cfg->cfg_id]->n;
+    }
+
+    dedx_free_config(cfg, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
     return result;
-};
+}
 
 int dedx_fill_default_energy_stp_table(
     const int program, const int ion, const int target, float *energies, float *stps) {
     int err = 0;
+    int cleanup_err = DEDX_OK;
     int i;
-
+    dedx_config *cfg = allocate_wrapper_config(program, ion, target, &err);
     dedx_workspace *ws;
-    dedx_config *cfg = (dedx_config *) calloc(1, sizeof(dedx_config));
-    ws = dedx_allocate_workspace(1, &err);
 
-    // set program + ion + target combination
-    cfg->program = program;
-    cfg->ion = ion;
-    cfg->target = target;
-
-    // load spline database from the data files
-    dedx_load_config(ws, cfg, &err);
-
-    // config loading failed, returning exit code
     if (err != 0)
         return -1;
+    ws = allocate_wrapper_workspace(&err);
+    if (err != 0) {
+        dedx_free_config(cfg, &cleanup_err);
+        return -1;
+    }
 
-    // assume only one dataset is loaded, extract default no of energies and stopping powers
-    if (ws->datasets == 1) {
-        for (i = 0; i < ws->loaded_data[0]->n; i++) {
-            energies[i] = ws->loaded_data[0]->base[i].x;
+    dedx_load_config(ws, cfg, &err);
+    if (err != 0) {
+        dedx_free_config(cfg, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return -1;
+    }
+
+    if (ws->active_datasets > 0) {
+        for (i = 0; i < ws->loaded_data[cfg->cfg_id]->n; i++) {
+            energies[i] = ws->loaded_data[cfg->cfg_id]->base[i].x;
             stps[i] = dedx_get_stp(ws, cfg, energies[i], &err);
-            if (err != 0)
+            if (err != 0) {
+                dedx_free_config(cfg, &cleanup_err);
+                dedx_free_workspace(ws, &cleanup_err);
                 return -1;
+            }
         }
     }
 
+    dedx_free_config(cfg, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
     return 0;
-};
+}
 
 int dedx_get_csda_range_table(const int program,
                               const int ion,
@@ -165,21 +219,34 @@ int dedx_get_csda_range_table(const int program,
                               const float *energies,
                               double *csda_ranges) {
     int err = 0;
-    dedx_config *config = (dedx_config *) calloc(1, sizeof(dedx_config));
-    config->target = target;
-    config->ion = ion;
-    config->program = program;
-    config->ion_a = _dedx_get_nucleon(config->ion, &err);
-    if (err != 0)
-        return err;
-    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+    int cleanup_err = DEDX_OK;
+    int i;
+    dedx_config *config = allocate_wrapper_config(program, ion, target, &err);
+    dedx_workspace *ws;
 
     if (err != 0)
         return err;
+    config->ion_a = dedx_internal_get_nucleon(config->ion, &err);
+    if (err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return err;
+    }
+    ws = allocate_wrapper_workspace(&err);
+    if (err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return err;
+    }
     dedx_load_config(ws, config, &err);
+    if (err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return err;
+    }
 
-    for (int i = 0; i < no_of_points; i++) {
+    for (i = 0; i < no_of_points; i++) {
         csda_ranges[i] = dedx_get_csda(ws, config, energies[i], &err);
+        if (err != 0)
+            break;
     }
     dedx_free_config(config, &err);
     dedx_free_workspace(ws, &err);

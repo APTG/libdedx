@@ -26,7 +26,7 @@ int main(void) {
     failures += check_stp(DEDX_PSTAR, DEDX_PROTON, DEDX_ALANINE, 78.0f, 8.617e0f);
     failures += check_stp(DEDX_PSTAR, DEDX_PROTON, DEDX_ALANINE, 1000.0f, 2.148e0f);
 
-    // Proton stopping power in nitrogen (gas target — exercises _dedx_target_is_gas)
+    // Proton stopping power in nitrogen (gas target — exercises dedx_internal_target_is_gas)
     // Reference values from NIST PSTAR database
     failures += check_stp(DEDX_PSTAR, DEDX_PROTON, DEDX_NITROGEN, 0.07f, 7.624e2f);
     failures += check_stp(DEDX_PSTAR, DEDX_PROTON, DEDX_NITROGEN, 1.0f, 2.260e2f);

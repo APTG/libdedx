@@ -16,46 +16,48 @@
 */
 #include "dedx_mstar.h"
 
-void _evaluate_compound_state_mstar(dedx_config *config, int *err) { /* LCOV_EXCL_START */
-    if (config->compound_state == DEDX_GAS) {
-        if (config->mstar_mode == 'a')
-            config->mstar_mode = 'g';
-        else
-            config->mstar_mode = 'h';
-    } else if (config->compound_state == DEDX_CONDENSED) {
-        if (config->mstar_mode == 'a')
-            config->mstar_mode = 'c';
-        else
-            config->mstar_mode = 'd';
-    }
-    *err = DEDX_OK;
-} /* LCOV_EXCL_STOP */
+#include "dedx_file_access.h"
 
-void _dedx_convert_energy_to_mstar(
-    stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy) {
-    //	int err = 0;
-    if (state == 'a' || state == 'b') {
-        if (config->compound_state) {
-            if (state == 'a')
-                state = 'g';
-            else
-                state = 'h';
+static char resolve_mstar_mode(char state, dedx_config *config, int *err) {
+    int target_state = config->compound_state;
 
+    if (state != DEDX_MSTAR_MODE_A && state != DEDX_MSTAR_MODE_B)
+        return state;
+
+    if (target_state == DEDX_DEFAULT_STATE) {
+        if (dedx_internal_target_is_gas(config->target, err) != 0) {
+            target_state = DEDX_GAS;
         } else {
-            if (state == 'a') {
-                state = 'c';
-            } else {
-                state = 'd';
-            }
+            if (*err != DEDX_OK)
+                return state;
+            target_state = DEDX_CONDENSED;
         }
     }
+
+    if (target_state == DEDX_GAS) {
+        return (state == DEDX_MSTAR_MODE_A) ? DEDX_MSTAR_MODE_G : DEDX_MSTAR_MODE_H;
+    }
+    return (state == DEDX_MSTAR_MODE_A) ? DEDX_MSTAR_MODE_C : DEDX_MSTAR_MODE_D;
+}
+
+void dedx_internal_evaluate_compound_state_mstar(dedx_config *config, int *err) { /* LCOV_EXCL_START */
+    *err = DEDX_OK;
+    config->mstar_mode = resolve_mstar_mode(config->mstar_mode, config, err);
+} /* LCOV_EXCL_STOP */
+
+void dedx_internal_convert_energy_to_mstar(
+    stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy, int *err) {
+    *err = DEDX_OK;
+    state = resolve_mstar_mode(state, config, err);
+    if (*err != DEDX_OK)
+        return;
     int n = in->length;
     int i;
     for (i = 0; i < n; i++) {
         energy[i] = energy[i] / 4.0;
     }
     for (i = 0; i < n; i++) {
-        out->data[i] = _dedx_calculate_mspaul_coef(state, in->ion, in->target, energy[i]) * in->data[i] * 1000;
+        out->data[i] = dedx_internal_calculate_mspaul_coef(state, in->ion, in->target, energy[i]) * in->data[i] * 1000;
     }
     out->length = in->length;
     out->target = in->target;

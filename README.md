@@ -1,7 +1,7 @@
 # libdedx
 
 [![CI](https://github.com/APTG/libdedx/actions/workflows/ci.yml/badge.svg)](https://github.com/APTG/libdedx/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/APTG/libdedx/graph/badge.svg?branch=main)](https://codecov.io/gh/APTG/libdedx)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Coverage](https://codecov.io/gh/APTG/libdedx/branch/main/graph/badge.svg)](https://app.codecov.io/gh/APTG/libdedx/tree/main)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 A C library for stopping power calculations (dE/dx) — the energy loss of a charged particle per unit length of material.
 
@@ -19,6 +19,11 @@ Full documentation: https://aptg.github.io/libdedx/
 | `DEDX_ICRU73_OLD` | ICRU Report 73, older parametrization          | Heavy ions    |
 | `DEDX_BETHE_EXT00` | Bethe formula with extensions                 | All ions      |
 | `DEDX_ICRU`     | Auto-selects ICRU49 or ICRU73 by ion type        | p, He, heavy  |
+
+Note:
+For compound targets, `libdedx` currently extends the native coverage of some original programs by falling back to Bragg/stoichiometric weighting when the upstream database does not provide that compound directly. This applies in particular to programs such as `DEDX_PSTAR`, `DEDX_ASTAR`, and `DEDX_MSTAR`, whose original target coverage is more limited than the full set of ICRU/ESTAR-style materials exposed by `libdedx`.
+
+This behavior is useful, but it means that a result returned under a given program label is not always a direct value from the original upstream program. Future releases may separate native program coverage more explicitly from these weighted extension modes.
 
 ## Quick start
 

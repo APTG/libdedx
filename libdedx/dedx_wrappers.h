@@ -1,5 +1,5 @@
-#ifndef DEDX_WRAPPERS_INCLUDED
-#define DEDX_WRAPPERS_INCLUDED
+#ifndef DEDX_WRAPPERS_H
+#define DEDX_WRAPPERS_H
 
 /**
  * @file dedx_wrappers.h
@@ -8,9 +8,6 @@
  * These functions handle workspace allocation internally and are suitable
  * for one-off queries. For repeated evaluations use the core API in dedx.h.
  */
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "dedx.h"
 
@@ -100,4 +97,4 @@ int dedx_get_csda_range_table(const int program,
                               const float *energies,
                               double *csda_ranges);
 
-#endif // DEDX_WRAPPERS_INCLUDED
+#endif // DEDX_WRAPPERS_H

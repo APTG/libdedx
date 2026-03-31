@@ -1,17 +1,23 @@
-#ifndef DEDX_LOOKUP_DATA_H_INCLUDED
-#define DEDX_LOOKUP_DATA_H_INCLUDED
+#ifndef DEDX_LOOKUP_DATA_H
+#define DEDX_LOOKUP_DATA_H
 
-// #include "dedx.h"
+#include "dedx_elements.h"
+#include "dedx_lookup_accelerator.h"
+#include "dedx_spline_base.h"
 
-/* typedef struct */
-/* { */
-/*     spline_base base[MAXELEMENTS]; */
-/*     int n; */
-/*     int prog; */
-/*     int target; */
-/*     int ion; */
-/*     int datapoints; */
-/*     lookup_accelerator acc; */
-/* } lookup_data; */
+/** @brief Internal representation of one loaded stopping-power table.
+ *
+ *  Each dataset stores the spline coefficients, source program id, ion/target
+ *  identifiers, and the lookup accelerator used by repeated spline queries.
+ */
+typedef struct _dedx_lookup_data {
+    _dedx_spline_base base[DEDX_MAX_ELEMENTS];
+    int n;
+    int prog;
+    int target;
+    int ion;
+    int datapoints;
+    _dedx_lookup_accelerator acc;
+} _dedx_lookup_data;
 
-#endif // DEDX_LOOKUP_DATA_H_INCLUDED
+#endif // DEDX_LOOKUP_DATA_H
