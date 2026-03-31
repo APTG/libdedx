@@ -1,6 +1,7 @@
 #ifndef DEDX_ELEMENTS_H_INCLUDED
 #define DEDX_ELEMENTS_H_INCLUDED
 
+/** Maximum number of tabulated energy points stored per dataset. */
 #define DEDX_MAX_ELEMENTS 150
 
 /**
@@ -36,7 +37,7 @@ enum {
     DEDX_POTASSIUM,
     DEDX_CALCIUM,
     DEDX_SCANDIUM,
-    DEDX_TITeANIUM,
+    DEDX_TITANIUM,
     DEDX_VANADIUM,
     DEDX_CHROMIUM,
     DEDX_MANGANESE,
