@@ -1,9 +1,8 @@
-#include "test_helpers.h"
-
-#include "dedx_mpaul.h"
-
 #include <dedx_error.h>
 #include <string.h>
+
+#include "dedx_mpaul.h"
+#include "test_helpers.h"
 
 static int faili(const char *label, int got, int expected) {
     fprintf(stderr, "FAIL %s: got %d expected %d\n", label, got, expected);
