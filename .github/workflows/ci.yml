@@ -10,7 +10,7 @@ jobs:
         platform: [ubuntu-latest, windows-latest]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check CMake version
         run: cmake --version
@@ -43,7 +43,7 @@ jobs:
     needs: build_and_test
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure
         run: cmake -S . -B build
@@ -69,7 +69,7 @@ jobs:
         python-version: ["3.9", "3.13"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
