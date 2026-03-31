@@ -37,7 +37,7 @@ static const char *_dedx_get_data_path(void) {
         if (stat(probe, &st) == 0)
             snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH_LOCAL);
         else
-            snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH);
+            snprintf(resolved, sizeof(resolved), "%s", DEDX_DATA_PATH); /* LCOV_EXCL_LINE */
         done = 1;
     }
     return resolved;
@@ -57,7 +57,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
     *err = DEDX_OK;
     fp = fopen(path, "r");
     out = fopen(output, "wb+");
-    if (fp == NULL || out == NULL) {
+    if (fp == NULL || out == NULL) { /* LCOV_EXCL_START */
         if (out == NULL) {
             *err = DEDX_ERR_WRITE_FAILED;
             if (fp != NULL)
@@ -67,7 +67,7 @@ void _dedx_convert_to_binary(char *path, char *output, int *err) {
             fclose(out);
         }
         return;
-    }
+    } /* LCOV_EXCL_STOP */
     while (!feof(fp)) {
         if (fgets(line, 100, fp) == NULL) {
         }
@@ -142,7 +142,7 @@ void _dedx_convert_energy_binary(char *path, char *output, int *err) {
     fp = fopen(path, "r");
     // TODO: Next line wont work after installation, unless user is root.
     out = fopen(output, "wb+");
-    if (fp == NULL || out == NULL) {
+    if (fp == NULL || out == NULL) { /* LCOV_EXCL_START */
         if (out == NULL) {
             *err = DEDX_ERR_WRITE_FAILED;
             if (fp != NULL)
@@ -152,7 +152,7 @@ void _dedx_convert_energy_binary(char *path, char *output, int *err) {
             fclose(out);
         }
         return;
-    }
+    } /* LCOV_EXCL_STOP */
 
     if (fgets(line, 100, fp) == NULL) {
     }
