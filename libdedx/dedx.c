@@ -673,7 +673,7 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
     data->length = 122;
     _dedx_read_energy_data(energy, DEDX_BETHE_EXT00, err);
     if (*err != 0)
-        return 0;
+        return -1;
 
     _dedx_bethe_coll_struct *bethe = (_dedx_bethe_coll_struct *) calloc(1, sizeof(_dedx_bethe_coll_struct));
     for (i = 0; i < data->length; i++) {
