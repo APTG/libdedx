@@ -64,6 +64,18 @@ int main(void) {
     err = 0;
     dedx_load_config(ws, cfg, &err);
     failures += check_err(err, DEDX_ERR_RHO_REQUIRED, "BETHE custom target without rho");
+    failures += check_err(cfg->loaded, 0, "failed load should not mark config loaded");
+    failures += check_err(cfg->cfg_id, -1, "failed load should not assign cfg_id");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    /* dedx_get_stp must reject invalid dataset ids before dereferencing */
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->cfg_id = 0;
+    err = 0;
+    dedx_get_stp(ws, cfg, 1.0f, &err);
+    failures += check_err(err, DEDX_ERR_INVALID_DATASET_ID, "stp with invalid dataset id");
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 

@@ -385,37 +385,3 @@ void _dedx_get_composition(int target, float composition[][2], unsigned int *len
     }
     fclose(fp);
 }
-
-float *_dedx_get_atima_data(int target, int *err) {
-    const char *folder;
-    char path[DEDX_PATH_SIZE];
-    char str[100];
-    float *compos;
-    unsigned int items;
-    char **temp;
-    FILE *fp;
-
-    *err = DEDX_OK;
-    folder = _dedx_get_data_path();
-    snprintf(path, sizeof(path), "%s%s", folder, "atima_compos");
-
-    fp = fopen(path, "r");
-    if (fp == NULL) {
-        *err = DEDX_ERR_NO_COMPOSITION;
-        return NULL;
-    }
-    compos = (float *) malloc(sizeof(float) * 4);
-    while (!feof(fp) && fgets(str, 100, fp) != NULL) {
-        temp = _dedx_split(str, '\t', &items, 100);
-        if (atoi(temp[0]) == target) {
-            compos = (float *) malloc(sizeof(float) * 4);
-            compos[0] = atof(temp[1]);
-            compos[1] = atof(temp[2]);
-            compos[2] = atof(temp[3]);
-            compos[3] = atof(temp[4]);
-        }
-        _dedx_free_split_temp(temp);
-    }
-    fclose(fp);
-    return compos;
-}

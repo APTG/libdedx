@@ -13,7 +13,7 @@
 /** No error. */
 #define DEDX_OK 0
 
-/** @defgroup err_file File I/O errors (1–11)
+/** @defgroup err_file File I/O errors (1–10)
  * @{ */
 #define DEDX_ERR_NO_COMPOS_FILE 1   /**< compos.txt not found */
 #define DEDX_ERR_NO_GAS_FILE 2      /**< gas_states.dat not found */
@@ -25,7 +25,6 @@
 #define DEDX_ERR_NO_DATA_FILE 8     /**< stopping-power .dat source file unreadable */
 #define DEDX_ERR_NO_NAMES_FILE 9    /**< short_names file unreadable (reserved) */
 #define DEDX_ERR_NO_COMPOSITION 10  /**< elemental composition file unreadable */
-#define DEDX_ERR_NO_ATIMA_FILE 11   /**< ATIMA composition file unreadable (reserved) */
 /** @} */
 
 /** @defgroup err_bounds Bounds errors (101)

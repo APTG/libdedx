@@ -585,8 +585,9 @@ typedef struct {
  *  @param[in]     ws      Workspace to load into.
  *  @param[in,out] config  Configuration to load; updated with resolved values.
  *  @param[out]    err     Error code; 0 on success.
+ *  @return 0 on success, -1 on failure.
  */
-void dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err);
+int dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err);
 
 /** @brief Evaluate the stopping power at a given energy.
  *
