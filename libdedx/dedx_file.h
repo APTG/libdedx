@@ -1,8 +1,10 @@
 #ifndef DEDX_FILE_H_INCLUDED
 #define DEDX_FILE_H_INCLUDED
 
-char *_dedx_get_program_file(int program);
+#include "dedx.h"
 
-char *_dedx_get_energy_file(int program);
+const char *dedx_internal_get_program_file(int program);
+
+const char *dedx_internal_get_energy_file(int program);
 
 #endif // DEDX_FILE_H_INCLUDED

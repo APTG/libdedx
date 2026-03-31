@@ -104,11 +104,11 @@ void _dedx_read_binary_data(stopping_data *data, int prog, int ion, int target, 
 
     *err = DEDX_OK;
     folder = _dedx_get_data_path();
-    snprintf(path, sizeof(path), "%s%s.bin", folder, _dedx_get_program_file(prog));
+    snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_program_file(prog));
 
     fp = fopen(path, "rb");
     if (fp == NULL) {
-        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, _dedx_get_program_file(prog));
+        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, dedx_internal_get_program_file(prog));
         _dedx_convert_to_binary(input_path, path, err);
         if (*err != DEDX_OK) {
             *err = DEDX_ERR_NO_BINARY_DATA;
@@ -175,11 +175,11 @@ void _dedx_read_energy_data(float *energy, int prog, int *err) {
 
     *err = DEDX_OK;
     folder = _dedx_get_data_path();
-    snprintf(path, sizeof(path), "%s%s.bin", folder, _dedx_get_energy_file(prog));
+    snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_energy_file(prog));
 
     fp = fopen(path, "rb");
     if (fp == NULL) {
-        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, _dedx_get_energy_file(prog));
+        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, dedx_internal_get_energy_file(prog));
         _dedx_convert_energy_binary(input_path, path, err);
         if (*err != DEDX_OK) {
             *err = DEDX_ERR_NO_BINARY_ENERGY;

@@ -16,71 +16,50 @@
 */
 #include "dedx_file.h"
 
-char *_dedx_get_program_file(int program) {
-    char *path;
+const char *dedx_internal_get_program_file(int program) {
     switch (program) {
-    case 1:
-        path = "ASTAR";
-        break;
-    case 2:
-        path = "PSTAR";
-        break;
-    case 3:
-        path = "ESTAR";
-        break;
-    case 4:
-        path = "MSTAR";
-        break;
-    case 5:
-        path = "ICRU73";
-        break;
-    case 6:
-        path = "ICRU73_NEW";
-        break;
-    case 7:
-        path = "ICRU_ASTAR";
-        break;
-    case 8:
-        path = "ICRU_PSTAR";
-        break;
+    case DEDX_ASTAR:
+        return "ASTAR";
+    case DEDX_PSTAR:
+        return "PSTAR";
+    case DEDX_ESTAR:
+        return "ESTAR";
+    case DEDX_MSTAR:
+        return "MSTAR";
+    case DEDX_ICRU73_OLD:
+        return "ICRU73";
+    case DEDX_ICRU73:
+        return "ICRU73_NEW";
+    case DEDX_ICRU49:
+        return "ICRU_ASTAR";
+    case _DEDX_0008:
+        return "ICRU_PSTAR";
     default:
-        path = "";
+        return "";
     }
-    return path;
 }
 
-char *_dedx_get_energy_file(int program) {
-    char *path;
+const char *dedx_internal_get_energy_file(int program) {
     switch (program) {
-    case 1:
-        path = "astarEng";
-        break;
-    case 2:
-        path = "pstarEng";
-        break;
-    case 3:
-        path = "estarEng";
-        break;
-    case 4:
-        path = "mstarEng";
-        break;
-    case 5:
-        path = "icru73Eng";
-        break;
-    case 6:
-        path = "icru73_newEng";
-        break;
-    case 7:
-        path = "icru_astarEng";
-        break;
-    case 8:
-        path = "icru_pstarEng";
-        break;
-    case 101:
-        path = "betheEng";
-        break;
+    case DEDX_ASTAR:
+        return "astarEng";
+    case DEDX_PSTAR:
+        return "pstarEng";
+    case DEDX_ESTAR:
+        return "estarEng";
+    case DEDX_MSTAR:
+        return "mstarEng";
+    case DEDX_ICRU73_OLD:
+        return "icru73Eng";
+    case DEDX_ICRU73:
+        return "icru73_newEng";
+    case DEDX_ICRU49:
+        return "icru_astarEng";
+    case _DEDX_0008:
+        return "icru_pstarEng";
+    case DEDX_BETHE_EXT00:
+        return "betheEng";
     default:
-        path = "";
+        return "";
     }
-    return path;
 }
