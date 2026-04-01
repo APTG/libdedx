@@ -1,200 +1,302 @@
-#!/usr/bin/env python
-#
-# Convert a ascii file to C code which can be included in headers.
-#
-# 12.03.2013 Niels Bassler <bassler@phys.au.dk>
-#
+#!/usr/bin/env python3
+"""
+Convert libdedx stopping power .dat files to embeddable C headers.
 
-import numpy as np
+All energy axes are normalised to MeV/u (kinetic energy per nucleon) in the
+generated headers so that the lookup code needs no per-dataset unit logic.
 
-def write2d(_data, _name, _bsize, _nsize,_type="float"): #
-    i = 1
-    j = 0
-    k = 1
+ASTAR and ICRU_ASTAR store total alpha energy in MeV in the source files;
+the generator divides by the alpha mass number (4) on the way out.
+Every other dataset is already in MeV/u.
 
-    _size = _bsize*_nsize
+Array layout
+------------
+All datasets use a uniform 3-D layout:
 
-    print _name+"[%i][%i] = {{" %(_nsize,_bsize)
+    dedx_<prog>_stp[n_ions][n_targets][n_energies]
 
-    for x in _data:
+Single-ion datasets (PSTAR, ASTAR, …) have n_ions=1.
+
+Companion arrays:
+    dedx_<prog>_energy[]      energy grid in MeV/u
+    dedx_<prog>_ion_ids[]     projectile Z values
+    dedx_<prog>_target_ids[]  NIST/ICRU material IDs (= Z for elements)
+
+Usage (run from libdedx/data/):
+    python3 dat2c.py pstar
+    python3 dat2c.py all
+"""
+
+import os
+import sys
+
+# ---------------------------------------------------------------------------
+# Dataset catalogue
+# ---------------------------------------------------------------------------
+
+# (dat_file, energy_file, energy_scale)
+# energy_scale: multiply raw file energy values by this to convert to MeV/u.
+# All datasets are MeV/u natively except ASTAR and ICRU_ASTAR, which store
+# total alpha kinetic energy in MeV (alpha A=4, so scale = 1/4).
+DATASETS = {
+    "astar":      ("ASTAR.dat",      "astarEng.dat",      1.0 / 4),
+    "pstar":      ("PSTAR.dat",      "pstarEng.dat",      1.0),
+    "estar":      ("ESTAR.dat",      "estarEng.dat",      1.0),
+    "mstar":      ("MSTAR.dat",      "mstarEng.dat",      1.0),
+    "icru73":     ("ICRU73.dat",     "icru73Eng.dat",     1.0),
+    "icru73new":  ("ICRU73_NEW.dat", "icru73_newEng.dat", 1.0),
+    "icru_pstar": ("ICRU_PSTAR.dat", "icru_pstarEng.dat", 1.0),
+    "icru_astar": ("ICRU_ASTAR.dat", "icru_astarEng.dat", 1.0 / 4),
+}
+
+# Energy-grid only (no stopping data; Bethe is calculated analytically)
+ENERGY_ONLY = {
+    "bethe": ("betheEng.dat", 1.0),
+}
+
+# ---------------------------------------------------------------------------
+# File readers
+# ---------------------------------------------------------------------------
+
+def read_energy(path):
+    """Read *Eng.dat: first line = count, remaining lines = values."""
+    with open(path) as fh:
+        lines = [ln.strip() for ln in fh if ln.strip()]
+    n = int(lines[0])
+    values = [float(ln) for ln in lines[1:]]
+    if len(values) != n:
+        raise ValueError(f"{path}: header says {n} values, found {len(values)}")
+    return values
 
 
-        # check if start of new block
-        if j == 1:
-            print "  {"
-        if j == 0: # make a nice start
-            j = 1
+def read_dat(path):
+    """
+    Read PROG.dat.  Header lines have the form  #<target>:<ion>:<n_points>
+    followed by n_points floating-point data lines.
+    Returns a list of (target, ion, [float, ...]).
+    """
+    entries = []
+    target = ion = n_pts = 0
+    buf = []
+    with open(path) as fh:
+        for raw in fh:
+            line = raw.strip()
+            if not line:
+                continue
+            if line[0] == "#":
+                parts = line[1:].split(":")
+                target, ion, n_pts = int(parts[0]), int(parts[1]), int(parts[2])
+                buf = []
+            else:
+                buf.append(float(line))
+                if len(buf) == n_pts:
+                    entries.append((target, ion, list(buf)))
+    return entries
 
-        # check if start of line
-        if i == 1:
-            print (" "),
+# ---------------------------------------------------------------------------
+# C array emitters
+# ---------------------------------------------------------------------------
 
-        # check if end of block
-        if j >= _bsize:
-            # check if end of data
-            if k >= _size:
-                if _type == "float":
-                    print ("%8.5e}" %x) # foobar
-                if _type == "int" :
-                    print ("%3i}" %x) #
-                print "};"
-                return
+# Column width constants chosen so lines stay inside the 120-char project limit.
+#   float literal "1.234567e+08f" = 13 chars, ", " = 2 chars
+#   7 floats × 13 + 6 × 2 +  4-sp indent  = 91 + 12 + 4  = 107  ✓ (1-D / 2-D outer)
+#   6 floats × 13 + 5 × 2 +  8-sp indent  = 78 + 10 + 8  =  96  ✓ (2-D inner / 3-D middle)
+#   6 floats × 13 + 5 × 2 + 12-sp indent  = 78 + 10 + 12 = 100  ✓ (3-D inner)
+_COLS_FLOAT_1D  = 7
+_COLS_FLOAT_2D  = 6
+_COLS_FLOAT_3D  = 6
+_COLS_INT       = 15
 
-            print ("%8.5e}," %x) # foobar
-            print ""
-            j = 0
-            i = 0
+_I1 = "    "        # 4 spaces  — outer level
+_I2 = "        "    # 8 spaces  — middle level
+_I3 = "            "  # 12 spaces — inner level
+
+
+def _ff(v):
+    """Format a single float literal."""
+    return f"{v:.6e}f"
+
+
+def _int_rows(values, cols):
+    """Yield formatted rows for an integer initialiser list."""
+    chunk = []
+    for v in values:
+        chunk.append(f"{v:4d}")
+        if len(chunk) == cols:
+            yield _I1 + ", ".join(chunk) + ","
+            chunk = []
+    if chunk:
+        yield _I1 + ", ".join(chunk) + ","
+
+
+def _float_rows(values, indent, cols):
+    """Yield formatted rows for a float initialiser list."""
+    chunk = []
+    for v in values:
+        chunk.append(_ff(v))
+        if len(chunk) == cols:
+            yield indent + ", ".join(chunk) + ","
+            chunk = []
+    if chunk:
+        yield indent + ", ".join(chunk) + ","
+
+
+def emit_int_array(name, values):
+    lines = [f"static const int {name}[{len(values)}] = {{"]
+    lines.extend(_int_rows(values, _COLS_INT))
+    lines.append("};")
+    return lines
+
+
+def emit_float_1d(name, values):
+    lines = [f"static const float {name}[{len(values)}] = {{"]
+    lines.extend(_float_rows(values, _I1, _COLS_FLOAT_1D))
+    lines.append("};")
+    return lines
+
+
+
+def emit_float_3d(name, arr, outer_labels, inner_labels):
+    """
+    arr[i][j]       : list of float   layout: [n_outer][n_inner][n_energy]
+    outer_labels[i] : comment on outer brace (e.g. "ion 3")
+    inner_labels[j] : comment on inner brace (e.g. "target 1")
+    """
+    n0 = len(arr)
+    n1 = len(arr[0])
+    n2 = len(arr[0][0]) if arr[0] else 0
+    lines = [f"static const float {name}[{n0}][{n1}][{n2}] = {{"]
+    for i, plane in enumerate(arr):
+        osep = "," if i < n0 - 1 else ""
+        lines.append(f"{_I1}{{  /* {outer_labels[i]} */")
+        for j, row in enumerate(plane):
+            isep = "," if j < n1 - 1 else ""
+            lines.append(f"{_I2}{{  /* {inner_labels[j]} */")
+            lines.extend(_float_rows(row, _I3, _COLS_FLOAT_3D))
+            lines.append(f"{_I2}}}{isep}")
+        lines.append(f"{_I1}}}{osep}")
+    lines.append("};")
+    return lines
+
+# ---------------------------------------------------------------------------
+# Header generator
+# ---------------------------------------------------------------------------
+
+def _header_lines(name, source_files, note=""):
+    """Opening boilerplate (guard + clang-format off)."""
+    sources = ", ".join(source_files)
+    guard = f"DEDX_DATA_{name.upper()}_H"
+    lines = [
+        f"/* Auto-generated from {sources} -- do not edit.",
+        f" * Regenerate: python3 dat2c.py {name}",
+    ]
+    if note:
+        lines.append(f" * {note}")
+    lines += [
+        " */",
+        "",
+        f"#ifndef {guard}",
+        f"#define {guard}",
+        "",
+        "/* clang-format off */",
+        "",
+    ]
+    return lines
+
+
+def _footer_lines(name):
+    """Closing boilerplate (clang-format on + end guard)."""
+    guard = f"DEDX_DATA_{name.upper()}_H"
+    return [
+        "",
+        "/* clang-format on */",
+        "",
+        f"#endif /* {guard} */",
+        "",
+    ]
+
+
+def generate(name, dat_path, eng_path, energy_scale):
+    energy  = [v * energy_scale for v in read_energy(eng_path)]
+    entries = read_dat(dat_path)
+
+    targets   = sorted({e[0] for e in entries})
+    ions      = sorted({e[1] for e in entries})
+    pfx       = f"dedx_{name}"
+
+    scale_note = "" if energy_scale == 1.0 else f" (scaled by {energy_scale} from raw file)"
+    L = _header_lines(name, [os.path.basename(dat_path), os.path.basename(eng_path)],
+                      f"Energy values are in MeV/u (kinetic energy per nucleon).{scale_note}")
+
+    # Uniform 3D layout: [n_ions][n_targets][n_energies]
+    # Single-ion datasets have n_ions=1 and an _ion_ids array with one entry.
+    L.extend(emit_float_1d(f"{pfx}_energy", energy))
+    L.append("")
+
+    L.extend(emit_int_array(f"{pfx}_ion_ids", ions))
+    L.append("")
+
+    L.extend(emit_int_array(f"{pfx}_target_ids", targets))
+    L.append("")
+
+    ion_idx    = {v: i for i, v in enumerate(ions)}
+    target_idx = {v: i for i, v in enumerate(targets)}
+    arr = [[[0.0] * len(energy) for _ in targets] for _ in ions]
+    for t, io, vals in entries:
+        arr[ion_idx[io]][target_idx[t]] = vals
+
+    L.extend(emit_float_3d(
+        f"{pfx}_stp", arr,
+        outer_labels=[f"ion {io}" for io in ions],
+        inner_labels=[f"target {t}" for t in targets],
+    ))
+
+    L.extend(_footer_lines(name))
+    return "\n".join(L)
+
+
+def generate_energy_only(name, eng_path, energy_scale):
+    """Bethe: energy grid only, no stopping table."""
+    energy = [v * energy_scale for v in read_energy(eng_path)]
+    pfx    = f"dedx_{name}"
+
+    L = _header_lines(name, [os.path.basename(eng_path)],
+                      "Energy values are in MeV/u (kinetic energy per nucleon).")
+    L.extend(emit_float_1d(f"{pfx}_energy", energy))
+    L.extend(_footer_lines(name))
+    return "\n".join(L)
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    requested = sys.argv[1:] if len(sys.argv) > 1 else ["all"]
+    if requested == ["all"]:
+        requested = list(DATASETS) + list(ENERGY_ONLY)
+
+    for name in requested:
+        if name in DATASETS:
+            dat, eng, scale = DATASETS[name]
+            outfile = f"dedx_{name}.h"
+            print(f"Generating {outfile} ...")
+            with open(outfile, "w") as fh:
+                fh.write(generate(name, dat, eng, scale))
+        elif name in ENERGY_ONLY:
+            eng, scale = ENERGY_ONLY[name]
+            outfile = f"dedx_{name}.h"
+            print(f"Generating {outfile} (energy only) ...")
+            with open(outfile, "w") as fh:
+                fh.write(generate_energy_only(name, eng, scale))
         else:
-        # print the data
-            if _type == "float":
-                print ("%8.5e," %x), # foobar
-            if _type == "int" :
-                print ("%3i" %x), #
-        j += 1
+            print(f"Unknown dataset: {name!r}", file=sys.stderr)
+            avail = ", ".join(list(DATASETS) + list(ENERGY_ONLY))
+            print(f"Available: {avail}", file=sys.stderr)
+            sys.exit(1)
 
-        # check if end of data
-        if k > _size:
-            print ("};") # foobar
-            print ""
-            return
-        k += 1
-
-        # check if end of line
-        if i >= 6:
-            i = 0
-            print ""
-        i += 1
+    print("Done.")
 
 
-def write1d(_data, _name, _bsize, _type="float"): #
-
-    # _data:  linear data array
-    # _name:  name of varioable
-    # _bsize: number of data to be written.
-
-
-    i = 1
-    j = 1
-
-    print _name+"[%i] = {" %(_bsize)
-    for x in _data:
-
-        # check if start of line
-        if i == 1:
-            print (" "),
-
-        # check if end of block
-        if j >= _bsize:
-            if _type == "float":
-                print ("%8.5e};" %x) # foobar
-            if _type == "int":
-                print ("%3i};" %x) # foobar
-            print ""
-            return
-        else:
-        # print the data
-            if _type == "int":
-                print ("%3i," %x), # foobar
-            if _type == "float":
-                print ("%8.5e," %x), # foobar
-        j += 1
-
-
-        # check if end of line
-        if i >= 6:
-            i = 0
-            print ""
-        i += 1
-
-
-#### ASTAR ####
-#data = np.loadtxt("astarEng.dat")
-#write1d(data[1:],"static const float astar_energy",122)  # 122 = data[0]
-#data = np.loadtxt("ASTAR.dat")
-#write2d(data,"static const float astar",122,74)
-
-### ESTAR ###
-#data = np.loadtxt("estarEng.dat")
-#write1d(data[1:],"static const float estar_energy",133)
-#data = np.loadtxt("ESTAR.dat")
-#write2d(data,"static const float estar",132,77)
-
-### PSTAR ###
-#data = np.loadtxt("pstarEng.dat")
-#write1d(data[1:],"static const float pstar_energy",133)
-#data = np.loadtxt("PSTAR.dat")
-#write2d(data,"static const float pstar",133,74)
-
-### MSTAR ###
-#data = np.loadtxt("mstarEng.dat")
-#write1d(data[1:],"static const float mstar_energy",132)
-#data = np.loadtxt("MSTAR.dat")
-#write2d(data,"static const float mstar",132,78)
-
-### ICRU73 ###
-#data = np.loadtxt("icru73Eng.dat")
-#write1d(data[1:],"static const float icru73_energy",53)
-#data = np.loadtxt("ICRU73.dat")
-#write2d(data,"static const float icru73",53,896)
-
-### ICRU73_NEW ###
-#data = np.loadtxt("icru73_newEng.dat")
-#write1d(data[1:],"static const float icru73new_energy",53)
-#data = np.loadtxt("ICRU73_NEW.dat")
-#write2d(data,"static const float icru73new",53,36)
-
-### ICRU49 PROTONS ###
-#data = np.loadtxt("icru_pstarEng.dat")
-#write1d(data[1:],"static const float icru_pstar_energy",133)
-#data = np.loadtxt("ICRU_PSTAR.dat")
-#write2d(data,"static const float icru_pstar",133,74)
-
-### ICRU49 ALPHAS ###
-#data = np.loadtxt("icru_astarEng.dat")
-#write1d(data[1:],"static const float icru_astar_energy",122)
-#data = np.loadtxt("ICRU_ASTAR.dat")
-#write2d(data,"static const float icru_astar",122,74)
-
-### BETHE energy grid (what is this used for anyway?)  ###
-#data = np.loadtxt("betheEng.dat")
-#write1d(data[1:],"static const float bethe_energy",122)
-
-### COMPOSITION ###
-data  = [] # array holding ICRU compound ID
-nele  = [] # number of elements for corresponding compound
-cindx = [] # array index for compound
-cdata_elem = [] # long array with all elements, pointer cindx needed to access
-cdata_frac = [] # long array with all fractions, pointer cindx needed to access
-
-
-lines = open("composition",'r').readlines()
-i = 0
-j = 0
-
-for line in lines:
-    if line[0] == "#":
-        data.append(int(line[1:]))
-        i = 0
-        cindx.append(j) # start index of each new element
-
-
-
-    if line[0] == "\n":
-        nele.append(i)
-
-
-    if (line[0].isdigit()):
-        i += 1
-        j += 1
-        cdata_elem.append(int(line.split(":")[0]))
-        cdata_frac.append(float(line.split(":")[1]))
-
-# need to manually add the last element since CR is missing at end of file.
-nele.append(i)
-
-write1d(data,"static const int _dedx_compos_list", len(data), "int")
-write1d(nele,"static const int _dedx_compos_nele", len(nele), "int")
-write1d(cindx,"static const int _dedx_compos_cindx", len(nele), "int")
-write1d(cdata_elem,"static const int _dedx_compos_elem", len(cdata_elem), "int")
-write1d(cdata_frac,"static const float _dedx_compos_frac", len(cdata_frac), "float")
-
+if __name__ == "__main__":
+    main()
