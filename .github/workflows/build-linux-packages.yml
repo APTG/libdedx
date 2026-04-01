@@ -25,6 +25,7 @@ jobs:
       - name: Configure
         run: >
           cmake -S . -B build-packaging
+          -DCMAKE_BUILD_TYPE=Release
           -DDEDX_BUILD_EXAMPLES=ON
           -DDEDX_BUILD_TESTS=OFF
 
