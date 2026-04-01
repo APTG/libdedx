@@ -1,0 +1,55 @@
+name: Build Windows Binaries
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DDEDX_BUILD_EXAMPLES=OFF
+          -DDEDX_BUILD_TESTS=OFF
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/stage
+
+      - name: Build
+        run: cmake --build build --parallel --config Release
+
+      - name: Install
+        run: cmake --install build --config Release
+
+      - name: Package Windows install tree
+        shell: pwsh
+        run: |
+          $pkg = "libdedx-windows-x86_64"
+          New-Item -ItemType Directory -Path dist | Out-Null
+          if (Test-Path $pkg) { Remove-Item -Recurse -Force $pkg }
+          New-Item -ItemType Directory -Path $pkg | Out-Null
+          Copy-Item -Recurse stage\* $pkg\
+          Compress-Archive -Path $pkg -DestinationPath "dist\$pkg.zip"
+
+      - name: Upload artifact for testing
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: libdedx-windows-x86_64
+          path: dist/libdedx-windows-x86_64.zip
+          retention-days: 3
+
+      - name: Upload artifact to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/libdedx-windows-x86_64.zip

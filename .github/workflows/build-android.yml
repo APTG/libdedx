@@ -1,0 +1,64 @@
+name: Build Android Binaries
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        abi: [arm64-v8a, x86_64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+
+      - name: Configure
+        run: >
+          cmake -S . -B build-${{ matrix.abi }}
+          -DDEDX_BUILD_EXAMPLES=OFF
+          -DDEDX_BUILD_TESTS=OFF
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake
+          -DANDROID_ABI=${{ matrix.abi }}
+          -DANDROID_PLATFORM=21
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/stage/${{ matrix.abi }}
+
+      - name: Build
+        run: cmake --build build-${{ matrix.abi }} --parallel
+
+      - name: Install
+        run: cmake --install build-${{ matrix.abi }}
+
+      - name: Package Android install tree
+        run: |
+          mkdir -p dist
+          pkg="libdedx-android-${{ matrix.abi }}"
+          tar -C stage -czf "dist/${pkg}.tar.gz" "${{ matrix.abi }}"
+
+      - name: Upload artifact for testing
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: libdedx-android-${{ matrix.abi }}
+          path: dist/libdedx-android-${{ matrix.abi }}.tar.gz
+          retention-days: 3
+
+      - name: Upload artifact to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/libdedx-android-${{ matrix.abi }}.tar.gz

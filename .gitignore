@@ -5,6 +5,7 @@
 build/
 build-release/
 build-coverage/
+build-packaging/
 
 Testing/
 

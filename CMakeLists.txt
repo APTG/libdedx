@@ -7,6 +7,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+option(DEDX_BUILD_EXAMPLES "Build libdedx example programs" ON)
+option(DEDX_BUILD_TESTS "Build libdedx test suite" ON)
+
 # ---- Version from git tag ----
 find_package(Git QUIET)
 if(GIT_FOUND)
@@ -34,11 +40,34 @@ else()
     set(DEDX_VERSION_MINOR 0)
     set(DEDX_VERSION_PATCH 0)
 endif()
+set(DEDX_PROJECT_VERSION "${DEDX_VERSION_MAJOR}.${DEDX_VERSION_MINOR}.${DEDX_VERSION_PATCH}")
 
 enable_testing()
-add_subdirectory(examples)
 add_subdirectory(src)
-add_subdirectory(tests)
+if(DEDX_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+if(DEDX_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/dedxConfig.cmake.in"
+    "${PROJECT_BINARY_DIR}/dedxConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/dedx"
+)
+
+write_basic_package_version_file(
+    "${PROJECT_BINARY_DIR}/dedxConfigVersion.cmake"
+    VERSION "${DEDX_PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    "${PROJECT_BINARY_DIR}/dedxConfig.cmake"
+    "${PROJECT_BINARY_DIR}/dedxConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/dedx"
+)
 
 # add uninstall target according to CMAKE FAQ:
 # https://gitlab.kitware.com/cmake/community/-/wikis/FAQ#can-i-do-make-uninstall-with-cmake

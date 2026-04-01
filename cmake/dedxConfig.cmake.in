@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/dedxTargets.cmake")
+
+if(TARGET dedx::shared AND NOT TARGET dedx::dedx)
+    add_library(dedx::dedx INTERFACE IMPORTED)
+    set_property(TARGET dedx::dedx PROPERTY INTERFACE_LINK_LIBRARIES dedx::shared)
+endif()
+
+check_required_components(dedx)
