@@ -25,6 +25,7 @@ target_compile_definitions(dedx_objects PRIVATE
     DEDX_VERSION_MAJOR=${DEDX_VERSION_MAJOR}
     DEDX_VERSION_MINOR=${DEDX_VERSION_MINOR}
     DEDX_VERSION_PATCH=${DEDX_VERSION_PATCH}
+    DEDX_VERSION_STRING="${GIT_VERSION}"
 )
 
 # Static library for C/CMake consumers.

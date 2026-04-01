@@ -193,6 +193,10 @@ void dedx_get_version(int *major, int *minor, int *patch) {
     return;
 }
 
+const char *dedx_get_version_string(void) {
+    return DEDX_VERSION_STRING;
+}
+
 void dedx_get_composition(int target, float composition[][2], unsigned int *comp_len, int *err) {
     dedx_internal_get_composition(target, composition, comp_len, err);
 }

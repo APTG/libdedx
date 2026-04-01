@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'libdEdx'
-copyright = '2021, J. Toftegard, N. Bassler, L. Grzanka'
-author = 'J. Toftegard, N. Bassler, L. Grzanka'
+project = 'libdedx'
+copyright = '2026, Jakob Toftegaard, Niels Bassler, Leszek Grzanka'
+author = 'Jakob Toftegaard, Niels Bassler, Leszek Grzanka'
 
 
 # -- General configuration ---------------------------------------------------
