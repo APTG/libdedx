@@ -8,6 +8,7 @@ foreach(test_src ${TEST_SOURCES})
 
     add_executable(${test_name} ${test_src})
     target_link_libraries(${test_name} PRIVATE dedx)
+    target_include_directories(${test_name} PRIVATE "${PROJECT_SOURCE_DIR}/src")
     if(NOT WIN32)
         target_link_libraries(${test_name} PRIVATE m)
     endif()

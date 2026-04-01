@@ -79,5 +79,18 @@ int main(void) {
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 
+    /* invalid interpolation mode must be rejected during config validation */
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_PSTAR;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = DEDX_WATER;
+    cfg->interpolation_mode = 99;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_ERR_INVALID_INTERPOLATION_MODE, "invalid interpolation mode");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
     return failures;
 }

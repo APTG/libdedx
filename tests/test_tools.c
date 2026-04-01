@@ -10,6 +10,8 @@ static int failf(const char *label, double got, double expected) {
 }
 
 static int faili(const char *label, int got, int expected) {
+    if (got == expected)
+        return 0;
     fprintf(stderr, "FAIL %s: got %d expected %d\n", label, got, expected);
     return 1;
 }
@@ -67,6 +69,8 @@ int main(void) {
     stp = dedx_get_stp(ws, cfg, energy, &err);
     if (err != DEDX_OK) {
         failures += faili("dedx_get_stp err", err, DEDX_OK);
+    } else if (!(stp > 0.0)) {
+        failures += failf("dedx_get_stp value", stp, 1.0);
     }
 
     err = convert_units(DEDX_MEVCM2G, DEDX_KEVUM, DEDX_WATER, 2, old_values, new_values);

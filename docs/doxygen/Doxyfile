@@ -2,7 +2,7 @@ PROJECT_NAME           = "libdedx"
 PROJECT_BRIEF          = "Stopping power (dE/dx) library"
 PROJECT_NUMBER         =
 
-INPUT                  = ../../libdedx/dedx.h ../../libdedx/dedx_wrappers.h ../../libdedx/dedx_tools.h
+INPUT                  = ../../include/dedx.h ../../include/dedx_wrappers.h ../../include/dedx_tools.h
 RECURSIVE              = NO
 
 OUTPUT_DIRECTORY       = .

@@ -1,0 +1,16 @@
+#ifndef DEDX_LOOKUP_ACCELERATOR_H
+#define DEDX_LOOKUP_ACCELERATOR_H
+
+/** @brief Cached interval index for repeated spline evaluations.
+ *
+ *  The spline evaluator stores the last successful interval in @c cache so
+ *  nearby lookups can skip the binary search. The hit/miss counters are
+ *  currently informational only.
+ */
+typedef struct {
+    int cache;
+    int hits;
+    int miss;
+} dedx_internal_lookup_accelerator;
+
+#endif // DEDX_LOOKUP_ACCELERATOR_H
