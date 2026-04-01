@@ -1,0 +1,7 @@
+libdedx is a C library for charged particle stopping power calculations
+(dE/dx) in materials.
+
+Authors: Jakob Toftegaard, Niels Bassler, and Leszek Grzanka.
+
+This package contains the shared and static libraries, public headers,
+the exported CMake package configuration, and the getdedx command-line tool.

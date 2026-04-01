@@ -8,3 +8,10 @@ coverage:
       default:
         target: 70%
         threshold: 1%
+ignore:
+  - ".github/**"
+  - "cmake/**"
+  - "**/CMakeLists.txt"
+  - "tests/install_smoke_test.cmake"
+  - "tests/install_consumer_cmake/**"
+  - "examples/**"

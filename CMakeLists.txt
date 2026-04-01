@@ -7,6 +7,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+option(DEDX_BUILD_EXAMPLES "Build libdedx example programs" ON)
+option(DEDX_BUILD_TESTS "Build libdedx test suite" ON)
+
 # ---- Version from git tag ----
 find_package(Git QUIET)
 if(GIT_FOUND)
@@ -34,11 +40,84 @@ else()
     set(DEDX_VERSION_MINOR 0)
     set(DEDX_VERSION_PATCH 0)
 endif()
+set(DEDX_PROJECT_VERSION "${DEDX_VERSION_MAJOR}.${DEDX_VERSION_MINOR}.${DEDX_VERSION_PATCH}")
 
 enable_testing()
-add_subdirectory(examples)
 add_subdirectory(src)
-add_subdirectory(tests)
+if(DEDX_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+if(DEDX_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/dedxConfig.cmake.in"
+    "${PROJECT_BINARY_DIR}/dedxConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/dedx"
+)
+
+write_basic_package_version_file(
+    "${PROJECT_BINARY_DIR}/dedxConfigVersion.cmake"
+    VERSION "${DEDX_PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    "${PROJECT_BINARY_DIR}/dedxConfig.cmake"
+    "${PROJECT_BINARY_DIR}/dedxConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/dedx"
+)
+
+# Minimal packaging metadata for CPack-generated release artifacts.
+set(CPACK_PACKAGE_NAME "libdedx")
+set(CPACK_PACKAGE_VENDOR "Aarhus Particle Therapy Group")
+set(CPACK_PACKAGE_CONTACT "https://github.com/APTG/libdedx/issues")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/APTG/libdedx")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Library for charged particle stopping power calculations")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/cmake/package-description.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_VERSION_MAJOR "${DEDX_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${DEDX_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${DEDX_VERSION_PATCH}")
+set(CPACK_PACKAGE_FILE_NAME
+    "${CPACK_PACKAGE_NAME}-${DEDX_PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}"
+)
+set(CPACK_SOURCE_PACKAGE_FILE_NAME
+    "${CPACK_PACKAGE_NAME}-${DEDX_PROJECT_VERSION}"
+)
+set(CPACK_SOURCE_IGNORE_FILES
+    "/build/;/build-release/;/build-coverage/;/build-packaging/;/.git/;/.venv/;/.idea/;/.vscode/;__pycache__/;\\\\.pyc$"
+)
+
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "https://github.com/APTG/libdedx/issues")
+string(CONCAT CPACK_DEBIAN_PACKAGE_DESCRIPTION
+    "libdedx is a C library for charged particle stopping power calculations (dE/dx) in materials.\n"
+    "Authors: Jakob Toftegaard, Niels Bassler, and Leszek Grzanka.\n"
+    ".\n"
+    "This package contains the shared and static libraries, public headers, exported CMake package files,\n"
+    "and the getdedx command-line tool."
+)
+
+set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
+set(CPACK_RPM_PACKAGE_LICENSE "GPL-3.0-or-later")
+set(CPACK_RPM_PACKAGE_GROUP "Applications/Science")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/APTG/libdedx")
+set(CPACK_RPM_PACKAGE_RELEASE 1)
+string(CONCAT CPACK_RPM_PACKAGE_DESCRIPTION
+    "libdedx is a C library for charged particle stopping power calculations (dE/dx) in materials.\n"
+    "\n"
+    "Authors: Jakob Toftegaard, Niels Bassler, and Leszek Grzanka.\n"
+    "\n"
+    "This package contains the shared and static libraries, public headers, exported CMake package files,\n"
+    "and the getdedx command-line tool."
+)
+
+include(CPack)
 
 # add uninstall target according to CMAKE FAQ:
 # https://gitlab.kitware.com/cmake/community/-/wikis/FAQ#can-i-do-make-uninstall-with-cmake
