@@ -34,8 +34,8 @@ an energy_scale factor to convert to MeV/u before embedding:
   alpha               : 0.25 (A = 4)
   carbon              : 1/12 (A = 12)
 
-Run from libdedx/data/:
-    python3 pdf2dat.py
+Usage:
+    python3 libdedx/data/tools/pdf2dat.py
 """
 
 import os
@@ -209,7 +209,9 @@ def write_dataset(ion_id, target_data, outdir):
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    raw_path   = os.path.join(script_dir, "icru_90_raw.txt")
+    data_dir   = os.path.dirname(script_dir)
+    raw_dir    = os.path.join(data_dir, "raw")
+    raw_path   = os.path.join(raw_dir, "icru_90_raw.txt")
 
     if not os.path.exists(raw_path):
         print(f"ERROR: {raw_path} not found", file=sys.stderr)
@@ -223,7 +225,7 @@ def main():
         sys.exit(1)
 
     for ion_id in sorted(data):
-        write_dataset(ion_id, data[ion_id], script_dir)
+        write_dataset(ion_id, data[ion_id], raw_dir)
 
     print("Done.")
 

@@ -1,5 +1,5 @@
 /* Auto-generated from ICRU_ASTAR.dat, icru_astarEng.dat -- do not edit.
- * Regenerate: python3 dat2c.py icru_astar
+ * Regenerate: python3 libdedx/data/tools/dat2c.py icru_astar
  * Energy values are in MeV/u (kinetic energy per nucleon).
  */
 

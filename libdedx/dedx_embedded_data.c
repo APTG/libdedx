@@ -19,17 +19,17 @@
 
 #include <stddef.h>
 
-#include "data/dedx_astar.h"
-#include "data/dedx_bethe.h"
-#include "data/dedx_icru90_C.h"
-#include "data/dedx_icru90_a.h"
-#include "data/dedx_icru90_p.h"
-#include "data/dedx_icru73.h"
-#include "data/dedx_icru73new.h"
-#include "data/dedx_icru_astar.h"
-#include "data/dedx_icru_pstar.h"
-#include "data/dedx_mstar.h"
-#include "data/dedx_pstar.h"
+#include "data/embedded/dedx_astar.h"
+#include "data/embedded/dedx_bethe.h"
+#include "data/embedded/dedx_icru90_C.h"
+#include "data/embedded/dedx_icru90_a.h"
+#include "data/embedded/dedx_icru90_p.h"
+#include "data/embedded/dedx_icru73.h"
+#include "data/embedded/dedx_icru73new.h"
+#include "data/embedded/dedx_icru_astar.h"
+#include "data/embedded/dedx_icru_pstar.h"
+#include "data/embedded/dedx_mstar.h"
+#include "data/embedded/dedx_pstar.h"
 
 enum {
     DEDX_EMBEDDED_ICRU90_P = 1001,

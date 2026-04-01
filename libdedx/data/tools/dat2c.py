@@ -22,13 +22,13 @@ Companion arrays:
     dedx_<prog>_ion_ids[]     projectile Z values
     dedx_<prog>_target_ids[]  NIST/ICRU material IDs (= Z for elements)
 
-Usage (run from libdedx/data/):
-    python3 dat2c.py pstar
-    python3 dat2c.py all
+Usage:
+    python3 libdedx/data/tools/dat2c.py pstar
+    python3 libdedx/data/tools/dat2c.py all
 """
 
-import os
 import sys
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Dataset catalogue
@@ -199,7 +199,7 @@ def _header_lines(name, source_files, note=""):
     guard = f"DEDX_DATA_{name.upper()}_H"
     lines = [
         f"/* Auto-generated from {sources} -- do not edit.",
-        f" * Regenerate: python3 dat2c.py {name}",
+        f" * Regenerate: python3 libdedx/data/tools/dat2c.py {name}",
     ]
     if note:
         lines.append(f" * {note}")
@@ -236,7 +236,7 @@ def generate(name, dat_path, eng_path, energy_scale):
     pfx       = f"dedx_{name}"
 
     scale_note = "" if energy_scale == 1.0 else f" (scaled by {energy_scale} from raw file)"
-    L = _header_lines(name, [os.path.basename(dat_path), os.path.basename(eng_path)],
+    L = _header_lines(name, [Path(dat_path).name, Path(eng_path).name],
                       f"Energy values are in MeV/u (kinetic energy per nucleon).{scale_note}")
 
     # Uniform 3D layout: [n_ions][n_targets][n_energies]
@@ -271,7 +271,7 @@ def generate_energy_only(name, eng_path, energy_scale):
     energy = [v * energy_scale for v in read_energy(eng_path)]
     pfx    = f"dedx_{name}"
 
-    L = _header_lines(name, [os.path.basename(eng_path)],
+    L = _header_lines(name, [Path(eng_path).name],
                       "Energy values are in MeV/u (kinetic energy per nucleon).")
     L.extend(emit_float_1d(f"{pfx}_energy", energy))
     L.extend(_footer_lines(name))
@@ -282,7 +282,11 @@ def generate_energy_only(name, eng_path, energy_scale):
 # ---------------------------------------------------------------------------
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    script_dir = Path(__file__).resolve().parent
+    data_dir = script_dir.parent
+    raw_dir = data_dir / "raw"
+    embedded_dir = data_dir / "embedded"
+
     requested = sys.argv[1:] if len(sys.argv) > 1 else ["all"]
     if requested == ["all"]:
         requested = list(DATASETS) + list(ENERGY_ONLY)
@@ -290,16 +294,16 @@ def main():
     for name in requested:
         if name in DATASETS:
             dat, eng, scale = DATASETS[name]
-            outfile = f"dedx_{name}.h"
+            outfile = embedded_dir / f"dedx_{name}.h"
             print(f"Generating {outfile} ...")
             with open(outfile, "w") as fh:
-                fh.write(generate(name, dat, eng, scale))
+                fh.write(generate(name, raw_dir / dat, raw_dir / eng, scale))
         elif name in ENERGY_ONLY:
             eng, scale = ENERGY_ONLY[name]
-            outfile = f"dedx_{name}.h"
+            outfile = embedded_dir / f"dedx_{name}.h"
             print(f"Generating {outfile} (energy only) ...")
             with open(outfile, "w") as fh:
-                fh.write(generate_energy_only(name, eng, scale))
+                fh.write(generate_energy_only(name, raw_dir / eng, scale))
         else:
             print(f"Unknown dataset: {name!r}", file=sys.stderr)
             avail = ", ".join(list(DATASETS) + list(ENERGY_ONLY))

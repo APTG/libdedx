@@ -119,7 +119,7 @@ void dedx_get_error_code(char *err_str, int err) {
         strcpy(err_str, "Legacy stopping-power source data is unavailable.");
         break;
     case DEDX_ERR_NO_NAMES_FILE:
-        strcpy(err_str, "Unable to read short_names file.");
+        strcpy(err_str, "Reserved internal metadata code.");
         break;
     case DEDX_ERR_NO_COMPOSITION:
         strcpy(err_str, "Embedded elemental composition metadata is unavailable.");

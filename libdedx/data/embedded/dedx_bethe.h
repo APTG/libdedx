@@ -1,5 +1,5 @@
 /* Auto-generated from betheEng.dat -- do not edit.
- * Regenerate: python3 dat2c.py bethe
+ * Regenerate: python3 libdedx/data/tools/dat2c.py bethe
  * Energy values are in MeV/u (kinetic energy per nucleon).
  */
 

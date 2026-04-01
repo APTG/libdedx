@@ -1,5 +1,5 @@
 /* Auto-generated from ESTAR.dat, estarEng.dat -- do not edit.
- * Regenerate: python3 dat2c.py estar
+ * Regenerate: python3 libdedx/data/tools/dat2c.py estar
  * Energy values are in MeV/u (kinetic energy per nucleon).
  */
 

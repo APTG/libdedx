@@ -1,8 +1,19 @@
-/* Auto-generated from compos.txt, effective_charge.dat, and gas_states.dat -- do not edit. */
+/* Embedded metadata tables used by libdedx.
+ * Density/I-value rows and effective-charge / gas-state entries are compiled
+ * into the library directly. The legacy compos.txt / composition intermediates
+ * are no longer part of the retained raw-data set.
+ */
 #ifndef DEDX_DATA_METADATA_H
 #define DEDX_DATA_METADATA_H
 
+/** @brief One embedded density/I-value metadata row.
+ *
+ *  The `state` field is `0` for the default entry, or a libdedx compound-state
+ *  selector for state-specific I-values.
+ */
 typedef struct { int id; float density; float i_value; int state; } dedx_embedded_compos_row;
+
+/** @brief Embedded density and I-value metadata rows keyed by material ID. */
 static const dedx_embedded_compos_row dedx_embedded_compos_rows[285] = {
     {1, 8.37480000e-05f, 1.92000000e+01f, 1},
     {1, 8.37480000e-05f, 2.18000000e+01f, 2},
@@ -291,7 +302,10 @@ static const dedx_embedded_compos_row dedx_embedded_compos_rows[285] = {
     {278, 8.70000000e-01f, 6.18000000e+01f, 0}
 };
 
+/** @brief One embedded effective-charge override entry keyed by material ID. */
 typedef struct { int id; float charge; } dedx_embedded_charge_row;
+
+/** @brief Embedded effective-charge overrides for compound/material IDs. */
 static const dedx_embedded_charge_row dedx_embedded_charge_rows[49] = {
     {99, 5.94261800e+00f},
     {101, 5.61291000e+00f},
@@ -344,6 +358,7 @@ static const dedx_embedded_charge_row dedx_embedded_charge_rows[49] = {
     {906, 6.00000000e+00f}
 };
 
+/** @brief Embedded list of target IDs treated as gaseous by libdedx. */
 static const int dedx_embedded_gas_targets[29] = {
     1, 2, 7, 8, 9, 10, 17, 18, 36, 54, 86, 101,
     104, 108, 124, 134, 152, 155, 161, 162, 163, 164, 165, 197,

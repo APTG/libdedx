@@ -17,8 +17,8 @@
 
 #include "dedx_embedded_metadata.h"
 
-#include "data/dedx_composition.h"
-#include "data/dedx_metadata.h"
+#include "data/embedded/dedx_composition.h"
+#include "data/embedded/dedx_metadata.h"
 
 static int find_target_index(int target) {
     int i;

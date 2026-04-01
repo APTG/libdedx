@@ -1,5 +1,5 @@
 /* Auto-generated from ICRU90_pos.dat, icru90_posEng.dat -- do not edit.
- * Regenerate: python3 dat2c.py icru90_pos
+ * Regenerate: python3 libdedx/data/tools/dat2c.py icru90_pos
  * Energy values are in MeV/u (kinetic energy per nucleon).
  */
 
