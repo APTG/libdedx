@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 
 #include "dedx_config.h"
+#include "dedx_embedded_data.h"
 #include "dedx_file.h"
 #include "dedx_split.h"
 
@@ -52,6 +53,34 @@ static const char *get_data_path(void) {
         done = 1;
     }
     return resolved;
+}
+
+static int read_embedded_stopping_data(stopping_data *data, int prog, int ion, int target) {
+    const float *stp = NULL;
+    int energy_len = 0;
+
+    if (dedx_embedded_find_table(prog, ion, target, NULL, &energy_len, &stp) != 0) {
+        return -1;
+    }
+
+    memset(data, 0, sizeof(*data));
+    data->target = target;
+    data->ion = ion;
+    data->length = (unsigned int) energy_len;
+    memcpy(data->data, stp, sizeof(float) * (size_t) energy_len);
+    return 0;
+}
+
+static int read_embedded_energy_data(float *energy, int prog) {
+    const dedx_embedded_program_data *data = dedx_embedded_get_program_data(prog);
+
+    if (data == NULL) {
+        return -1;
+    }
+
+    memset(energy, 0, sizeof(float) * DEDX_MAX_ELEMENTS);
+    memcpy(energy, data->energy, sizeof(float) * (size_t) data->energy_len);
+    return 0;
 }
 
 static void convert_to_binary(char *path, char *output, int *err) {
@@ -124,6 +153,10 @@ void dedx_internal_read_binary_data(stopping_data *data, int prog, int ion, int 
     stopping_data dat;
 
     *err = DEDX_OK;
+    if (read_embedded_stopping_data(data, prog, ion, target) == 0) {
+        return;
+    }
+
     folder = get_data_path();
     snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_program_file(prog));
 
@@ -205,6 +238,10 @@ void dedx_internal_read_energy_data(float *energy, int prog, int *err) {
     FILE *fp;
 
     *err = DEDX_OK;
+    if (read_embedded_energy_data(energy, prog) == 0) {
+        return;
+    }
+
     folder = get_data_path();
     snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_energy_file(prog));
 

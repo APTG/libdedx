@@ -63,6 +63,8 @@ int main(void) {
     failures += check_string_present("program version", dedx_get_program_version(DEDX_PSTAR));
     failures += check_string_present("material name", dedx_get_material_name(DEDX_WATER));
     failures += check_string_present("ion name", dedx_get_ion_name(DEDX_PROTON));
+    failures += check_close("ICRU carbon min", dedx_get_min_energy(DEDX_ICRU, DEDX_CARBON), 0.001 / 12.0, 1e-6);
+    failures += check_close("ICRU carbon max", dedx_get_max_energy(DEDX_ICRU, DEDX_CARBON), 10000.0 / 12.0, 1e-6);
 
     programs = dedx_get_program_list();
     if (programs == NULL || programs[0] < 0)

@@ -23,6 +23,7 @@
 
 #include "dedx_bethe.h"
 #include "dedx_config.h"
+#include "dedx_embedded_data.h"
 #include "dedx_file.h"
 #include "dedx_file_access.h"
 #include "dedx_lookup_data.h"
@@ -253,7 +254,10 @@ float dedx_get_min_energy(int program, int ion) {
         energy_min = get_min_energy_icru(ion);
         break;
     case DEDX_ICRU:
-        energy_min = get_min_energy_icru(ion);
+        if (ion == DEDX_CARBON)
+            energy_min = 0.001f / 12.0f;
+        else
+            energy_min = get_min_energy_icru(ion);
         break;
     case DEDX_DEFAULT:
         energy_min = 0.001;
@@ -291,7 +295,10 @@ float dedx_get_max_energy(int program, int ion) {
         energy_max = get_max_energy_icru(ion);
         break;
     case DEDX_ICRU:
-        energy_max = get_max_energy_icru(ion);
+        if (ion == DEDX_CARBON)
+            energy_max = 10000.0f / 12.0f;
+        else
+            energy_max = get_max_energy_icru(ion);
         break;
     case DEDX_DEFAULT:
         energy_max = 1000.0;
@@ -559,29 +566,10 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
     *err = DEDX_OK;
 
     if (prog == DEDX_ICRU) {
-        if (ion == 1) {
-            prog_load = _DEDX_0008;
-        } else if (ion == 2) {
-            prog_load = DEDX_ICRU49;
-        } else if (!(target == DEDX_WATER || target == DEDX_AIR)) {
-            prog_load = DEDX_ICRU73_OLD;
-        } else {
-            prog_load = DEDX_ICRU73;
-        }
     } else if (prog == DEDX_ICRU49) {
-        if (ion == 1) {
-            prog_load = _DEDX_0008;
-        } else if (ion == 2) {
-            prog_load = DEDX_ICRU49;
-        } else {
-            *err = DEDX_ERR_COMBINATION_NOT_FOUND;
-            return -1;
-        }
     } else if (prog == DEDX_ESTAR) {
         *err = DEDX_ERR_ESTAR_NOT_IMPL;
         return -1;
-    } else if (prog == DEDX_ICRU73 && !(target == 276 || target == 104)) {
-        prog_load = DEDX_ICRU73_OLD;
     } else if (prog == DEDX_MSTAR && ion > 1) {
         ion_load = 2;
     } else if (prog == DEDX_BETHE_EXT00 || prog == DEDX_DEFAULT) {
@@ -595,6 +583,11 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
         return 0;
     }
 
+    if (dedx_embedded_resolve_program(prog_load, ion_load, target_load, &prog_load) != 0 &&
+        (prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73)) {
+        *err = DEDX_ERR_COMBINATION_NOT_FOUND;
+        return -1;
+    }
     dedx_internal_read_binary_data(data, prog_load, ion_load, target_load, err);
     if (*err != 0)
         return -1;
