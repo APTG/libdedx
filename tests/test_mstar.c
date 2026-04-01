@@ -55,7 +55,7 @@ static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, floa
 
     if (failures == 0 && check_result(lhs_value, rhs_value)) {
         fprintf(stderr,
-                "FAIL mode-equivalence: %s target=%d E=%.3e MeV/u got %.5e expected %.5e\n",
+                "FAIL mode-equivalence: %s target=%d E=%.3e MeV/nucl got %.5e expected %.5e\n",
                 label,
                 target,
                 energy,

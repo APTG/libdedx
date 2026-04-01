@@ -33,7 +33,7 @@ static inline int check_config_stp(dedx_config *cfg, float energy, float expecte
 
     if (check_result(result, expected)) {
         fprintf(stderr,
-                "FAIL stp: %s program=%d ion=%d target=%d E=%.3e MeV/u: got %.5e expected %.5e\n",
+                "FAIL stp: %s program=%d ion=%d target=%d E=%.3e MeV/nucl: got %.5e expected %.5e\n",
                 label,
                 program,
                 ion,

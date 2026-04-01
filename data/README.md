@@ -34,14 +34,14 @@ Not every historical intermediate file is still kept in `data/raw/`.
 
 ## Energy Convention
 
-The generated headers are intended to use `MeV/u` consistently.
+The generated headers are intended to use `MeV/nucl` consistently.
 
 For the checked-in alpha tables:
 
 - `data/raw/ASTAR.dat` + `data/raw/astarEng.dat`
 - `data/raw/ICRU_ASTAR.dat` + `data/raw/icru_astarEng.dat`
 
-the `*Eng.dat` grids are already aligned with the `MeV/u` convention used by
+the `*Eng.dat` grids are already aligned with the `MeV/nucl` convention used by
 libdedx and must not be scaled again during header generation.
 
 ## ASTAR vs ICRU_ASTAR
@@ -62,7 +62,7 @@ The largest difference observed while comparing `data/raw/ASTAR.dat` and
 
 - ion: `He` (`Z = 2`)
 - target: `STILBENE` (`id = 255`)
-- energy: `1.0 MeV/u`
+- energy: `1.0 MeV/nucl`
 - `ASTAR.dat`: `1.0155e+03 MeV cm^2/g`
 - `ICRU_ASTAR.dat`: `1.0160e+03 MeV cm^2/g`
 - relative difference: about `4.9e-4` (`0.049%`)
