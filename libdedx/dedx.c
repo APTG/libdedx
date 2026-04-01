@@ -23,7 +23,7 @@
 
 #include "dedx_bethe.h"
 #include "dedx_embedded_data.h"
-#include "dedx_file_access.h"
+#include "dedx_data_access.h"
 #include "dedx_lookup_data.h"
 #include "dedx_mstar.h"
 #include "dedx_periodic_table.h"

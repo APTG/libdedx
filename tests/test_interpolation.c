@@ -1,6 +1,6 @@
 #include "test_helpers.h"
 
-#include <dedx_file_access.h>
+#include <dedx_data_access.h>
 #include <dedx_wrappers.h>
 
 #include <string.h>

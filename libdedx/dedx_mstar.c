@@ -16,7 +16,7 @@
 */
 #include "dedx_mstar.h"
 
-#include "dedx_file_access.h"
+#include "dedx_data_access.h"
 
 static char resolve_mstar_mode(char state, dedx_config *config, int *err) {
     int target_state = config->compound_state;

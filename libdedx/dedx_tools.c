@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "dedx_file_access.h"
+#include "dedx_data_access.h"
 
 typedef struct {
     dedx_workspace *ws;

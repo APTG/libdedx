@@ -1,7 +1,7 @@
 # Object library: compiled once with -fPIC so the objects feed both the
 # static and the shared library without a second compilation pass.
 add_library(dedx_objects OBJECT
-    dedx_tools.c dedx_bethe.c dedx.c dedx_wrappers.c dedx_file_access.c
+    dedx_tools.c dedx_bethe.c dedx.c dedx_wrappers.c dedx_data_access.c
     dedx_embedded_data.c dedx_embedded_metadata.c dedx_mpaul.c dedx_mstar.c dedx_spline.c
     dedx_periodic_table.c tools/dedx_math.c dedx_validate.c
 )

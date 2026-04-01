@@ -23,8 +23,11 @@
 static int find_target_index(int target) {
     int i;
 
-    for (i = 0; i < (int) (sizeof(_dedx_compos_list) / sizeof(_dedx_compos_list[0])); i++) {
-        if (_dedx_compos_list[i] == target) {
+    for (i = 0;
+         i < (int) (sizeof(dedx_embedded_composition_targets) /
+                    sizeof(dedx_embedded_composition_targets[0]));
+         i++) {
+        if (dedx_embedded_composition_targets[i] == target) {
             return i;
         }
     }
@@ -125,11 +128,11 @@ int dedx_embedded_get_composition(int target, float composition[][2], unsigned i
         return -1;
     }
 
-    start = _dedx_compos_cindx[idx];
-    count = _dedx_compos_nele[idx];
+    start = dedx_embedded_composition_offsets[idx];
+    count = dedx_embedded_composition_lengths[idx];
     for (i = 0; i < count; i++) {
-        composition[i][0] = (float) _dedx_compos_elem[start + i];
-        composition[i][1] = _dedx_compos_frac[start + i];
+        composition[i][0] = (float) dedx_embedded_composition_elements[start + i];
+        composition[i][1] = dedx_embedded_composition_fractions[start + i];
     }
     *length = (unsigned int) count;
     return 0;

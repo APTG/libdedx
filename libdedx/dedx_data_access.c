@@ -15,7 +15,7 @@
     along with libdedx.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "dedx_file_access.h"
+#include "dedx_data_access.h"
 
 #include <string.h>
 

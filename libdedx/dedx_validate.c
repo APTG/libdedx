@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "dedx_file_access.h"
+#include "dedx_data_access.h"
 #include "dedx_periodic_table.h"
 
 int dedx_internal_set_names(dedx_config *config, int *err) {
