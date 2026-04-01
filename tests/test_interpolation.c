@@ -38,6 +38,13 @@ interpolate_log_log_natural_spline(const float *energies, const float *stopping,
     unsigned int i;
     int interval = (int) n - 2;
 
+    if (n == 0) {
+        return 0.0;
+    }
+    if (n == 1) {
+        return (double) stopping[0];
+    }
+
     for (i = 0; i < n; i++) {
         log_energy[i] = log((double) energies[i]);
         log_stopping[i] = log((double) stopping[i]);
@@ -96,6 +103,13 @@ interpolate_linear_natural_spline(const float *energies, const float *stopping, 
     double d[DEDX_MAX_ELEMENTS];
     unsigned int i;
     int interval = (int) n - 2;
+
+    if (n == 0) {
+        return 0.0;
+    }
+    if (n == 1) {
+        return (double) stopping[0];
+    }
 
     l[0] = 1.0;
     mu[0] = 0.0;
