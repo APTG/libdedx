@@ -1,16 +1,8 @@
-set(dedx_data_bin
-    data/compos.txt
-    data/effective_charge.dat
-    data/short_names
-    data/composition
-    data/gas_states.dat
-)
-
 # Object library: compiled once with -fPIC so the objects feed both the
 # static and the shared library without a second compilation pass.
 add_library(dedx_objects OBJECT
     dedx_tools.c dedx_bethe.c dedx.c dedx_wrappers.c dedx_file_access.c
-    dedx_embedded_data.c dedx_mpaul.c dedx_mstar.c dedx_spline.c dedx_split.c
+    dedx_embedded_data.c dedx_embedded_metadata.c dedx_mpaul.c dedx_mstar.c dedx_spline.c
     dedx_periodic_table.c tools/dedx_math.c dedx_validate.c
 )
 set_property(TARGET dedx_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -57,9 +49,3 @@ install(TARGETS dedx dedx_shared
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
-
-if(WIN32)
-    install(FILES ${dedx_data_bin} DESTINATION data)
-else()
-    install(FILES ${dedx_data_bin} DESTINATION share/libdedx)
-endif()

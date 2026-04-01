@@ -1,3 +1,0 @@
-// Data paths configured by CMake at build time
-#define DEDX_DATA_PATH "@DEDX_DATA_PATH@"
-#define DEDX_DATA_PATH_LOCAL "@DEDX_DATA_PATH_LOCAL@"

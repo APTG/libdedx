@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "dedx_bethe.h"
-#include "dedx_config.h"
 #include "dedx_embedded_data.h"
 #include "dedx_file_access.h"
 #include "dedx_lookup_data.h"
@@ -96,43 +95,43 @@ void dedx_get_error_code(char *err_str, int err) {
         strcpy(err_str, "No error.");
         break;
     case DEDX_ERR_NO_COMPOS_FILE:
-        strcpy(err_str, "Composition file compos.txt does not exist.");
+        strcpy(err_str, "Embedded density/I-value metadata is unavailable.");
         break;
     case DEDX_ERR_NO_GAS_FILE:
-        strcpy(err_str, "MSTAR file mstar_gas_states.dat does not exist.");
+        strcpy(err_str, "Embedded gas-state metadata is unavailable.");
         break;
     case DEDX_ERR_NO_CHARGE_FILE:
-        strcpy(err_str, "MSTAR effective_charge.dat file does not exist.");
+        strcpy(err_str, "Embedded effective-charge metadata is unavailable.");
         break;
     case DEDX_ERR_NO_BINARY_DATA:
-        strcpy(err_str, "Unable to access binary data file.");
+        strcpy(err_str, "Embedded stopping-power data is unavailable.");
         break;
     case DEDX_ERR_NO_BINARY_ENERGY:
-        strcpy(err_str, "Unable to access binary energy file.");
+        strcpy(err_str, "Embedded energy-grid data is unavailable.");
         break;
     case DEDX_ERR_WRITE_FAILED:
         strcpy(err_str, "Unable to write to disk.");
         break;
     case DEDX_ERR_NO_ENERGY_FILE:
-        strcpy(err_str, "Unable to read energy file.");
+        strcpy(err_str, "Legacy energy source data is unavailable.");
         break;
     case DEDX_ERR_NO_DATA_FILE:
-        strcpy(err_str, "Unable to read data file.");
+        strcpy(err_str, "Legacy stopping-power source data is unavailable.");
         break;
     case DEDX_ERR_NO_NAMES_FILE:
         strcpy(err_str, "Unable to read short_names file.");
         break;
     case DEDX_ERR_NO_COMPOSITION:
-        strcpy(err_str, "Unable to read composition file.");
+        strcpy(err_str, "Embedded elemental composition metadata is unavailable.");
         break;
     case DEDX_ERR_ENERGY_OUT_OF_RANGE:
         strcpy(err_str, "Energy out of bounds.");
         break;
     case DEDX_ERR_TARGET_NOT_FOUND:
-        strcpy(err_str, "Target is not in composition file.");
+        strcpy(err_str, "Target is not in the embedded metadata.");
         break;
     case DEDX_ERR_COMBINATION_NOT_FOUND:
-        strcpy(err_str, "Target and ion combination is not in data file.");
+        strcpy(err_str, "Target and ion combination is not in the embedded data.");
         break;
     case DEDX_ERR_INVALID_DATASET_ID:
         strcpy(err_str, "ID does not exist.");

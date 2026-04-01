@@ -11,7 +11,6 @@ set(configure_args
     -B "${smoke_build}"
     -DCMAKE_INSTALL_PREFIX=${smoke_prefix}
     -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-    -DDEDX_DATA_PATH_LOCAL=              # force use of installed data, not source tree
 )
 if(DEFINED CMAKE_GENERATOR AND NOT CMAKE_GENERATOR STREQUAL "")
     list(PREPEND configure_args -G "${CMAKE_GENERATOR}")
