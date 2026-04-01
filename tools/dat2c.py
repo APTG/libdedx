@@ -114,7 +114,6 @@ def read_dat(path):
 #   6 floats × 13 + 5 × 2 +  8-sp indent  = 78 + 10 + 8  =  96  ✓ (2-D inner / 3-D middle)
 #   6 floats × 13 + 5 × 2 + 12-sp indent  = 78 + 10 + 12 = 100  ✓ (3-D inner)
 _COLS_FLOAT_1D  = 7
-_COLS_FLOAT_2D  = 6
 _COLS_FLOAT_3D  = 6
 _COLS_INT       = 15
 
