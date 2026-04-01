@@ -17,6 +17,7 @@ typedef struct _dedx_lookup_data {
     int target;
     int ion;
     int datapoints;
+    int interpolation_mode;
     _dedx_lookup_accelerator acc;
 } _dedx_lookup_data;
 

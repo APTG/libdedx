@@ -77,6 +77,19 @@ enum {
 
 /** @} */
 
+/**
+ * @defgroup interpolation_modes Stopping-power interpolation modes
+ * @brief Modes for interpolating tabulated stopping-power data.
+ * @{
+ */
+enum {
+    DEDX_INTERPOLATION_LOG_LOG = 0,                /**< Natural cubic spline of ln(stopping) vs ln(energy). */
+    DEDX_INTERPOLATION_LINEAR = 1,                 /**< Natural cubic spline of stopping vs energy. */
+    DEDX_INTERPOLATION_DEFAULT = DEDX_INTERPOLATION_LOG_LOG /**< Default for zero-initialized configs. */
+};
+
+/** @} */
+
 /** @brief Translate a numeric error code to a human-readable string.
  *  @param[out] err_str  Buffer to receive the error description (caller-allocated).
  *  @param[in]  err      Error code returned by a libdedx function.
@@ -202,6 +215,7 @@ void dedx_free_workspace(dedx_workspace *workspace, int *err);
  * Optional fields:
  * - @c compound_state — defaults to normal state of aggregation
  * - @c mstar_mode     — defaults to DEDX_MSTAR_MODE_DEFAULT
+ * - @c interpolation_mode — defaults to DEDX_INTERPOLATION_LOG_LOG
  * - @c i_value        — defaults to tabulated ICRU values
  * - @c rho            — required for Bethe-type programs (DEDX_BETHE_EXT00)
  */
@@ -219,6 +233,7 @@ typedef struct {
     int *elements_id;              /**< Atomic numbers (Z) of each element in compound. */
     int *elements_atoms;           /**< Number of atoms per formula unit for each element. */
     char mstar_mode;               /**< MSTAR mode: DEDX_MSTAR_MODE_DEFAULT or A–H. */
+    int interpolation_mode;        /**< Interpolation mode: DEDX_INTERPOLATION_LOG_LOG or DEDX_INTERPOLATION_LINEAR. */
     float i_value;                 /**< Mean excitation potential of target in eV. */
     float _temp_i_value;           /**< Internal: temporary I-value for Bethe calculation. */
     float rho;                     /**< Target density in g/cm³ (required for DEDX_BETHE_EXT00). */

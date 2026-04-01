@@ -16,6 +16,8 @@ typedef struct {
     float c;
     float d;
     float x;
+    float log_a;
+    float log_x;
 } _dedx_spline_base;
 
 typedef struct {
@@ -25,6 +27,7 @@ typedef struct {
     int target;
     int ion;
     int datapoints;
+    int interpolation_mode;
     _dedx_lookup_accelerator acc;
 } _dedx_lookup_data;
 

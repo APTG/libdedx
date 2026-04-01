@@ -9,6 +9,8 @@ typedef struct {
     float c;
     float d;
     float x;
+    float log_a;
+    float log_x;
 } _dedx_spline_base;
 
 #endif // DEDX_SPLINE_BASE_H

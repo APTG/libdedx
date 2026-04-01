@@ -33,7 +33,7 @@
 #include "dedx_stopping_data.h"
 #include "dedx_validate.h"
 
-static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int prog, int *err);
+static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, dedx_config *config, int *err);
 static int check_energy_bounds(_dedx_lookup_data *data, float energy);
 static float get_min_energy_icru(int ion);
 static float get_max_energy_icru(int ion);
@@ -157,6 +157,9 @@ void dedx_get_error_code(char *err_str, int err) {
         break;
     case DEDX_ERR_INVALID_I_VALUE:
         strcpy(err_str, "I value must be larger than zero.");
+        break;
+    case DEDX_ERR_INVALID_INTERPOLATION_MODE:
+        strcpy(err_str, "Interpolation mode is not supported.");
         break;
     case DEDX_ERR_NO_MEMORY:
         strcpy(err_str, "Out of memory");
@@ -340,7 +343,11 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
 
     // Evaluating the spline function
     return dedx_internal_evaluate_spline(
-        ws->loaded_data[id]->base, energy, &(ws->loaded_data[id]->acc), ws->loaded_data[id]->n);
+        ws->loaded_data[id]->base,
+        energy,
+        &(ws->loaded_data[id]->acc),
+        ws->loaded_data[id]->n,
+        ws->loaded_data[id]->interpolation_mode);
 }
 
 void dedx_free_config(dedx_config *config, int *err) {
@@ -410,8 +417,9 @@ float dedx_get_simple_stp(int ion, int target, float energy, int *err) {
     return stp;
 }
 
-static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int prog, int *err) {
+static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, dedx_config *config, int *err) {
     int active_dataset = ws->active_datasets;
+    int prog = config->program;
 
     *err = DEDX_OK;
 
@@ -420,7 +428,8 @@ static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int
         return -1;
     }
 
-    dedx_internal_calculate_coefficients(ws->loaded_data[active_dataset]->base, energy, data->data, data->length);
+    dedx_internal_calculate_coefficients(
+        ws->loaded_data[active_dataset]->base, energy, data->data, data->length, config->interpolation_mode);
 
     ws->loaded_data[active_dataset]->acc.cache = 0;
     ws->loaded_data[active_dataset]->n = data->length;
@@ -428,6 +437,7 @@ static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, int
     ws->loaded_data[active_dataset]->ion = data->ion;
     ws->loaded_data[active_dataset]->target = data->target;
     ws->loaded_data[active_dataset]->datapoints = data->length;
+    ws->loaded_data[active_dataset]->interpolation_mode = config->interpolation_mode;
 
     ws->active_datasets++;
     return active_dataset;
@@ -533,7 +543,7 @@ static int load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) 
         if (*err != 0)
             return -1;
     } else {
-        cfg = load_data(ws, &data, energy, prog, err);
+        cfg = load_data(ws, &data, energy, config, err);
     }
     return cfg;
 }
@@ -655,7 +665,7 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     }
     data.length = compound_data[0].length;
     free(compound_data);
-    return load_data(ws, &data, energy, config->program, err);
+    return load_data(ws, &data, energy, config, err);
 }
 
 static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy, int *err) {

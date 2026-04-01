@@ -5,6 +5,7 @@ add_executable(dedx_bethe dedx_bethe.c)
 add_executable(dedx_use_wrappers dedx_use_wrappers.c)
 add_executable(dedx_get_sample_csv dedx_get_sample_csv.c)
 add_executable(dedx_csda dedx_csda.c)
+add_executable(dedx_bench_lookup dedx_bench_lookup.c)
 
 target_link_libraries (dedx_example dedx)
 target_link_libraries (getdedx dedx)
@@ -13,6 +14,7 @@ target_link_libraries (dedx_bethe dedx)
 target_link_libraries (dedx_use_wrappers dedx)
 target_link_libraries (dedx_get_sample_csv dedx)
 target_link_libraries (dedx_csda dedx)
+target_link_libraries (dedx_bench_lookup dedx)
 
 # Visual Studio does not need or want you to explicitly request linking the math library.
 # You must avoid adding it as a link library when building for Windows.
@@ -25,6 +27,7 @@ IF (NOT WIN32)
     target_link_libraries (dedx_use_wrappers m)
     target_link_libraries (dedx_get_sample_csv m)
     target_link_libraries (dedx_csda m)
+    target_link_libraries (dedx_bench_lookup m)
 ENDIF()
 
 # some of the examples need data/ folder in the same location as generated executable

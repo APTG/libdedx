@@ -25,6 +25,15 @@ int dedx_internal_validate_rho(dedx_config *config, int *err) {
     return 0;
 }
 
+static int dedx_internal_validate_interpolation_mode(dedx_config *config, int *err) {
+    if (config->interpolation_mode != DEDX_INTERPOLATION_LOG_LOG &&
+        config->interpolation_mode != DEDX_INTERPOLATION_LINEAR) {
+        *err = DEDX_ERR_INVALID_INTERPOLATION_MODE;
+        return -1;
+    }
+    return 0;
+}
+
 int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
     int i;
 
@@ -156,6 +165,11 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
 }
 
 int dedx_internal_validate_config(dedx_config *config, int *err) {
+    dedx_internal_validate_interpolation_mode(config, err);
+    if (*err != 0) {
+        return -1;
+    }
+
     dedx_internal_validate_rho(config, err);
     if (*err != 0) {
         return -1;

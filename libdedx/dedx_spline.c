@@ -34,8 +34,51 @@ static int binary_search(_dedx_spline_base *coef, float value, int n) {
     return guess;
 }
 
-void dedx_internal_calculate_coefficients(_dedx_spline_base *coef, float *energy, float *stopping, int n) {
+static void calculate_linear_coefficients(_dedx_spline_base *coef, const float *energy, const float *stopping, int n) {
     int i;
+    float h[DEDX_MAX_ELEMENTS];
+    float alpha[DEDX_MAX_ELEMENTS];
+    float l[DEDX_MAX_ELEMENTS];
+    float my[DEDX_MAX_ELEMENTS];
+    float z[DEDX_MAX_ELEMENTS];
+
+    l[0] = 1.0f;
+    my[0] = 0.0f;
+    z[0] = 0.0f;
+
+    l[n - 1] = 1.0f;
+    z[n - 1] = 0.0f;
+    coef[n - 1].c = 0.0f;
+
+    for (i = 0; i < n; i++) {
+        coef[i].a = stopping[i];
+        coef[i].x = energy[i];
+        coef[i].log_a = NAN;
+        coef[i].log_x = NAN;
+    }
+    for (i = 0; i < n - 1; i++) {
+        h[i] = energy[i + 1] - energy[i];
+    }
+    for (i = 1; i < n - 1; i++) {
+        alpha[i] = 3.0f / h[i] * (stopping[i + 1] - stopping[i]) - 3.0f / h[i - 1] * (stopping[i] - stopping[i - 1]);
+    }
+    for (i = 1; i < n - 1; i++) {
+        l[i] = 2.0f * (energy[i + 1] - energy[i - 1]) - h[i - 1] * my[i - 1];
+        my[i] = h[i] / l[i];
+        z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
+    }
+    for (i = n - 2; i >= 0; i--) {
+        coef[i].c = z[i] - my[i] * coef[i + 1].c;
+        coef[i].b = (coef[i + 1].a - coef[i].a) / h[i] - h[i] * (coef[i + 1].c + 2.0f * coef[i].c) / 3.0f;
+        coef[i].d = (coef[i + 1].c - coef[i].c) / (3.0f * h[i]);
+    }
+}
+
+void dedx_internal_calculate_coefficients(
+    _dedx_spline_base *coef, float *energy, float *stopping, int n, int interpolation_mode) {
+    int i;
+    float log_energy[DEDX_MAX_ELEMENTS];
+    float log_stopping[DEDX_MAX_ELEMENTS];
     float h[DEDX_MAX_ELEMENTS];
     float alpha[DEDX_MAX_ELEMENTS];
     float l[DEDX_MAX_ELEMENTS];
@@ -45,37 +88,54 @@ void dedx_internal_calculate_coefficients(_dedx_spline_base *coef, float *energy
     if (n < 2)
         return;
 
-    l[0] = 1;
-    my[0] = 0;
-    z[0] = 0;
-
-    l[n - 1] = 1;
-    z[n - 1] = 0;
-    coef[n - 1].c = 0;
+    if (interpolation_mode == DEDX_INTERPOLATION_LINEAR) {
+        calculate_linear_coefficients(coef, energy, stopping, n);
+        return;
+    }
 
     for (i = 0; i < n; i++) {
+        if (energy[i] <= 0.0f || stopping[i] <= 0.0f) {
+            calculate_linear_coefficients(coef, energy, stopping, n);
+            return;
+        }
         coef[i].a = stopping[i];
         coef[i].x = energy[i];
+        coef[i].log_x = logf(energy[i]);
+        coef[i].log_a = logf(stopping[i]);
+        log_energy[i] = coef[i].log_x;
+        log_stopping[i] = coef[i].log_a;
     }
+
+    l[0] = 1.0f;
+    my[0] = 0.0f;
+    z[0] = 0.0f;
+
+    l[n - 1] = 1.0f;
+    z[n - 1] = 0.0f;
+    coef[n - 1].c = 0.0f;
+
     for (i = 0; i < n - 1; i++) {
-        h[i] = energy[i + 1] - energy[i];
+        h[i] = log_energy[i + 1] - log_energy[i];
     }
     for (i = 1; i < n - 1; i++) {
-        alpha[i] = 3 / h[i] * (stopping[i + 1] - stopping[i]) - 3 / h[i - 1] * (stopping[i] - stopping[i - 1]);
+        alpha[i] = 3.0f / h[i] * (log_stopping[i + 1] - log_stopping[i]) -
+                   3.0f / h[i - 1] * (log_stopping[i] - log_stopping[i - 1]);
     }
     for (i = 1; i < n - 1; i++) {
-        l[i] = 2 * (energy[i + 1] - energy[i - 1]) - h[i - 1] * my[i - 1];
+        l[i] = 2.0f * (log_energy[i + 1] - log_energy[i - 1]) - h[i - 1] * my[i - 1];
         my[i] = h[i] / l[i];
         z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
     }
     for (i = n - 2; i >= 0; i--) {
         coef[i].c = z[i] - my[i] * coef[i + 1].c;
-        coef[i].b = (coef[i + 1].a - coef[i].a) / h[i] - h[i] * (coef[i + 1].c + 2 * coef[i].c) / 3;
-        coef[i].d = (coef[i + 1].c - coef[i].c) / (3 * h[i]);
+        coef[i].b = (log_stopping[i + 1] - log_stopping[i]) / h[i] -
+                    h[i] * (coef[i + 1].c + 2.0f * coef[i].c) / 3.0f;
+        coef[i].d = (coef[i + 1].c - coef[i].c) / (3.0f * h[i]);
     }
 }
 
-float dedx_internal_evaluate_spline(_dedx_spline_base *coef, float x, _dedx_lookup_accelerator *acc, int n) {
+float dedx_internal_evaluate_spline(
+    _dedx_spline_base *coef, float x, _dedx_lookup_accelerator *acc, int n, int interpolation_mode) {
     int i;
     int lookup = 1;
     if (acc != NULL) {
@@ -89,7 +149,29 @@ float dedx_internal_evaluate_spline(_dedx_spline_base *coef, float x, _dedx_look
         if (acc != NULL)
             acc->cache = i;
     }
-    float energy =
-        coef[i].a + coef[i].b * (x - coef[i].x) + coef[i].c * pow(x - coef[i].x, 2) + coef[i].d * pow(x - coef[i].x, 3);
-    return energy;
+
+    if (x == coef[i].x) {
+        return coef[i].a;
+    }
+    if (i + 1 < n && x == coef[i + 1].x) {
+        return coef[i + 1].a;
+    }
+
+    {
+        const float dx = x - coef[i].x;
+        const float dx2 = dx * dx;
+
+        if (interpolation_mode == DEDX_INTERPOLATION_LINEAR || isnan(coef[i].log_x)) {
+            return coef[i].a + coef[i].b * dx + coef[i].c * dx2 + coef[i].d * dx2 * dx;
+        }
+    }
+
+    {
+        const float log_dx = logf(x) - coef[i].log_x;
+        const float log_dx2 = log_dx * log_dx;
+        const float log_stopping =
+            coef[i].log_a + coef[i].b * log_dx + coef[i].c * log_dx2 + coef[i].d * log_dx2 * log_dx;
+
+        return expf(log_stopping);
+    }
 }
