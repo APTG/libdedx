@@ -20,7 +20,7 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
 float dedx_internal_get_atom_mass(int id, int *err);
 
 /* file-local helper */
-static int check_energy_bounds(_dedx_lookup_data *data, float energy);
+static int check_energy_bounds(dedx_internal_lookup_data *data, float energy);
 ```
 
 Do not introduce new `_dedx_*` identifiers. Existing ones should be migrated to
@@ -60,12 +60,10 @@ fine when the variable is genuinely local to that scope.
 ## Thread safety
 
 libdedx is currently **not thread-safe**. There is no synchronization around
-the static path cache in the file-local data-path helper in
-[`libdedx/dedx_file_access.c`](libdedx/dedx_file_access.c),
-nor around workspace mutation in `dedx_load_config()` / the internal dataset
-loading helpers. Do not share a `dedx_workspace`
-across threads without external locking.
+workspace mutation in `dedx_load_config()` / the internal dataset loading
+helpers. Do not share a `dedx_workspace` across threads without external
+locking.
 
-The intended fix is to replace the cached-path `done` flag with C11
-`call_once()`, and audit the rest of the library for shared mutable state. This
-is tracked as a known issue.
+The intended fix is to audit the library for shared mutable state and either
+make workspaces single-thread-owned by design or add explicit synchronization
+where shared access is required. This is tracked as a known issue.

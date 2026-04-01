@@ -37,7 +37,7 @@ endif()
 
 enable_testing()
 add_subdirectory(examples)
-add_subdirectory(libdedx)
+add_subdirectory(src)
 add_subdirectory(tests)
 
 # add uninstall target according to CMAKE FAQ:

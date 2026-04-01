@@ -93,5 +93,5 @@ jobs:
       - name: Run Python tests
         working-directory: python
         env:
-          LIBDEDX_SO: ${{ github.workspace }}/build/libdedx/libdedx.so
+          LIBDEDX_SO: ${{ github.workspace }}/build/src/libdedx.so
         run: python -m pytest tests -q

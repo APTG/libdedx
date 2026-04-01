@@ -16,6 +16,7 @@ def _candidate_library_paths(repo_root: Path) -> list[Path]:
     candidates = []
     for build_dir in ("build", "build-debug", "build-release", "build-coverage"):
         for lib_name in lib_names:
+            candidates.append(repo_root / build_dir / "src" / lib_name)
             candidates.append(repo_root / build_dir / "libdedx" / lib_name)
     return candidates
 
