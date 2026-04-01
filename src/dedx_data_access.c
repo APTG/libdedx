@@ -29,6 +29,9 @@ static int read_embedded_stopping_data(stopping_data *data, int prog, int ion, i
     if (dedx_embedded_find_table(prog, ion, target, NULL, &energy_len, &stp) != 0) {
         return -1;
     }
+    if (energy_len < 1 || energy_len > DEDX_MAX_ELEMENTS) {
+        return -1;
+    }
 
     memset(data, 0, sizeof(*data));
     data->target = target;
@@ -43,6 +46,9 @@ static int read_embedded_energy_data(float *energy, int prog) {
     int energy_len = 0;
 
     if (dedx_embedded_get_energy_grid(prog, &embedded_energy, &energy_len) != 0) {
+        return -1;
+    }
+    if (energy_len < 1 || energy_len > DEDX_MAX_ELEMENTS) {
         return -1;
     }
 
@@ -79,7 +85,8 @@ float dedx_internal_read_effective_charge(int id, int *err) {
     if (dedx_embedded_read_effective_charge(id, &charge) == 0) {
         return charge;
     }
-    return charge;
+    *err = DEDX_ERR_TARGET_NOT_FOUND;
+    return 0.0f;
 }
 
 size_t dedx_internal_target_is_gas(int target, int *err) {
@@ -113,5 +120,6 @@ void dedx_internal_get_composition(int target, float composition[][2], unsigned 
     *err = DEDX_OK;
     if (dedx_embedded_get_composition(target, composition, length) != 0) {
         *length = 0;
+        *err = DEDX_ERR_TARGET_NOT_FOUND;
     }
 }

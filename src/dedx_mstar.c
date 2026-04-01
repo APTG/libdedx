@@ -47,6 +47,8 @@ void dedx_internal_evaluate_compound_state_mstar(dedx_config *config, int *err) 
 
 void dedx_internal_convert_energy_to_mstar(
     stopping_data *in, stopping_data *out, char state, dedx_config *config, float *energy, int *err) {
+    float coef;
+
     *err = DEDX_OK;
     state = resolve_mstar_mode(state, config, err);
     if (*err != DEDX_OK)
@@ -57,7 +59,10 @@ void dedx_internal_convert_energy_to_mstar(
         energy[i] = energy[i] / 4.0;
     }
     for (i = 0; i < n; i++) {
-        out->data[i] = dedx_internal_calculate_mspaul_coef(state, in->ion, in->target, energy[i]) * in->data[i] * 1000;
+        coef = dedx_internal_calculate_mspaul_coef(state, in->ion, in->target, energy[i], err);
+        if (*err != DEDX_OK)
+            return;
+        out->data[i] = coef * in->data[i] * 1000;
     }
     out->length = in->length;
     out->target = in->target;

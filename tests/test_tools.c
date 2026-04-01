@@ -10,6 +10,8 @@ static int failf(const char *label, double got, double expected) {
 }
 
 static int faili(const char *label, int got, int expected) {
+    if (got == expected)
+        return 0;
     fprintf(stderr, "FAIL %s: got %d expected %d\n", label, got, expected);
     return 1;
 }

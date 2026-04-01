@@ -5,6 +5,8 @@
 #include "test_helpers.h"
 
 static int faili(const char *label, int got, int expected) {
+    if (got == expected)
+        return 0;
     fprintf(stderr, "FAIL %s: got %d expected %d\n", label, got, expected);
     return 1;
 }
@@ -86,6 +88,15 @@ int main(void) {
     }
 
     err = 0;
+    comp_len = 0;
+    dedx_get_composition(98, composition, &comp_len, &err);
+    if (err != DEDX_ERR_TARGET_NOT_FOUND) {
+        failures += faili("missing composition err", err, DEDX_ERR_TARGET_NOT_FOUND);
+    } else if (comp_len != 0) {
+        failures += failmsg("missing composition", "non-zero composition length on failure");
+    }
+
+    err = 0;
     i_value = dedx_get_i_value(DEDX_WATER, &err);
     if (err != DEDX_OK) {
         failures += faili("water i-value err", err, DEDX_OK);
@@ -128,20 +139,37 @@ int main(void) {
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 
-    coef_c = dedx_internal_calculate_mspaul_coef('c', DEDX_CARBON, DEDX_HYDROGEN, 10.0f);
-    coef_d_low_z = dedx_internal_calculate_mspaul_coef('d', DEDX_CARBON, DEDX_HYDROGEN, 10.0f);
+    coef_c = dedx_internal_calculate_mspaul_coef('c', DEDX_CARBON, DEDX_HYDROGEN, 10.0f, &err);
+    if (err != DEDX_OK)
+        failures += faili("mspaul c err", err, DEDX_OK);
+    coef_d_low_z = dedx_internal_calculate_mspaul_coef('d', DEDX_CARBON, DEDX_HYDROGEN, 10.0f, &err);
+    if (err != DEDX_OK)
+        failures += faili("mspaul d err", err, DEDX_OK);
     failures += check_close("mspaul d->c low-z", coef_d_low_z, coef_c, 1e-6);
 
-    coef_g = dedx_internal_calculate_mspaul_coef('g', DEDX_CARBON, DEDX_HYDROGEN, 10.0f);
-    coef_h_low_z = dedx_internal_calculate_mspaul_coef('h', DEDX_CARBON, DEDX_HYDROGEN, 10.0f);
+    coef_g = dedx_internal_calculate_mspaul_coef('g', DEDX_CARBON, DEDX_HYDROGEN, 10.0f, &err);
+    if (err != DEDX_OK)
+        failures += faili("mspaul g err", err, DEDX_OK);
+    coef_h_low_z = dedx_internal_calculate_mspaul_coef('h', DEDX_CARBON, DEDX_HYDROGEN, 10.0f, &err);
+    if (err != DEDX_OK)
+        failures += faili("mspaul h low-z err", err, DEDX_OK);
     failures += check_close("mspaul h->g low-z", coef_h_low_z, coef_g, 1e-6);
 
-    coef_h = dedx_internal_calculate_mspaul_coef('h', DEDX_CARBON, DEDX_WATER, 10.0f);
+    coef_h = dedx_internal_calculate_mspaul_coef('h', DEDX_CARBON, DEDX_WATER, 10.0f, &err);
+    if (err != DEDX_OK)
+        failures += faili("mspaul h water err", err, DEDX_OK);
     if (coef_h <= 0.0f)
         failures += failmsg("mspaul h water", "non-positive coefficient");
 
-    if (dedx_internal_calculate_mspaul_coef('c', DEDX_HELIUM, DEDX_WATER, 10.0f) != 1.0f)
+    if (dedx_internal_calculate_mspaul_coef('c', DEDX_HELIUM, DEDX_WATER, 10.0f, &err) != 1.0f)
         failures += failmsg("mspaul helium", "helium fast-path is not unity");
+    if (err != DEDX_OK)
+        failures += faili("mspaul helium err", err, DEDX_OK);
+
+    if (dedx_internal_calculate_mspaul_coef('h', DEDX_CARBON, 105, 10.0f, &err) != 0.0f)
+        failures += failmsg("mspaul missing charge", "expected zero coefficient on metadata failure");
+    if (err != DEDX_ERR_TARGET_NOT_FOUND)
+        failures += faili("mspaul missing charge err", err, DEDX_ERR_TARGET_NOT_FOUND);
 
     return failures;
 }

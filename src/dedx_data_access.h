@@ -24,7 +24,7 @@ void dedx_internal_read_energy_data(float *energy, int prog, int *err);
 /** @brief Read an effective charge override for a heavy target or ion ID.
  *  @param[in]  id   Element or material identifier.
  *  @param[out] err  Set to DEDX_OK or a data error code.
- *  @return Effective charge, or @p id itself for elemental IDs below 99.
+ *  @return Effective charge, or 0 on failure.
  */
 float dedx_internal_read_effective_charge(int id, int *err);
 

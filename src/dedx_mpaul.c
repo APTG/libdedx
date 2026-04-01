@@ -16,13 +16,18 @@
 */
 #include "dedx_mpaul.h"
 
-float dedx_internal_calculate_mspaul_coef(char mode, int ion, int target, float energy) {
+#include "dedx_error.h"
+
+float dedx_internal_calculate_mspaul_coef(char mode, int ion, int target, float energy, int *err) {
+    float output;
+    float f;
+
+    *err = DEDX_OK;
     if (ion == 2)
         return 1;
-    float output;
-    int err = 0;
-    float f;
-    f = dedx_internal_read_effective_charge(target, &err);
+    f = dedx_internal_read_effective_charge(target, err);
+    if (*err != DEDX_OK)
+        return 0.0f;
 
     double a = 5.0;
     double b = -1;

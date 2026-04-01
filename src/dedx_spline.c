@@ -22,16 +22,20 @@
 static int binary_search(dedx_internal_spline_base *coef, float value, int n) {
     int head = n - 1;
     int tail = 0;
-    int guess = n / 2;
-    while (head != tail + 1) {
+    int guess;
+
+    if (n <= 2)
+        return 0;
+
+    while (head > tail + 1) {
+        guess = (head - tail) / 2 + tail;
         if (coef[guess].x <= value) {
             tail = guess;
         } else {
             head = guess;
         }
-        guess = (head - tail) / 2 + tail;
     }
-    return guess;
+    return tail;
 }
 
 static void
@@ -138,8 +142,12 @@ float dedx_internal_evaluate_spline(
     dedx_internal_spline_base *coef, float x, dedx_internal_lookup_accelerator *acc, int n, int interpolation_mode) {
     int i;
     int lookup = 1;
+
+    if (n < 2)
+        return coef[0].a;
+
     if (acc != NULL) {
-        if ((coef[acc->cache].x <= x) && (x < coef[acc->cache + 1].x)) {
+        if (acc->cache >= 0 && acc->cache + 1 < n && (coef[acc->cache].x <= x) && (x < coef[acc->cache + 1].x)) {
             lookup = 0;
             i = acc->cache;
         }

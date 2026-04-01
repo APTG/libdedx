@@ -1,4 +1,5 @@
 #include <dedx_data_access.h>
+#include <dedx_spline.h>
 #include <dedx_wrappers.h>
 #include <string.h>
 
@@ -278,6 +279,36 @@ static int check_interpolation_mode(
     return 0;
 }
 
+static int check_internal_two_point_spline_cache(void) {
+    dedx_internal_spline_base coef[2];
+    dedx_internal_lookup_accelerator acc;
+    float energy[2] = {1.0f, 2.0f};
+    float stopping[2] = {10.0f, 20.0f};
+    float result;
+
+    memset(coef, 0, sizeof(coef));
+    memset(&acc, 0, sizeof(acc));
+
+    dedx_internal_calculate_coefficients(coef, energy, stopping, 2, DEDX_INTERPOLATION_LINEAR);
+
+    result = dedx_internal_evaluate_spline(coef, 2.0f, &acc, 2, DEDX_INTERPOLATION_LINEAR);
+    if (result != 20.0f) {
+        fprintf(stderr, "FAIL internal two-point knot: got %.8g expected 20\n", result);
+        return 1;
+    }
+    if (acc.cache != 0) {
+        fprintf(stderr, "FAIL internal two-point cache: got %d expected 0\n", acc.cache);
+        return 1;
+    }
+
+    result = dedx_internal_evaluate_spline(coef, 1.5f, &acc, 2, DEDX_INTERPOLATION_LINEAR);
+    if (fabsf(result - 15.0f) > 1e-6f) {
+        fprintf(stderr, "FAIL internal two-point midpoint: got %.8g expected 15\n", result);
+        return 1;
+    }
+    return 0;
+}
+
 int main(void) {
     int failures = 0;
     const float icru_old_midpoint = sqrtf(0.03f * 0.04f);
@@ -303,6 +334,7 @@ int main(void) {
                                          icru_old_midpoint,
                                          DEDX_INTERPOLATION_LINEAR,
                                          "ICRU73 explicit linear");
+    failures += check_internal_two_point_spline_cache();
 
     return failures;
 }

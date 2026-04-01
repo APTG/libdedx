@@ -30,7 +30,7 @@ void dedx_internal_calculate_coefficients(
  *  @param[in]      coef  Spline coefficients.
  *  @param[in]      x     Energy at which to evaluate the spline.
  *  @param[in,out]  acc   Optional lookup cache for repeated evaluations; may be NULL.
- *  @param[in]      n     Number of valid spline intervals.
+ *  @param[in]      n     Number of valid grid points / spline knots.
  *  @param[in]      interpolation_mode  Interpolation mode stored with the dataset.
  *  @return Interpolated stopping power at @p x.
  */
