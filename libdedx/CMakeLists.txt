@@ -7,7 +7,7 @@ set(dedx_data_bin data/ASTAR.bin data/astarEng.bin data/ICRU73.bin data/icru73En
 # static and the shared library without a second compilation pass.
 add_library(dedx_objects OBJECT
     dedx_tools.c dedx_bethe.c dedx.c dedx_wrappers.c dedx_file_access.c
-    dedx_file.c dedx_mpaul.c dedx_mstar.c dedx_spline.c dedx_split.c
+    dedx_file.c dedx_embedded_data.c dedx_mpaul.c dedx_mstar.c dedx_spline.c dedx_split.c
     dedx_periodic_table.c tools/dedx_math.c dedx_validate.c
 )
 set_property(TARGET dedx_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
