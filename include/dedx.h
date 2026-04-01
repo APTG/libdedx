@@ -83,8 +83,8 @@ enum {
  * @{
  */
 enum {
-    DEDX_INTERPOLATION_LOG_LOG = 0,                /**< Natural cubic spline of ln(stopping) vs ln(energy). */
-    DEDX_INTERPOLATION_LINEAR = 1,                 /**< Natural cubic spline of stopping vs energy. */
+    DEDX_INTERPOLATION_LOG_LOG = 0,                         /**< Natural cubic spline of ln(stopping) vs ln(energy). */
+    DEDX_INTERPOLATION_LINEAR = 1,                          /**< Natural cubic spline of stopping vs energy. */
     DEDX_INTERPOLATION_DEFAULT = DEDX_INTERPOLATION_LOG_LOG /**< Default for zero-initialized configs. */
 };
 
@@ -183,8 +183,8 @@ typedef struct dedx_internal_lookup_data dedx_internal_lookup_data;
  */
 typedef struct {
     dedx_internal_lookup_data **loaded_data; /**< Array of loaded datasets */
-    int datasets;                             /**< Total number of dataset slots */
-    int active_datasets;                      /**< Number of currently loaded datasets */
+    int datasets;                            /**< Total number of dataset slots */
+    int active_datasets;                     /**< Number of currently loaded datasets */
 } dedx_workspace;
 
 /** @brief Allocate a workspace for loading stopping power data.

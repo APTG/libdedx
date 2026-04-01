@@ -34,17 +34,17 @@
 
 /** @defgroup err_data Data and configuration errors (201–210)
  * @{ */
-#define DEDX_ERR_TARGET_NOT_FOUND 201        /**< target not found in embedded metadata */
-#define DEDX_ERR_COMBINATION_NOT_FOUND 202   /**< ion/target combination not in embedded data */
-#define DEDX_ERR_INVALID_DATASET_ID 203      /**< dataset ID does not exist in workspace */
-#define DEDX_ERR_NOT_AN_ELEMENT 204          /**< ID does not correspond to an atomic element */
-#define DEDX_ERR_ESTAR_NOT_IMPL 205          /**< ESTAR program is not implemented */
-#define DEDX_ERR_ION_NOT_SUPPORTED_MSTAR 206 /**< ion not supported for MSTAR (reserved legacy code) */
-#define DEDX_ERR_ION_NOT_SUPPORTED 207       /**< ion not supported by requested program */
-#define DEDX_ERR_RHO_REQUIRED 208            /**< target density rho must be provided */
-#define DEDX_ERR_ION_A_REQUIRED 209          /**< nucleon number ion_a must be provided */
-#define DEDX_ERR_INVALID_I_VALUE 210         /**< mean excitation potential must be > 0 */
-#define DEDX_ERR_INCONSISTENT_COMPOUND 211   /**< inconsistent compound specification */
+#define DEDX_ERR_TARGET_NOT_FOUND 201           /**< target not found in embedded metadata */
+#define DEDX_ERR_COMBINATION_NOT_FOUND 202      /**< ion/target combination not in embedded data */
+#define DEDX_ERR_INVALID_DATASET_ID 203         /**< dataset ID does not exist in workspace */
+#define DEDX_ERR_NOT_AN_ELEMENT 204             /**< ID does not correspond to an atomic element */
+#define DEDX_ERR_ESTAR_NOT_IMPL 205             /**< ESTAR program is not implemented */
+#define DEDX_ERR_ION_NOT_SUPPORTED_MSTAR 206    /**< ion not supported for MSTAR (reserved legacy code) */
+#define DEDX_ERR_ION_NOT_SUPPORTED 207          /**< ion not supported by requested program */
+#define DEDX_ERR_RHO_REQUIRED 208               /**< target density rho must be provided */
+#define DEDX_ERR_ION_A_REQUIRED 209             /**< nucleon number ion_a must be provided */
+#define DEDX_ERR_INVALID_I_VALUE 210            /**< mean excitation potential must be > 0 */
+#define DEDX_ERR_INCONSISTENT_COMPOUND 211      /**< inconsistent compound specification */
 #define DEDX_ERR_INVALID_INTERPOLATION_MODE 212 /**< interpolation mode is not supported */
 /** @} */
 
