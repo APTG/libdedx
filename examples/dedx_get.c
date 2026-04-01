@@ -32,9 +32,8 @@ int main(int argc, char *argv[]) {
         dedx_get_version(&vmaj, &vmin, &vpatch);
         printf("\n This is getdedx using libdEdx version %i.%i.%i", vmaj, vmin, vpatch);
         printf("\n");
-        printf(" (c) 2012 by Jakob Toftegaard <jakob.toftegaard@gmail.com>\n");
-        printf(" and Niels Bassler <bassler@phys.au.dk>\n");
-        printf(" See http://libdedx.sf.net\n\n");
+        printf(" Authors: Jakob Toftegaard and Niels Bassler\n");
+        printf(" Project: https://github.com/APTG/libdedx\n\n");
         printf("Usage: %s program_id  Z icru_target_id energy\n\n", argv[0]);
         printf("Use numbers or capital letters for specifying program, ion and target.\n");
         printf("Negative numbers prints available parameters and exits.\n\n");

@@ -3,6 +3,11 @@ set(smoke_build "${smoke_root}/build")
 set(smoke_prefix "${smoke_root}/prefix")
 set(smoke_consumer "${smoke_root}/install_consumer")
 set(smoke_consumer_build "${smoke_root}/consumer-build")
+set(smoke_install_libdir "lib")
+
+if(DEFINED CMAKE_INSTALL_LIBDIR AND NOT CMAKE_INSTALL_LIBDIR STREQUAL "")
+    set(smoke_install_libdir "${CMAKE_INSTALL_LIBDIR}")
+endif()
 
 file(REMOVE_RECURSE "${smoke_root}")
 file(MAKE_DIRECTORY "${smoke_root}")
@@ -35,10 +40,15 @@ if(NOT rc EQUAL 0)
     message(FATAL_ERROR "install smoke install failed: ${rc}")
 endif()
 
+set(smoke_libdir "${smoke_prefix}/${smoke_install_libdir}")
+if(NOT EXISTS "${smoke_libdir}" AND EXISTS "${smoke_prefix}/lib64")
+    set(smoke_libdir "${smoke_prefix}/lib64")
+endif()
+
 execute_process(
     COMMAND "${CMAKE_C_COMPILER}"
             "-I${smoke_prefix}/include"
-            "-L${smoke_prefix}/lib"
+            "-L${smoke_libdir}"
             "${SOURCE_DIR}/tests/install_consumer.c"
             -o "${smoke_consumer}"
             -ldedx
@@ -51,11 +61,11 @@ endif()
 set(runtime_env)
 if(APPLE)
     list(APPEND runtime_env
-        "DYLD_LIBRARY_PATH=${smoke_prefix}/lib:$ENV{DYLD_LIBRARY_PATH}"
+        "DYLD_LIBRARY_PATH=${smoke_libdir}:$ENV{DYLD_LIBRARY_PATH}"
     )
 else()
     list(APPEND runtime_env
-        "LD_LIBRARY_PATH=${smoke_prefix}/lib:$ENV{LD_LIBRARY_PATH}"
+        "LD_LIBRARY_PATH=${smoke_libdir}:$ENV{LD_LIBRARY_PATH}"
     )
 endif()
 

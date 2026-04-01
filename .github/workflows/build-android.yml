@@ -12,7 +12,7 @@ jobs:
       contents: write
     strategy:
       matrix:
-        abi: [arm64-v8a, x86_64]
+        abi: [arm64-v8a, armeabi-v7a, x86_64]
 
     steps:
       - name: Checkout
@@ -38,27 +38,23 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/stage/${{ matrix.abi }}
 
       - name: Build
-        run: cmake --build build-${{ matrix.abi }} --parallel
+        run: cmake --build build-${{ matrix.abi }} --parallel --target dedx_shared
 
-      - name: Install
-        run: cmake --install build-${{ matrix.abi }}
-
-      - name: Package Android install tree
+      - name: Collect Android shared library
         run: |
           mkdir -p dist
-          pkg="libdedx-android-${{ matrix.abi }}"
-          tar -C stage -czf "dist/${pkg}.tar.gz" "${{ matrix.abi }}"
+          cp "build-${{ matrix.abi }}/src/libdedx.so" "dist/libdedx-android-${{ matrix.abi }}.so"
 
       - name: Upload artifact for testing
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v4
         with:
           name: libdedx-android-${{ matrix.abi }}
-          path: dist/libdedx-android-${{ matrix.abi }}.tar.gz
+          path: dist/libdedx-android-${{ matrix.abi }}.so
           retention-days: 3
 
       - name: Upload artifact to release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/libdedx-android-${{ matrix.abi }}.tar.gz
+          files: dist/libdedx-android-${{ matrix.abi }}.so

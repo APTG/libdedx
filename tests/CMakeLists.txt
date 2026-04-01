@@ -24,6 +24,7 @@ if(NOT WIN32)
                 -DTEST_BINARY_DIR=${PROJECT_BINARY_DIR}
                 -DCMAKE_COMMAND=${CMAKE_COMMAND}
                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
                 -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
                 -P ${PROJECT_SOURCE_DIR}/tests/install_smoke_test.cmake)
 endif()

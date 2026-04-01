@@ -6,6 +6,9 @@ build/
 build-release/
 build-coverage/
 build-packaging/
+_CPack_Packages/
+*.deb
+*.rpm
 
 Testing/
 

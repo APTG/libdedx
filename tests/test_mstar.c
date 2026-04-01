@@ -62,7 +62,6 @@ static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, floa
                 lhs_value,
                 rhs_value);
         failures = 1;
-        failures = 1;
     }
 
     dedx_free_config(lhs, &err);
