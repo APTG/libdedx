@@ -38,7 +38,7 @@ One-call API for a single stopping power value:
 
 int err = 0;
 float stp = dedx_get_simple_stp(DEDX_PROTON, DEDX_WATER, 100.0f, &err);
-// stp in MeV cm² / g at 100 MeV/u
+// stp in MeV cm² / g at 100 MeV/nucl
 ```
 
 Full API with workspace for repeated evaluations:

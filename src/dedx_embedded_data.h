@@ -5,7 +5,7 @@
 
 /** @brief In-memory descriptor for one tabulated stopping-power program. */
 typedef struct {
-    const float *energy;   /**< Energy grid in MeV/u. */
+    const float *energy;   /**< Energy grid in MeV/nucl (MeV per nucleon). */
     int energy_len;        /**< Number of energy grid points. */
     const int *ion_ids;    /**< Supported ion IDs for this program. */
     int ion_count;         /**< Number of supported ions. */

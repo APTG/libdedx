@@ -1,6 +1,6 @@
 /* Auto-generated from MSTAR.dat, mstarEng.dat -- do not edit.
  * Regenerate: python3 tools/dat2c.py mstar
- * Energy values are in MeV/u (kinetic energy per nucleon).
+ * Energy values are in MeV/nucl (kinetic energy per nucleon).
  */
 
 #ifndef DEDX_DATA_MSTAR_H

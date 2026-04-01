@@ -4,7 +4,7 @@
 
 int main() {
     int err = 0;
-    float energy = 100; /* MeV/u */
+    float energy = 100; /* MeV/nucl */
     float ste;
     // int cfg = 0;
     // int bragg = 0;

@@ -1,6 +1,6 @@
 /* Auto-generated from ICRU73_NEW.dat, icru73_newEng.dat -- do not edit.
  * Regenerate: python3 tools/dat2c.py icru73new
- * Energy values are in MeV/u (kinetic energy per nucleon).
+ * Energy values are in MeV/nucl (kinetic energy per nucleon).
  */
 
 #ifndef DEDX_DATA_ICRU73NEW_H

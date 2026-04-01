@@ -19,7 +19,7 @@ int main() {
 
     /* TODO: this example is still broken */
 
-    printf("Test Bethe function. 100 MeV/u Carbon ions on Silicon target.\n");
+    printf("Test Bethe function. 100 MeV/nucl Carbon ions on Silicon target.\n");
     ws = dedx_allocate_workspace(2, &err); // two ways of calling bethe
     if (err != 0) {
         printf("init err %i\n", err);

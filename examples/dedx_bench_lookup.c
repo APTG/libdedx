@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
     printf("  program        : %d (%s)\n", program, dedx_get_program_name(program));
     printf("  ion            : %d (%s)\n", ion, dedx_get_ion_name(ion));
     printf("  target         : %d (%s)\n", target, dedx_get_material_name(target));
-    printf("  energy_range   : [%.8g, %.8g] MeV/u\n", min_energy, max_energy);
+    printf("  energy_range   : [%.8g, %.8g] MeV/nucl\n", min_energy, max_energy);
 
     failures += run_benchmark(ws, cfg_log, iterations, min_energy, max_energy, "mode=log-log");
     failures += run_benchmark(ws, cfg_linear, iterations, min_energy, max_energy, "mode=linear");

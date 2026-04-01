@@ -85,7 +85,7 @@ Supported programs
 
 Notes:
 
-* Energies are given in ``MeV/u`` (``MeV/nucleon``) for ions.
+* Ion energies are given in ``MeV/nucl`` (``MeV per nucleon``).
 * Compound targets can be evaluated by Bragg additivity when a program
   does not provide that compound directly.
 * ``DEDX_ESTAR`` still exists as an identifier in the API, but normal
@@ -140,7 +140,7 @@ The simplest API is a one-shot lookup:
    int err = 0;
    float stp = dedx_get_simple_stp(DEDX_CARBON, DEDX_WATER, 100.0f, &err);
 
-This returns the mass stopping power of a 100 MeV/u carbon ion in water.
+This returns the mass stopping power of a 100 MeV/nucl carbon ion in water.
 
 For repeated evaluations, use a workspace and loaded configuration:
 

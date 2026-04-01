@@ -5,7 +5,7 @@
 
 /** @brief Evaluate Bethe stopping power for one energy using cached work buffers.
  *  @param[in,out] ws      Cached Bethe/Gauss-search workspace.
- *  @param[in]     energy  Projectile energy in MeV/u.
+ *  @param[in]     energy  Projectile energy in MeV/nucl (MeV per nucleon).
  *  @param[in]     PZ      Projectile charge.
  *  @param[in]     PA      Projectile mass number.
  *  @param[in]     TZ      Target atomic number.
