@@ -24,7 +24,6 @@
 #include "dedx_bethe.h"
 #include "dedx_config.h"
 #include "dedx_embedded_data.h"
-#include "dedx_file.h"
 #include "dedx_file_access.h"
 #include "dedx_lookup_data.h"
 #include "dedx_mstar.h"
@@ -575,7 +574,7 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
     } else if (prog == DEDX_BETHE_EXT00 || prog == DEDX_DEFAULT) {
         int prog_temp = config->program;
 
-        prog_load = 101;
+        prog_load = DEDX_BETHE_EXT00;
         dedx_internal_read_energy_data(energy, prog_load, err);
         config->program = prog_load;
         load_bethe_2(data, config, energy, err);

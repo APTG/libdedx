@@ -47,4 +47,12 @@ int dedx_embedded_resolve_program(int program, int ion, int target, int *resolve
 int dedx_embedded_find_table(
     int program, int ion, int target, const float **energy, int *energy_len, const float **stp);
 
+/** @brief Resolve an embedded energy grid by program.
+ *  @param[in]  program     Program identifier.
+ *  @param[out] energy      Receives pointer to the shared energy grid.
+ *  @param[out] energy_len  Receives the energy-grid length.
+ *  @return 0 on success, -1 if the program has no embedded energy grid.
+ */
+int dedx_embedded_get_energy_grid(int program, const float **energy, int *energy_len);
+
 #endif // DEDX_EMBEDDED_DATA_H

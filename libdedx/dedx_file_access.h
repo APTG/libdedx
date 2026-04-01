@@ -5,7 +5,7 @@
 
 #include "dedx_stopping_data.h"
 
-/** @brief Read one tabulated stopping-power dataset from the cached binary file.
+/** @brief Read one tabulated stopping-power dataset from the embedded tables.
  *  @param[out] data    Destination dataset buffer.
  *  @param[in]  prog    Program identifier.
  *  @param[in]  ion     Projectile identifier.

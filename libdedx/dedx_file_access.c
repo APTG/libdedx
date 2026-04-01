@@ -24,7 +24,6 @@
 
 #include "dedx_config.h"
 #include "dedx_embedded_data.h"
-#include "dedx_file.h"
 #include "dedx_split.h"
 
 #define DEDX_PATH_SIZE 512
@@ -72,196 +71,37 @@ static int read_embedded_stopping_data(stopping_data *data, int prog, int ion, i
 }
 
 static int read_embedded_energy_data(float *energy, int prog) {
-    const dedx_embedded_program_data *data = dedx_embedded_get_program_data(prog);
+    const float *embedded_energy = NULL;
+    int energy_len = 0;
 
-    if (data == NULL) {
+    if (dedx_embedded_get_energy_grid(prog, &embedded_energy, &energy_len) != 0) {
         return -1;
     }
 
     memset(energy, 0, sizeof(float) * DEDX_MAX_ELEMENTS);
-    memcpy(energy, data->energy, sizeof(float) * (size_t) data->energy_len);
+    memcpy(energy, embedded_energy, sizeof(float) * (size_t) energy_len);
     return 0;
 }
 
-static void convert_to_binary(char *path, char *output, int *err) {
-    FILE *fp;
-    FILE *out;
-    char line[100];
-    int datalines = 0;
-    int i;
-    unsigned int length;
-    float data[DEDX_MAX_ELEMENTS];
-    char **temp = NULL;
-    stopping_data container;
-
-    *err = DEDX_OK;
-    fp = fopen(path, "r");
-    out = fopen(output, "wb+");
-    if (fp == NULL || out == NULL) { /* LCOV_EXCL_START */
-        if (out == NULL) {
-            *err = DEDX_ERR_WRITE_FAILED;
-            if (fp != NULL)
-                fclose(fp);
-        } else {
-            *err = DEDX_ERR_NO_DATA_FILE;
-            fclose(out);
-        }
-        return;
-    } /* LCOV_EXCL_STOP */
-    while (fgets(line, sizeof(line), fp) != NULL) {
-        if (line[0] == '#') {
-            length = 0;
-            i = 0;
-            memset(data, 0, sizeof(data));
-            temp = dedx_internal_split(line, ':', &length, 100);
-            if (temp == NULL) {
-                *err = DEDX_ERR_NO_MEMORY;
-                break;
-            }
-            temp[0][0] = ' ';
-            datalines = atoi(temp[2]);
-            while (i++ < datalines) {
-                if (fgets(line, sizeof(line), fp) == NULL) {
-                    *err = DEDX_ERR_NO_DATA_FILE;
-                    dedx_internal_free_split_temp(temp, 10);
-                    temp = NULL;
-                    break;
-                }
-                data[i - 1] = atof(line);
-            }
-            if (*err != DEDX_OK)
-                break;
-            container.target = atoi(temp[0]);
-            container.ion = atoi(temp[1]);
-            container.length = datalines;
-            memcpy(container.data, data, sizeof(data));
-            fwrite(&container, sizeof(container), 1, out);
-            dedx_internal_free_split_temp(temp, 10);
-            temp = NULL;
-        }
-    }
-    dedx_internal_free_split_temp(temp, 10);
-    fclose(fp);
-    fclose(out);
-}
-
 void dedx_internal_read_binary_data(stopping_data *data, int prog, int ion, int target, int *err) {
-    const char *folder;
-    char path[DEDX_PATH_SIZE];
-    char input_path[DEDX_PATH_SIZE];
-    FILE *fp;
-    stopping_data dat;
-
     *err = DEDX_OK;
     if (read_embedded_stopping_data(data, prog, ion, target) == 0) {
         return;
     }
-
-    folder = get_data_path();
-    snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_program_file(prog));
-
-    fp = fopen(path, "rb");
-    if (fp == NULL) {
-        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, dedx_internal_get_program_file(prog));
-        convert_to_binary(input_path, path, err);
-        if (*err != DEDX_OK) {
-            *err = DEDX_ERR_NO_BINARY_DATA;
-            return;
-        }
-        fp = fopen(path, "rb");
-        if (fp == NULL) {
-            *err = DEDX_ERR_NO_BINARY_DATA;
-            return;
-        }
+    if (dedx_embedded_get_program_data(prog) != NULL ||
+        prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73) {
+        *err = DEDX_ERR_COMBINATION_NOT_FOUND;
+    } else {
+        *err = DEDX_ERR_NO_BINARY_DATA;
     }
-    *err = DEDX_ERR_COMBINATION_NOT_FOUND;
-    while (fread(&dat, sizeof(stopping_data), 1, fp) == 1) {
-        if (dat.target == target && dat.ion == ion) {
-            memcpy(data, &dat, sizeof(stopping_data));
-            *err = DEDX_OK;
-        }
-    }
-    fclose(fp);
-}
-
-static void convert_energy_binary(char *path, char *output, int *err) {
-    FILE *fp;
-    FILE *out;
-    char line[100];
-    int datalines;
-    int i;
-    float data[DEDX_MAX_ELEMENTS];
-
-    *err = DEDX_OK;
-    fp = fopen(path, "r");
-    out = fopen(output, "wb+");
-    if (fp == NULL || out == NULL) { /* LCOV_EXCL_START */
-        if (out == NULL) {
-            *err = DEDX_ERR_WRITE_FAILED;
-            if (fp != NULL)
-                fclose(fp);
-        } else {
-            *err = DEDX_ERR_NO_ENERGY_FILE;
-            fclose(out);
-        }
-        return;
-    } /* LCOV_EXCL_STOP */
-
-    memset(data, 0, sizeof(data));
-
-    if (fgets(line, sizeof(line), fp) == NULL) {
-        *err = DEDX_ERR_NO_ENERGY_FILE;
-        fclose(fp);
-        fclose(out);
-        return;
-    }
-    datalines = atoi(line);
-
-    for (i = 0; i < datalines; i++) {
-        if (fgets(line, sizeof(line), fp) == NULL) {
-            *err = DEDX_ERR_NO_ENERGY_FILE;
-            fclose(fp);
-            fclose(out);
-            return;
-        }
-        data[i] = atof(line);
-    }
-    fwrite(&data, sizeof(data), 1, out);
-    fclose(fp);
-    fclose(out);
 }
 
 void dedx_internal_read_energy_data(float *energy, int prog, int *err) {
-    const char *folder;
-    char path[DEDX_PATH_SIZE];
-    char input_path[DEDX_PATH_SIZE];
-    FILE *fp;
-
     *err = DEDX_OK;
     if (read_embedded_energy_data(energy, prog) == 0) {
         return;
     }
-
-    folder = get_data_path();
-    snprintf(path, sizeof(path), "%s%s.bin", folder, dedx_internal_get_energy_file(prog));
-
-    fp = fopen(path, "rb");
-    if (fp == NULL) {
-        snprintf(input_path, sizeof(input_path), "%s%s.dat", folder, dedx_internal_get_energy_file(prog));
-        convert_energy_binary(input_path, path, err);
-        if (*err != DEDX_OK) {
-            *err = DEDX_ERR_NO_BINARY_ENERGY;
-            return;
-        }
-        fp = fopen(path, "rb");
-        if (fp == NULL) {
-            *err = DEDX_ERR_NO_BINARY_ENERGY;
-            return;
-        }
-    }
-    if (fread(energy, sizeof(float) * DEDX_MAX_ELEMENTS, 1, fp) == 0) {
-    }
-    fclose(fp);
+    *err = DEDX_ERR_NO_BINARY_ENERGY;
 }
 
 float dedx_internal_read_effective_charge(int id, int *err) {

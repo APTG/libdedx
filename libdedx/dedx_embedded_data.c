@@ -20,6 +20,7 @@
 #include <stddef.h>
 
 #include "data/dedx_astar.h"
+#include "data/dedx_bethe.h"
 #include "data/dedx_icru90_C.h"
 #include "data/dedx_icru90_a.h"
 #include "data/dedx_icru90_p.h"
@@ -284,6 +285,33 @@ int dedx_embedded_find_table(
     }
     if (stp != NULL) {
         *stp = data->stp + offset;
+    }
+
+    return 0;
+}
+
+int dedx_embedded_get_energy_grid(int program, const float **energy, int *energy_len) {
+    const dedx_embedded_program_data *data = dedx_embedded_get_program_data(program);
+
+    if (program == DEDX_BETHE_EXT00) {
+        if (energy != NULL) {
+            *energy = dedx_bethe_energy;
+        }
+        if (energy_len != NULL) {
+            *energy_len = (int) (sizeof(dedx_bethe_energy) / sizeof(dedx_bethe_energy[0]));
+        }
+        return 0;
+    }
+
+    if (data == NULL) {
+        return -1;
+    }
+
+    if (energy != NULL) {
+        *energy = data->energy;
+    }
+    if (energy_len != NULL) {
+        *energy_len = data->energy_len;
     }
 
     return 0;

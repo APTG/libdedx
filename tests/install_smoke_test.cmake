@@ -12,7 +12,6 @@ set(configure_args
     -DCMAKE_INSTALL_PREFIX=${smoke_prefix}
     -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
     -DDEDX_DATA_PATH_LOCAL=              # force use of installed data, not source tree
-    -DDEDX_BUILD_BINARY_TABLE=OFF        # tables are already built; don't delete and fail to rebuild them
 )
 if(DEFINED CMAKE_GENERATOR AND NOT CMAKE_GENERATOR STREQUAL "")
     list(PREPEND configure_args -G "${CMAKE_GENERATOR}")
