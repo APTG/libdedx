@@ -36,7 +36,7 @@ void dedx_fill_ion_list(int program, int *ion_list);
  *  @param[in]  ion          Ion identifier.
  *  @param[in]  target       Target material identifier.
  *  @param[in]  no_of_points Number of energy points.
- *  @param[in]  energies     Array of energies in MeV/u (length: no_of_points).
+ *  @param[in]  energies     Array of energies in MeV/nucl (MeV per nucleon, length: no_of_points).
  *  @param[out] stps         Array to receive stopping powers in MeV cm²/g.
  *  @return 0 on success, non-zero error code on failure.
  */
@@ -48,7 +48,7 @@ int dedx_get_stp_table(
  *  @param[in]  program  Program identifier.
  *  @param[in]  ion      Ion identifier.
  *  @param[in]  target   Target material identifier.
- *  @param[in]  energy   Kinetic energy in MeV/u.
+ *  @param[in]  energy   Kinetic energy in MeV/nucl (MeV per nucleon).
  *  @param[out] err      Error code; 0 on success.
  *  @return Mass stopping power in MeV cm²/g.
  */
@@ -70,7 +70,7 @@ int dedx_get_stp_table_size(const int program, const int ion, const int target);
  *  @param[in]  program   Program identifier.
  *  @param[in]  ion       Ion identifier.
  *  @param[in]  target    Target material identifier.
- *  @param[out] energies  Array to receive energies in MeV/u.
+ *  @param[out] energies  Array to receive energies in MeV/nucl (MeV per nucleon).
  *  @param[out] stps      Array to receive stopping powers in MeV cm²/g.
  *  @return Number of points filled, or negative error code on failure.
  */
@@ -86,7 +86,7 @@ int dedx_fill_default_energy_stp_table(
  *  @param[in]  ion          Ion identifier.
  *  @param[in]  target       Target material identifier.
  *  @param[in]  no_of_points Number of energy points.
- *  @param[in]  energies     Array of energies in MeV/u (length: no_of_points).
+ *  @param[in]  energies     Array of energies in MeV/nucl (MeV per nucleon, length: no_of_points).
  *  @param[out] csda_ranges  Array to receive CSDA ranges in g/cm².
  *  @return 0 on success, non-zero error code on failure.
  */

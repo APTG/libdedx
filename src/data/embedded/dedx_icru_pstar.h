@@ -1,6 +1,6 @@
 /* Auto-generated from ICRU_PSTAR.dat, icru_pstarEng.dat -- do not edit.
  * Regenerate: python3 tools/dat2c.py icru_pstar
- * Energy values are in MeV/u (kinetic energy per nucleon).
+ * Energy values are in MeV/nucl (kinetic energy per nucleon).
  */
 
 #ifndef DEDX_DATA_ICRU_PSTAR_H

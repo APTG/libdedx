@@ -28,8 +28,8 @@ Output files
 Energy scale notes for dat2c.py
 --------------------------------
 All ICRU 90 tables list T as total kinetic energy in MeV.  dat2c.py applies
-an energy_scale factor to convert to MeV/u before embedding:
-  electrons/positrons : 1.0  (no nucleons; treat MeV as MeV/u)
+an energy_scale factor to convert to MeV/nucl before embedding:
+  electrons/positrons : 1.0  (no nucleons; treat MeV as MeV/nucl)
   proton              : 1.0  (A = 1)
   alpha               : 0.25 (A = 4)
   carbon              : 1/12 (A = 12)

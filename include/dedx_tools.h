@@ -24,7 +24,7 @@ enum dedx_stp_units {
  *
  *  @param[in]  ws      Workspace with a loaded configuration.
  *  @param[in]  config  Loaded configuration.
- *  @param[in]  energy  Kinetic energy in MeV/u.
+ *  @param[in]  energy  Kinetic energy in MeV/nucl (MeV per nucleon).
  *  @param[out] err     Error code; 0 on success.
  *  @return CSDA range in g/cm².
  */
@@ -40,7 +40,7 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
  *  @param[in]  stp     Target stopping power in MeV cm²/g.
  *  @param[in]  side    0 = low-energy branch, 1 = high-energy branch.
  *  @param[out] err     Error code; 0 on success.
- *  @return Energy in MeV/u.
+ *  @return Energy in MeV/nucl (MeV per nucleon).
  */
 double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, int side, int *err);
 
@@ -50,7 +50,7 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
  *  @param[in]  config  Loaded configuration.
  *  @param[in]  range   CSDA range in g/cm².
  *  @param[out] err     Error code; 0 on success.
- *  @return Energy in MeV/u.
+ *  @return Energy in MeV/nucl (MeV per nucleon).
  */
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err);
 

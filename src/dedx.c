@@ -32,6 +32,22 @@
 #include "dedx_stopping_data.h"
 #include "dedx_validate.h"
 
+#ifndef DEDX_VERSION_MAJOR
+#define DEDX_VERSION_MAJOR 0
+#endif
+
+#ifndef DEDX_VERSION_MINOR
+#define DEDX_VERSION_MINOR 0
+#endif
+
+#ifndef DEDX_VERSION_PATCH
+#define DEDX_VERSION_PATCH 0
+#endif
+
+#ifndef DEDX_VERSION_STRING
+#define DEDX_VERSION_STRING "0.0.0-unknown"
+#endif
+
 static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, dedx_config *config, int *err);
 static int check_energy_bounds(dedx_internal_lookup_data *data, float energy);
 static float get_min_energy_icru(int ion);

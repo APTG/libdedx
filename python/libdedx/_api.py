@@ -68,7 +68,7 @@ def get_version():
 
 
 def get_stp(program, ion, target, energy):
-    """Return mass stopping power in MeV cm²/g for a single energy in MeV/u."""
+    """Return mass stopping power in MeV cm²/g for a single energy in MeV/nucl."""
     err = ctypes.c_int(0)
     result = _lib.dedx_get_simple_stp_for_program(
         program, ion, target, float(energy), ctypes.byref(err)
@@ -78,7 +78,7 @@ def get_stp(program, ion, target, energy):
 
 
 def get_stp_table(program, ion, target, energies):
-    """Return stopping powers (MeV cm²/g) for a list of energies (MeV/u)."""
+    """Return stopping powers (MeV cm²/g) for a list of energies (MeV/nucl)."""
     n = len(energies)
     e_arr = (ctypes.c_float * n)(*energies)
     s_arr = (ctypes.c_float * n)()
@@ -91,7 +91,7 @@ def get_stp_table(program, ion, target, energies):
 def get_default_table(program, ion, target):
     """Return (energies, stps) for the built-in tabulated data points.
 
-    energies -- list of energies in MeV/u
+    energies -- list of energies in MeV/nucl
     stps     -- list of stopping powers in MeV cm^2/g
     """
     n = _lib.dedx_get_stp_table_size(program, ion, target)
@@ -110,7 +110,7 @@ def get_default_table(program, ion, target):
 
 
 def get_csda_table(program, ion, target, energies):
-    """Return CSDA ranges (g/cm^2) for a list of energies (MeV/u)."""
+    """Return CSDA ranges (g/cm^2) for a list of energies (MeV/nucl)."""
     n = len(energies)
     e_arr = (ctypes.c_float * n)(*energies)
     r_arr = (ctypes.c_double * n)()

@@ -5,7 +5,7 @@
 
 int main() {
     int err = 0;
-    float energy = 100.0f; /* MeV/u */
+    float energy = 100.0f; /* MeV/nucl */
     double csda;
     dedx_workspace *ws;
     dedx_config *cfg;
@@ -38,7 +38,7 @@ int main() {
         return 1;
     }
 
-    printf("CSDA range at %g MeV/u: %6.3E cm^2/g\n", energy, csda);
+    printf("CSDA range at %g MeV/nucl: %6.3E cm^2/g\n", energy, csda);
 
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);

@@ -20,7 +20,7 @@
  *   cfg->ion     = DEDX_PROTON;
  *   cfg->target  = DEDX_WATER;
  *   dedx_load_config(ws, cfg, &err);
- *   float stp = dedx_get_stp(ws, cfg, 100.0f, &err);  // MeV cm²/g at 100 MeV/u
+ *   float stp = dedx_get_stp(ws, cfg, 100.0f, &err);  // MeV cm²/g at 100 MeV/nucl
  *   dedx_free_config(cfg, &err);
  *   dedx_free_workspace(ws, &err);
  * @endcode
@@ -167,14 +167,14 @@ const int *dedx_get_ion_list(int program);
 /** @brief Return the minimum valid energy for a program/ion combination.
  *  @param[in] program  Program identifier.
  *  @param[in] ion      Ion identifier.
- *  @return Minimum energy in MeV/u.
+ *  @return Minimum kinetic energy in MeV/nucl (MeV per nucleon).
  */
 float dedx_get_min_energy(int program, int ion);
 
 /** @brief Return the maximum valid energy for a program/ion combination.
  *  @param[in] program  Program identifier.
  *  @param[in] ion      Ion identifier.
- *  @return Maximum energy in MeV/u.
+ *  @return Maximum kinetic energy in MeV/nucl (MeV per nucleon).
  */
 float dedx_get_max_energy(int program, int ion);
 
@@ -265,7 +265,7 @@ int dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err);
  *
  *  @param[in]  ws      Workspace with a loaded configuration.
  *  @param[in]  config  Loaded configuration (cfg_id must be valid).
- *  @param[in]  energy  Kinetic energy in MeV/u.
+ *  @param[in]  energy  Kinetic energy in MeV/nucl (MeV per nucleon).
  *  @param[out] err     Error code; 0 on success.
  *  @return Mass stopping power in MeV cm²/g.
  */
@@ -278,7 +278,7 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
  *
  *  @param[in]  ion     Ion identifier (e.g. DEDX_PROTON).
  *  @param[in]  target  Target material identifier (e.g. DEDX_WATER).
- *  @param[in]  energy  Kinetic energy in MeV/u.
+ *  @param[in]  energy  Kinetic energy in MeV/nucl (MeV per nucleon).
  *  @param[out] err     Error code; 0 on success.
  *  @return Mass stopping power in MeV cm²/g.
  */

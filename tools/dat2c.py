@@ -2,10 +2,10 @@
 """
 Convert libdedx stopping power .dat files to embeddable C headers.
 
-All energy axes are normalised to MeV/u (kinetic energy per nucleon) in the
+All energy axes are normalised to MeV/nucl (kinetic energy per nucleon) in the
 generated headers so that the lookup code needs no per-dataset unit logic.
 
-ASTAR and ICRU_ASTAR are already tabulated on a MeV/u grid in the checked-in
+ASTAR and ICRU_ASTAR are already tabulated on a MeV/nucl grid in the checked-in
 `*Eng.dat` files and must not be rescaled here. Only datasets whose raw energy
 files are still in total kinetic energy are converted on the way out.
 
@@ -18,7 +18,7 @@ All datasets use a uniform 3-D layout:
 Single-ion datasets (PSTAR, ASTAR, …) have n_ions=1.
 
 Companion arrays:
-    dedx_<prog>_energy[]      energy grid in MeV/u
+    dedx_<prog>_energy[]      energy grid in MeV/nucl
     dedx_<prog>_ion_ids[]     projectile Z values
     dedx_<prog>_target_ids[]  NIST/ICRU material IDs (= Z for elements)
 
@@ -35,14 +35,14 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 # (dat_file, energy_file, energy_scale)
-# energy_scale: multiply raw file energy values by this to convert to MeV/u.
-# Most datasets are already in MeV/u natively. The current checked-in ASTAR and
-# ICRU_ASTAR energy grids are also already in MeV/u, despite the original NIST
+# energy_scale: multiply raw file energy values by this to convert to MeV/nucl.
+# Most datasets are already in MeV/nucl natively. The current checked-in ASTAR and
+# ICRU_ASTAR energy grids are also already in MeV/nucl, despite the original NIST
 # UI using total alpha energy in MeV.
 # Datasets still stored in total kinetic energy are scaled here:
 #   alpha  A=4  → scale 1/4
 #   carbon A=12 → scale 1/12
-# Electrons and positrons are listed with scale 1.0 (MeV ≡ MeV/u for leptons).
+# Electrons and positrons are listed with scale 1.0 (MeV ≡ MeV/nucl for leptons).
 DATASETS = {
     "astar":       ("ASTAR.dat",      "astarEng.dat",      1.0),
     "pstar":       ("PSTAR.dat",      "pstarEng.dat",      1.0),
@@ -236,7 +236,7 @@ def generate(name, dat_path, eng_path, energy_scale):
 
     scale_note = "" if energy_scale == 1.0 else f" (scaled by {energy_scale} from raw file)"
     L = _header_lines(name, [Path(dat_path).name, Path(eng_path).name],
-                      f"Energy values are in MeV/u (kinetic energy per nucleon).{scale_note}")
+                      f"Energy values are in MeV/nucl (kinetic energy per nucleon).{scale_note}")
 
     # Uniform 3D layout: [n_ions][n_targets][n_energies]
     # Single-ion datasets have n_ions=1 and an _ion_ids array with one entry.
@@ -271,7 +271,7 @@ def generate_energy_only(name, eng_path, energy_scale):
     pfx    = f"dedx_{name}"
 
     L = _header_lines(name, [Path(eng_path).name],
-                      "Energy values are in MeV/u (kinetic energy per nucleon).")
+                      "Energy values are in MeV/nucl (kinetic energy per nucleon).")
     L.extend(emit_float_1d(f"{pfx}_energy", energy))
     L.extend(_footer_lines(name))
     return "\n".join(L)
