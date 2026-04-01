@@ -24,12 +24,11 @@ static void gold_section(dedx_internal_bethe_model bet, dedx_internal_bethe_gold
 static float evaluate_bethe_model(float PT, dedx_internal_bethe_model bet, int *err);
 
 /* Full evaluator with Lindhard-Scharff behavior below the sewn transition. */
-static float evaluate_bethe_model_LEext(float PT, dedx_internal_bethe_model bet, dedx_internal_bethe_gold gold,
-                                        int *err);
+static float
+evaluate_bethe_model_LEext(float PT, dedx_internal_bethe_model bet, dedx_internal_bethe_gold gold, int *err);
 
 float dedx_internal_calculate_bethe_energy(
-    dedx_internal_bethe_workspace *ws, float energy, float PZ, float PA, float TZ, float TA, float rho,
-    float Io_Pot) {
+    dedx_internal_bethe_workspace *ws, float energy, float PZ, float PA, float TZ, float TA, float rho, float Io_Pot) {
 
     float dedx;
     dedx_internal_bethe_gold *gold = ws->gold;
@@ -73,8 +72,8 @@ float dedx_internal_calculate_bethe_energy(
     return dedx;
 }
 
-static float evaluate_bethe_model_LEext(float PT, dedx_internal_bethe_model bet, dedx_internal_bethe_gold gold,
-                                        int *err) {
+static float
+evaluate_bethe_model_LEext(float PT, dedx_internal_bethe_model bet, dedx_internal_bethe_gold gold, int *err) {
     double T = PT;
     float dedx;
     double mass = 940 * bet.PA0;

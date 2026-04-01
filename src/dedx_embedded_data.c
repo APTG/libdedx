@@ -21,11 +21,11 @@
 
 #include "data/embedded/dedx_astar.h"
 #include "data/embedded/dedx_bethe.h"
+#include "data/embedded/dedx_icru73.h"
+#include "data/embedded/dedx_icru73new.h"
 #include "data/embedded/dedx_icru90_C.h"
 #include "data/embedded/dedx_icru90_a.h"
 #include "data/embedded/dedx_icru90_p.h"
-#include "data/embedded/dedx_icru73.h"
-#include "data/embedded/dedx_icru73new.h"
 #include "data/embedded/dedx_icru_astar.h"
 #include "data/embedded/dedx_icru_pstar.h"
 #include "data/embedded/dedx_mstar.h"
@@ -182,8 +182,8 @@ int dedx_embedded_has_table(int program, int ion, int target) {
         return 0;
     }
 
-    return find_index(data->ion_ids, data->ion_count, ion) >= 0 &&
-           find_index(data->target_ids, data->target_count, target) >= 0;
+    return find_index(data->ion_ids, data->ion_count, ion) >= 0
+           && find_index(data->target_ids, data->target_count, target) >= 0;
 }
 
 int dedx_embedded_resolve_program(int program, int ion, int target, int *resolved_program) {

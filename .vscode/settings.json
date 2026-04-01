@@ -2,10 +2,8 @@
     // CMake
     "cmake.configureOnOpen": true,
     "cmake.useCMakePresets": "always",
-
     // CTest integration — tells VS Code Test Explorer to use CTest
     "cmake.ctest.allowParallelJobs": true,
-
     // Clangd (C language server) — clangd not currently installed, using ms-vscode.cpptools instead.
     // If clangd is installed later, switch defaultFormatter below and uncomment:
     // "clangd.arguments": [
@@ -17,19 +15,21 @@
         "editor.defaultFormatter": "ms-vscode.cpptools",
         "editor.formatOnSave": true
     },
-
     // Python — add python/ to the analysis path so Pylance finds the libdedx package (__init__.py / __init__.pyi)
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    "python.analysis.extraPaths": ["python"],
+    "python.analysis.extraPaths": [
+        "python"
+    ],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.cwd": "${workspaceFolder}/python",
     "python.testing.pytestArgs": [
-        "python"
+        "tests"
     ],
-
     // Editor
-    "editor.rulers": [120],
+    "editor.rulers": [
+        120
+    ],
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true
 }

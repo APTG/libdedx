@@ -56,8 +56,8 @@ void dedx_internal_read_binary_data(stopping_data *data, int prog, int ion, int 
     if (read_embedded_stopping_data(data, prog, ion, target) == 0) {
         return;
     }
-    if (dedx_embedded_get_program_data(prog) != NULL ||
-        prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73) {
+    if (dedx_embedded_get_program_data(prog) != NULL || prog == DEDX_ICRU || prog == DEDX_ICRU49
+        || prog == DEDX_ICRU73) {
         *err = DEDX_ERR_COMBINATION_NOT_FOUND;
     } else {
         *err = DEDX_ERR_NO_BINARY_DATA;

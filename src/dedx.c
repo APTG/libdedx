@@ -22,8 +22,8 @@
 #include <string.h>
 
 #include "dedx_bethe.h"
-#include "dedx_embedded_data.h"
 #include "dedx_data_access.h"
+#include "dedx_embedded_data.h"
 #include "dedx_lookup_data.h"
 #include "dedx_mstar.h"
 #include "dedx_periodic_table.h"
@@ -347,12 +347,11 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
     }
 
     // Evaluating the spline function
-    return dedx_internal_evaluate_spline(
-        ws->loaded_data[id]->base,
-        energy,
-        &(ws->loaded_data[id]->acc),
-        ws->loaded_data[id]->n,
-        ws->loaded_data[id]->interpolation_mode);
+    return dedx_internal_evaluate_spline(ws->loaded_data[id]->base,
+                                         energy,
+                                         &(ws->loaded_data[id]->acc),
+                                         ws->loaded_data[id]->n,
+                                         ws->loaded_data[id]->interpolation_mode);
 }
 
 void dedx_free_config(dedx_config *config, int *err) {
@@ -581,8 +580,8 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
         return 0;
     }
 
-    if (dedx_embedded_resolve_program(prog_load, ion_load, target_load, &prog_load) != 0 &&
-        (prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73)) {
+    if (dedx_embedded_resolve_program(prog_load, ion_load, target_load, &prog_load) != 0
+        && (prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73)) {
         *err = DEDX_ERR_COMBINATION_NOT_FOUND;
         return -1;
     }

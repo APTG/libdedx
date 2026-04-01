@@ -1,5 +1,4 @@
 #include <dedx.h>
-
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -32,12 +31,8 @@ static void configure_default(dedx_config *cfg, int program, int ion, int target
     cfg->interpolation_mode = interpolation_mode;
 }
 
-static int run_benchmark(dedx_workspace *ws,
-                         dedx_config *cfg,
-                         int iterations,
-                         float min_energy,
-                         float max_energy,
-                         const char *label) {
+static int run_benchmark(
+    dedx_workspace *ws, dedx_config *cfg, int iterations, float min_energy, float max_energy, const char *label) {
     double elapsed;
     double log_min_energy = log((double) min_energy);
     double log_span = log((double) max_energy) - log_min_energy;

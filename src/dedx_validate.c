@@ -26,8 +26,8 @@ int dedx_internal_validate_rho(dedx_config *config, int *err) {
 }
 
 static int dedx_internal_validate_interpolation_mode(dedx_config *config, int *err) {
-    if (config->interpolation_mode != DEDX_INTERPOLATION_LOG_LOG &&
-        config->interpolation_mode != DEDX_INTERPOLATION_LINEAR) {
+    if (config->interpolation_mode != DEDX_INTERPOLATION_LOG_LOG
+        && config->interpolation_mode != DEDX_INTERPOLATION_LINEAR) {
         *err = DEDX_ERR_INVALID_INTERPOLATION_MODE;
         return -1;
     }

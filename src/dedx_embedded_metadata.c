@@ -23,9 +23,7 @@
 static int find_target_index(int target) {
     int i;
 
-    for (i = 0;
-         i < (int) (sizeof(dedx_embedded_composition_targets) /
-                    sizeof(dedx_embedded_composition_targets[0]));
+    for (i = 0; i < (int) (sizeof(dedx_embedded_composition_targets) / sizeof(dedx_embedded_composition_targets[0]));
          i++) {
         if (dedx_embedded_composition_targets[i] == target) {
             return i;

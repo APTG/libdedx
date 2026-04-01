@@ -1,9 +1,8 @@
-#include "test_helpers.h"
-
 #include <dedx_data_access.h>
 #include <dedx_wrappers.h>
-
 #include <string.h>
+
+#include "test_helpers.h"
 
 static int load_raw_table(int program, int ion, int target, stopping_data *data, float *energies) {
     int err = DEDX_OK;
@@ -23,10 +22,8 @@ static int load_raw_table(int program, int ion, int target, stopping_data *data,
     return 0;
 }
 
-static double interpolate_log_log_natural_spline(const float *energies,
-                                                 const float *stopping,
-                                                 unsigned int n,
-                                                 double energy) {
+static double
+interpolate_log_log_natural_spline(const float *energies, const float *stopping, unsigned int n, double energy) {
     double log_energy[DEDX_MAX_ELEMENTS];
     double log_stopping[DEDX_MAX_ELEMENTS];
     double h[DEDX_MAX_ELEMENTS];
@@ -56,8 +53,8 @@ static double interpolate_log_log_natural_spline(const float *energies,
         h[i] = log_energy[i + 1] - log_energy[i];
     }
     for (i = 1; i < n - 1; i++) {
-        alpha[i] = 3.0 / h[i] * (log_stopping[i + 1] - log_stopping[i]) -
-                   3.0 / h[i - 1] * (log_stopping[i] - log_stopping[i - 1]);
+        alpha[i] = 3.0 / h[i] * (log_stopping[i + 1] - log_stopping[i])
+                   - 3.0 / h[i - 1] * (log_stopping[i] - log_stopping[i - 1]);
     }
     for (i = 1; i < n - 1; i++) {
         l[i] = 2.0 * (log_energy[i + 1] - log_energy[i - 1]) - h[i - 1] * mu[i - 1];
@@ -86,10 +83,8 @@ static double interpolate_log_log_natural_spline(const float *energies,
     }
 }
 
-static double interpolate_linear_natural_spline(const float *energies,
-                                                const float *stopping,
-                                                unsigned int n,
-                                                double energy) {
+static double
+interpolate_linear_natural_spline(const float *energies, const float *stopping, unsigned int n, double energy) {
     double h[DEDX_MAX_ELEMENTS];
     double alpha[DEDX_MAX_ELEMENTS];
     double l[DEDX_MAX_ELEMENTS];
@@ -112,8 +107,8 @@ static double interpolate_linear_natural_spline(const float *energies,
         h[i] = (double) energies[i + 1] - (double) energies[i];
     }
     for (i = 1; i < n - 1; i++) {
-        alpha[i] = 3.0 / h[i] * ((double) stopping[i + 1] - (double) stopping[i]) -
-                   3.0 / h[i - 1] * ((double) stopping[i] - (double) stopping[i - 1]);
+        alpha[i] = 3.0 / h[i] * ((double) stopping[i + 1] - (double) stopping[i])
+                   - 3.0 / h[i - 1] * ((double) stopping[i] - (double) stopping[i - 1]);
     }
     for (i = 1; i < n - 1; i++) {
         l[i] = 2.0 * ((double) energies[i + 1] - (double) energies[i - 1]) - h[i - 1] * mu[i - 1];
@@ -196,12 +191,7 @@ static int check_exact_tabulated_value(
         return 1;
     }
     if (result != expected) {
-        fprintf(stderr,
-                "FAIL exact knot: %s E=%.8g got %.8g expected %.8g\n",
-                label,
-                energy,
-                result,
-                expected);
+        fprintf(stderr, "FAIL exact knot: %s E=%.8g got %.8g expected %.8g\n", label, energy, result, expected);
         return 1;
     }
     return 0;
@@ -272,16 +262,17 @@ static int check_interpolation_mode(
         return 1;
     }
     if (fabsf(result - expected) / expected > 1e-4f) {
-        fprintf(stderr,
-                "FAIL interpolation mode: %s program=%d raw_program=%d ion=%d target=%d E=%.8g got %.8g expected %.8g\n",
-                label,
-                api_program,
-                raw_program,
-                ion,
-                target,
-                energy,
-                result,
-                expected);
+        fprintf(
+            stderr,
+            "FAIL interpolation mode: %s program=%d raw_program=%d ion=%d target=%d E=%.8g got %.8g expected %.8g\n",
+            label,
+            api_program,
+            raw_program,
+            ion,
+            target,
+            energy,
+            result,
+            expected);
         return 1;
     }
     return 0;
@@ -292,9 +283,9 @@ int main(void) {
     const float icru_old_midpoint = sqrtf(0.03f * 0.04f);
 
     failures += check_exact_tabulated_value(DEDX_PSTAR, DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, 0, "PSTAR first point");
-    failures += check_exact_tabulated_value(DEDX_PSTAR, DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, 27, "PSTAR interior point");
-    failures += check_exact_tabulated_value(
-        DEDX_PSTAR, DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, 132, "PSTAR final point");
+    failures +=
+        check_exact_tabulated_value(DEDX_PSTAR, DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, 27, "PSTAR interior point");
+    failures += check_exact_tabulated_value(DEDX_PSTAR, DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, 132, "PSTAR final point");
 
     failures += check_exact_tabulated_value(
         DEDX_ICRU73, DEDX_ICRU73_OLD, DEDX_ARGON, DEDX_PHOTOGRAPHIC_EMULSION, 1, "ICRU73 old-table point");
