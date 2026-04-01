@@ -12,7 +12,6 @@ int main(int argc, char *argv[]) {
     int prog = -1;
     int target = DEDX_WATER;
     int z = -1;
-    int vmaj = 0, vmin = 0, vpatch = 0, vsvn = 0; // version number
     const int *ion_list, *mat_list, *prog_list;
     int i = 0;
     float energy = -1.0;
@@ -28,9 +27,13 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    if (argc == 2 && strcmp(argv[1], "--version") == 0) {
+        printf("%s\n", dedx_get_version_string());
+        goto cleanup;
+    }
+
     if (argc != 5) {
-        dedx_get_version(&vmaj, &vmin, &vpatch);
-        printf("\n This is getdedx using libdEdx version %i.%i.%i", vmaj, vmin, vpatch);
+        printf("\n This is getdedx using libdEdx version %s", dedx_get_version_string());
         printf("\n");
         printf(" Authors: Jakob Toftegaard and Niels Bassler\n");
         printf(" Project: https://github.com/APTG/libdedx\n\n");

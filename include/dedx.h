@@ -127,6 +127,11 @@ const char *dedx_get_ion_name(int ion);
  */
 void dedx_get_version(int *major, int *minor, int *patch);
 
+/** @brief Retrieve the full library version string.
+ *  @return Pointer to a static string; do not free.
+ */
+const char *dedx_get_version_string(void);
+
 /** @brief Retrieve the elemental composition of a compound target.
  *  @param[in]  target       Material identifier.
  *  @param[out] composition  2D array [element][0=Z, 1=mass_fraction].
