@@ -65,6 +65,9 @@ endif()
 if(NOT WIN32)
     target_link_libraries(dedx_shared PUBLIC m)
 endif()
+if(ANDROID)
+    target_link_options(dedx_shared PRIVATE -Wl,-z,max-page-size=16384)
+endif()
 
 install(FILES
     "${PROJECT_SOURCE_DIR}/include/dedx.h"
