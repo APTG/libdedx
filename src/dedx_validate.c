@@ -157,6 +157,25 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
         }
         free(density);
         config->elements_mass_fraction = weight;
+    } else if (config->elements_mass_fraction != NULL) {
+        /* Mass fractions are already available, so there is nothing to derive.
+         * This covers two cases:
+         *   1. A caller-provided compound described directly via elements_id +
+         *      elements_mass_fraction (elements_atoms == NULL), which the public
+         *      API documents as an alternative to elements_atoms (see dedx.h).
+         *   2. The second of two calls for analytical programs (program >= 100)
+         *      with a custom compound (target == 0): dedx_internal_validate_config()
+         *      invokes this function once to prepare I-potentials and again in the
+         *      generic custom-compound path; the first call already populated the
+         *      mass fractions.
+         * Either way, return success without touching the existing array. A compound
+         * still needs at least one element, so reject an empty list. */
+        if (config->elements_length == 0) {
+            *err = DEDX_ERR_TARGET_NOT_FOUND;
+            return -1;
+        }
+        *err = DEDX_OK;
+        return 0;
     } else {
         *err = DEDX_ERR_INCONSISTENT_COMPOUND;
         return -1;
@@ -165,6 +184,11 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
 }
 
 int dedx_internal_validate_config(dedx_config *config, int *err) {
+    /* Start from a clean slate: the helper validators below only set *err on
+     * failure, so a stale non-zero value left in *err by the caller would
+     * otherwise be mistaken for a validation error. */
+    *err = DEDX_OK;
+
     dedx_internal_validate_interpolation_mode(config, err);
     if (*err != 0) {
         return -1;
@@ -176,7 +200,10 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
     }
 
     if (config->program >= 100) {
-        // Order is important
+        /* For analytical programs the compound must be evaluated first so that
+         * elements_mass_fraction is available before dedx_internal_evaluate_i_pot
+         * computes the Bragg-averaged mean excitation energy. The three calls
+         * below must remain in this order. */
         dedx_internal_evaluate_compound(config, err);
         if (*err != 0)
             return -1;
@@ -188,6 +215,9 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
             return -1;
     }
 
+    /* Ensure tabulated programs also resolve custom compounds (target == 0).
+     * When program >= 100 this is a second call; dedx_internal_evaluate_compound
+     * detects the already-populated elements_mass_fraction and returns early. */
     if (config->target == 0 && config->elements_id != NULL) {
         dedx_internal_evaluate_compound(config, err);
         if (*err != 0)
