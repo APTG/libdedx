@@ -157,6 +157,15 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
         }
         free(density);
         config->elements_mass_fraction = weight;
+    } else if (config->elements_mass_fraction != NULL && config->elements_atoms != NULL) {
+        /* Mass fractions are already computed. This happens when an analytical
+         * program (program >= 100) is used with a custom compound (target == 0):
+         * dedx_internal_validate_config() calls this function once to prepare
+         * I-potentials and again in the generic custom-compound path. The second
+         * call is a no-op – return success without touching the already-allocated
+         * elements_mass_fraction array. */
+        *err = DEDX_OK;
+        return 0;
     } else {
         *err = DEDX_ERR_INCONSISTENT_COMPOUND;
         return -1;
@@ -176,7 +185,10 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
     }
 
     if (config->program >= 100) {
-        // Order is important
+        /* For analytical programs the compound must be evaluated first so that
+         * elements_mass_fraction is available before dedx_internal_evaluate_i_pot
+         * computes the Bragg-averaged mean excitation energy. The three calls
+         * below must remain in this order. */
         dedx_internal_evaluate_compound(config, err);
         if (*err != 0)
             return -1;
@@ -188,6 +200,9 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
             return -1;
     }
 
+    /* Ensure tabulated programs also resolve custom compounds (target == 0).
+     * When program >= 100 this is a second call; dedx_internal_evaluate_compound
+     * detects the already-populated elements_mass_fraction and returns early. */
     if (config->target == 0 && config->elements_id != NULL) {
         dedx_internal_evaluate_compound(config, err);
         if (*err != 0)
