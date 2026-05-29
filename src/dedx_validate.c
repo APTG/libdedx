@@ -157,13 +157,23 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
         }
         free(density);
         config->elements_mass_fraction = weight;
-    } else if (config->elements_mass_fraction != NULL && config->elements_atoms != NULL) {
-        /* Mass fractions are already computed. This happens when an analytical
-         * program (program >= 100) is used with a custom compound (target == 0):
-         * dedx_internal_validate_config() calls this function once to prepare
-         * I-potentials and again in the generic custom-compound path. The second
-         * call is a no-op – return success without touching the already-allocated
-         * elements_mass_fraction array. */
+    } else if (config->elements_mass_fraction != NULL) {
+        /* Mass fractions are already available, so there is nothing to derive.
+         * This covers two cases:
+         *   1. A caller-provided compound described directly via elements_id +
+         *      elements_mass_fraction (elements_atoms == NULL), which the public
+         *      API documents as an alternative to elements_atoms (see dedx.h).
+         *   2. The second of two calls for analytical programs (program >= 100)
+         *      with a custom compound (target == 0): dedx_internal_validate_config()
+         *      invokes this function once to prepare I-potentials and again in the
+         *      generic custom-compound path; the first call already populated the
+         *      mass fractions.
+         * Either way, return success without touching the existing array. A compound
+         * still needs at least one element, so reject an empty list. */
+        if (config->elements_length == 0) {
+            *err = DEDX_ERR_TARGET_NOT_FOUND;
+            return -1;
+        }
         *err = DEDX_OK;
         return 0;
     } else {
@@ -174,6 +184,11 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
 }
 
 int dedx_internal_validate_config(dedx_config *config, int *err) {
+    /* Start from a clean slate: the helper validators below only set *err on
+     * failure, so a stale non-zero value left in *err by the caller would
+     * otherwise be mistaken for a validation error. */
+    *err = DEDX_OK;
+
     dedx_internal_validate_interpolation_mode(config, err);
     if (*err != 0) {
         return -1;
