@@ -99,7 +99,7 @@ static dedx_config *make_bethe_null_i_config(int ion, int target) {
     dedx_config *cfg = calloc(1, sizeof(dedx_config));
     cfg->program = DEDX_BETHE_EXT00;
     cfg->ion = ion;
-    cfg->target = target;
+    cfg->target = 0;
 
     switch (target) {
     case DEDX_WATER:

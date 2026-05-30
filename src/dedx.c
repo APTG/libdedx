@@ -656,7 +656,12 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
             config->_temp_i_value = config->elements_i_value[i];
             // If the explicit I-value for this element is <= 0.0, we fallback
             // to the default I-value for the element.
-            if (config->elements_i_value[i] <= 0.0) {
+            if (config->elements_i_value[i] < 0.0) {
+                *err = DEDX_ERR_INVALID_I_VALUE;
+                free(compound_data);
+                return -1;
+            }
+            if (config->elements_i_value[i] == 0.0) {
                 config->_temp_i_value = dedx_get_i_value(targets[i], err);
                 if (*err != 0) {
                     free(compound_data);
