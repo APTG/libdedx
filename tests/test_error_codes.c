@@ -92,5 +92,43 @@ int main(void) {
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 
+    /* BETHE custom target with invalid element id for default I-value fallback (with elements_i_value <= 0) */
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_BETHE_EXT00;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = 0;
+    cfg->rho = 1.0f;
+    cfg->elements_id = calloc(1, sizeof(int));
+    cfg->elements_id[0] = 999; /* invalid element */
+    cfg->elements_atoms = calloc(1, sizeof(int));
+    cfg->elements_atoms[0] = 1;
+    cfg->elements_i_value = calloc(1, sizeof(float));
+    cfg->elements_i_value[0] = 0.0f; /* force fallback */
+    cfg->elements_length = 1;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_ERR_NOT_AN_ELEMENT, "invalid element for i-value fallback");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    /* BETHE custom target with invalid element id for default I-value fallback (elements_i_value is NULL) */
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_BETHE_EXT00;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = 0;
+    cfg->rho = 1.0f;
+    cfg->elements_id = calloc(1, sizeof(int));
+    cfg->elements_id[0] = 999; /* invalid element */
+    cfg->elements_atoms = calloc(1, sizeof(int));
+    cfg->elements_atoms[0] = 1;
+    cfg->elements_length = 1;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_ERR_NOT_AN_ELEMENT, "invalid element for i-value fallback (NULL array)");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
     return failures;
 }
