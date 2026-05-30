@@ -367,16 +367,16 @@ int main(void) {
     failures +=
         check_config_stp(make_bethe_null_i_config(DEDX_PROTON, DEDX_PMMA), energy_grid[4], 2.146e+00f, "bethe-null-i");
 
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[0], 7.168e+02f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[1], 2.650e+02f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[2], 4.500e+01f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[3], 8.598e+00f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[4], 2.148e+00f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[0], 7.168e+02f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[1], 2.650e+02f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[2], 4.500e+01f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[3], 8.598e+00f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_PROTON, DEDX_ALANINE), energy_grid[4], 2.148e+00f, "bethe-null-i");
 
     failures +=
         check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_WATER), energy_grid[0], 2.035e+03f, "bethe-null-i");
@@ -400,16 +400,16 @@ int main(void) {
     failures +=
         check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_PMMA), energy_grid[4], 8.582e+00f, "bethe-null-i");
 
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[0], 1.967e+03f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[1], 1.040e+03f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[2], 1.800e+02f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[3], 3.439e+01f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[4], 8.593e+00f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[0], 1.967e+03f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[1], 1.040e+03f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[2], 1.800e+02f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[3], 3.439e+01f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_HELIUM, DEDX_ALANINE), energy_grid[4], 8.593e+00f, "bethe-null-i");
 
     failures +=
         check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_WATER), energy_grid[0], 5.192e+03f, "bethe-null-i");
@@ -433,16 +433,16 @@ int main(void) {
     failures +=
         check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_PMMA), energy_grid[4], 7.724e+01f, "bethe-null-i");
 
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[0], 4.996e+03f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[1], 7.312e+03f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[2], 1.607e+03f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[3], 3.095e+02f, "bethe-null-i");
-    failures +=
-        check_config_stp(make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[4], 7.733e+01f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[0], 4.996e+03f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[1], 7.312e+03f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[2], 1.607e+03f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[3], 3.095e+02f, "bethe-null-i");
+    failures += check_config_stp(
+        make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[4], 7.733e+01f, "bethe-null-i");
 
     return failures;
 }
