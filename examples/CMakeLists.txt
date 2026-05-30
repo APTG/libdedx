@@ -6,6 +6,7 @@ add_executable(dedx_use_wrappers dedx_use_wrappers.c)
 add_executable(dedx_get_sample_csv dedx_get_sample_csv.c)
 add_executable(dedx_csda dedx_csda.c)
 add_executable(dedx_bench_lookup dedx_bench_lookup.c)
+add_executable(dedx_custom_compound dedx_custom_compound.c)
 
 target_link_libraries(dedx_example dedx)
 target_link_libraries(getdedx dedx)
@@ -15,6 +16,7 @@ target_link_libraries(dedx_use_wrappers dedx)
 target_link_libraries(dedx_get_sample_csv dedx)
 target_link_libraries(dedx_csda dedx)
 target_link_libraries(dedx_bench_lookup dedx)
+target_link_libraries(dedx_custom_compound dedx)
 
 # Visual Studio does not need or want you to explicitly request linking the math library.
 # You must avoid adding it as a link library when building for Windows.
@@ -27,9 +29,10 @@ if(NOT WIN32)
     target_link_libraries(dedx_get_sample_csv m)
     target_link_libraries(dedx_csda m)
     target_link_libraries(dedx_bench_lookup m)
+    target_link_libraries(dedx_custom_compound m)
 endif()
 
-foreach(example dedx_example dedx_bethe dedx_list dedx_use_wrappers dedx_get_sample_csv dedx_csda)
+foreach(example dedx_example dedx_bethe dedx_list dedx_use_wrappers dedx_get_sample_csv dedx_csda dedx_custom_compound)
     add_test(NAME ${example} COMMAND ${example})
 endforeach()
 
