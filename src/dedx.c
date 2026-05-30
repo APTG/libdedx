@@ -653,7 +653,15 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
         if (config->elements_i_value != NULL) {
             config->_temp_i_value = config->elements_i_value[i];
             if (config->elements_i_value[i] <= 0.0) {
-                *err = DEDX_ERR_INVALID_I_VALUE;
+                config->_temp_i_value = dedx_get_i_value(targets[i], err);
+                if (*err != 0) {
+                    free(compound_data);
+                    return -1;
+                }
+            }
+        } else {
+            config->_temp_i_value = dedx_get_i_value(targets[i], err);
+            if (*err != 0) {
                 free(compound_data);
                 return -1;
             }
