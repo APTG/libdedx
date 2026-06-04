@@ -127,6 +127,7 @@ int main(void) {
     /* Unknown target is reported as non-gas (documented behaviour). */
     err = -1;
     gas = dedx_is_gas(9999, &err);
+    failures += faili("is_gas unknown err", err, DEDX_OK);
     failures += faili("is_gas unknown value", gas, 0);
 
     if (failures == 0)

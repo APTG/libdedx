@@ -173,7 +173,8 @@ float dedx_get_density(int material, int *err);
 
 /** @brief Report whether a target material is gaseous.
  *  @param[in]  target  Material identifier.
- *  @param[out] err     Error code; DEDX_OK on success.
+ *  @param[out] err     Error code; always set to DEDX_OK — an unknown target is
+ *                      reported as non-gas rather than as an error.
  *  @return 1 if the target is flagged gaseous, 0 otherwise (including unknown targets).
  */
 int dedx_is_gas(int target, int *err);
