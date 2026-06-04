@@ -1,17 +1,45 @@
+# Codecov configuration for libdedx.
+#
+# Codecov does not instrument or run anything itself. The CMake `coverage`
+# preset compiles the project with --coverage, `ctest` runs the suite, and the
+# resulting gcov/lcov report is uploaded. Codecov then drops everything matched
+# by `ignore:` below and reports the rest as two numbers:
+#   * project — coverage of the whole tracked codebase
+#   * patch   — coverage of just the lines changed in a pull request
+#
+# The intent is to measure how well the tests exercise the shipped *library*
+# (src/, include/) — not the harness, examples, or build plumbing.
+
 coverage:
   status:
     patch:
       default:
-        target: 70%
+        target: 70% # new/changed library lines should be well covered
         threshold: 2%
     project:
       default:
         target: 70%
-        threshold: 1%
+        threshold: 1% # tolerate small dips so unrelated refactors don't fail CI
+
+# Paths excluded from coverage. Coverage should reflect library code only.
 ignore:
+  # Build / CI / packaging config — not compiled C source, nothing to cover.
   - ".github/**"
   - "cmake/**"
   - "**/CMakeLists.txt"
-  - "tests/install_smoke_test.cmake"
-  - "tests/install_consumer_cmake/**"
+
+  # Test harness (subsumes the previously-listed tests/install_* helpers).
+  # Measuring coverage *of the tests themselves* is circular and misleading:
+  # assertion helpers and their "test failed" branches are dead code on a green
+  # run, so counting them only depresses the number without telling us anything
+  # about the library. Best practice is to gate on library coverage and keep
+  # the test sources out of the metric.
+  #
+  # For genuinely unreachable *library* lines (defensive error paths, OOM
+  # guards), mark them in-source with /* LCOV_EXCL_LINE */ or
+  # LCOV_EXCL_START / LCOV_EXCL_STOP — as already done in src/ — rather than
+  # excluding whole files.
+  - "tests/**"
+
+  # Example programs — illustrative usage, not part of the library under test.
   - "examples/**"
