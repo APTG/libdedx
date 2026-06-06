@@ -11,6 +11,10 @@
 
 #include "dedx.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @brief Fill an array with all supported program identifiers.
  *  @param[out] program_list  Caller-allocated array; must be large enough to
  *                            hold all programs (use dedx_get_program_list() to
@@ -96,5 +100,9 @@ int dedx_get_csda_range_table(const int program,
                               const int no_of_points,
                               const float *energies,
                               double *csda_ranges);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // DEDX_WRAPPERS_H

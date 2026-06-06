@@ -1,6 +1,10 @@
 #ifndef DEDX_ELEMENTS_H
 #define DEDX_ELEMENTS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Maximum number of tabulated energy points stored per dataset. */
 #define DEDX_MAX_ELEMENTS 150
 
@@ -325,5 +329,9 @@ enum {
 #define DEDX_CONCRETE DEDX_CONCRETE_PORTLAND
 #define DEDX_CAESIUM DEDX_CESIUM
 /** @} */
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // DEDX_ELEMENTS_H
