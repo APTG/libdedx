@@ -1,6 +1,10 @@
 #ifndef DEDX_ERROR_H
 #define DEDX_ERROR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @file dedx_error.h
  * @brief Error codes returned via the int *err output parameter.
@@ -52,5 +56,9 @@
  * @{ */
 #define DEDX_ERR_NO_MEMORY 301 /**< memory allocation failed */
 /** @} */
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif /* DEDX_ERROR_H */
