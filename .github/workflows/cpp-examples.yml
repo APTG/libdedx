@@ -1,0 +1,44 @@
+name: C++ Examples
+
+# Builds the C++ example consumers and runs their tests on Linux, Windows and
+# macOS. This guards the public headers' extern "C" guards: the examples
+# include dedx.h / dedx_tools.h / dedx_wrappers.h from C++ translation units
+# and link the C library, so a regression in the guards breaks this workflow.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cpp-examples:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Tool versions
+        run: |
+          cmake --version
+          cmake -E echo "Generator/compiler resolved at configure time"
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DDEDX_BUILD_EXAMPLES=ON
+          -DDEDX_BUILD_CXX_EXAMPLES=ON
+          -DDEDX_BUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Run C++ example tests
+        run: ctest --test-dir build -C Release -R dedx_cpp --output-on-failure
