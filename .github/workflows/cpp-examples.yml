@@ -11,6 +11,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Build/test only: the token needs no more than read access to the checkout.
+permissions:
+  contents: read
+
 jobs:
   cpp-examples:
     name: ${{ matrix.os }}
