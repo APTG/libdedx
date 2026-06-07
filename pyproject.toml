@@ -1,0 +1,81 @@
+[build-system]
+requires = [
+    "scikit-build-core>0.10",
+    "nanobind>=2",
+    "setuptools-scm>=8",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "libdedx"
+description = "Python binding for the libdedx charged-particle stopping-power library"
+readme = "python/README.md"
+requires-python = ">=3.9"
+license = "GPL-3.0-or-later"
+license-files = ["COPYING"]
+authors = [
+    { name = "Jakob Toftegaard" },
+    { name = "Niels Bassler" },
+    { name = "Leszek Grzanka" },
+]
+dependencies = ["numpy"]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/APTG/libdedx"
+Issues = "https://github.com/APTG/libdedx/issues"
+
+[project.optional-dependencies]
+test = ["pytest>=8", "numpy"]
+dev = ["ruff>=0.5.0", "pytest>=8", "numpy"]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = "build/{wheel_tag}"
+# The repo root is the CMake source tree; the extension is added when SKBUILD
+# turns on DEDX_BUILD_PYTHON. Only the pure-Python package lives under python/.
+wheel.packages = ["python/libdedx"]
+
+[tool.scikit-build.cmake]
+version = ">=3.21"
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.setuptools_scm"
+
+[tool.scikit-build.sdist]
+# Ship the C sources/headers needed to build the extension from an sdist. The
+# stopping-power tables are already embedded in src/, so the raw data/ tree is
+# not required to build a wheel.
+include = [
+    "CMakeLists.txt",
+    "include/**",
+    "src/**",
+    "python/**",
+]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+extend-exclude = ["build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+
+[tool.cibuildwheel]
+# CPython 3.9–3.14 on 64-bit platforms; PyPy and musllinux are skipped for now.
+build = "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "pp* *-musllinux*"
+build-frontend = "build"
+# Install-and-import smoke test plus the full test suite for every wheel.
+test-requires = "pytest numpy"
+test-command = "pytest {project}/python/tests"
+
+[tool.cibuildwheel.macos.environment]
+MACOSX_DEPLOYMENT_TARGET = "11.0"
