@@ -189,6 +189,38 @@ Passing ``-1`` for the program, ion, or target slot lists the available
 values for that level.
 
 
+***************
+Python binding
+***************
+
+libdedx ships a Python package built as a `nanobind
+<https://nanobind.readthedocs.io>`_ extension with `scikit-build-core
+<https://scikit-build-core.readthedocs.io>`_. The C library is statically
+linked into the extension and the stopping-power tables are embedded, so the
+wheels are self-contained — ``pip install libdedx`` needs no local C build or
+shared library.
+
+.. code-block:: python
+
+   import libdedx
+   from libdedx import _core as dedx
+
+   # one-shot lookup, mass stopping power in MeV cm^2 / g
+   stp = libdedx.simple_stp(dedx.PROTON, dedx.WATER, 100.0)
+
+   # workspace/config object model for repeated evaluations
+   ws = dedx.Workspace()
+   cfg = dedx.Config()
+   cfg.program, cfg.ion, cfg.target = dedx.PSTAR, dedx.PROTON, dedx.WATER
+   ws.load(cfg)
+   stp = ws.stp(cfg, 100.0)
+
+The low-level ``libdedx._core`` module mirrors the C API: the workspace/config
+object model, custom compounds, CSDA range, inverse stopping power / range,
+unit conversion, composition and I-value accessors, and the program/ion/material
+lists and names. The package version is kept in lockstep with the C library.
+
+
 *****
 Notes
 *****
