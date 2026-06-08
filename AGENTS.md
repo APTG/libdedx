@@ -70,8 +70,9 @@ automatically, so the loop above is ready at session start.
 - Full path: allocate a `dedx_workspace`, fill a `dedx_config` (`program`, `ion`,
   `target`), `dedx_load_config()`, then `dedx_get_stp()`; free both.
 - A result is selected by a `(program, ion, target)` triple. Programs include
-  `DEDX_PSTAR`, `DEDX_ASTAR`, `DEDX_MSTAR`, `DEDX_ICRU49/73/73_OLD`,
-  `DEDX_BETHE_EXT00`, and `DEDX_ICRU` (auto-selects newest embedded ICRU data).
+  `DEDX_PSTAR`, `DEDX_ASTAR`, `DEDX_MSTAR`, `DEDX_ICRU49`, `DEDX_ICRU73`,
+  `DEDX_ICRU73_OLD`, `DEDX_BETHE_EXT00`, and `DEDX_ICRU` (auto-selects the
+  newest embedded ICRU data).
 - Energies are in **MeV/nucl** throughout, including the generated data grids.
 
 ## Conventions (enforced — see CONTRIBUTING.md)

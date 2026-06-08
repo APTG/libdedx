@@ -36,7 +36,9 @@ python3 -m pip install -e "python[dev]" \
 # `pytest` works without any manual setup.
 LIBDEDX_SO="${CLAUDE_PROJECT_DIR:-$(pwd)}/build/src/libdedx.so"
 export LIBDEDX_SO
-if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+# Idempotent: only append once, so repeated hook runs don't clutter the env file.
+if [ -n "${CLAUDE_ENV_FILE:-}" ] \
+    && ! grep -qs '^export LIBDEDX_SO=' "$CLAUDE_ENV_FILE"; then
     echo "export LIBDEDX_SO=\"${LIBDEDX_SO}\"" >> "$CLAUDE_ENV_FILE"
 fi
 
