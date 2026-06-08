@@ -22,7 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        # macOS arm64 + x86_64 are both built on the arm64 runner (see the
+        # [tool.cibuildwheel.macos] archs in pyproject.toml), so the scarce
+        # Intel macos-13 runner is not needed.
+        os: [ubuntu-latest, windows-latest, macos-14]
     steps:
       - uses: actions/checkout@v6
         with:

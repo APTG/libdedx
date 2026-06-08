@@ -77,5 +77,11 @@ build-frontend = "build"
 test-requires = "pytest numpy"
 test-command = "pytest {project}/python/tests"
 
+[tool.cibuildwheel.macos]
+# Build both architectures on a single (arm64) runner: arm64 natively and
+# x86_64 by cross-compiling. This avoids GitHub's scarce Intel `macos-13`
+# runners, which queue for a very long time.
+archs = ["arm64", "x86_64"]
+
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "11.0"
