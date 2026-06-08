@@ -11,6 +11,10 @@ concurrency:
   group: wheels-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Least-privilege default for every job; publish jobs opt into id-token below.
+permissions:
+  contents: read
+
 jobs:
   build_wheels:
     name: Wheels on ${{ matrix.os }}
@@ -40,11 +44,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build sdist
-        run: pipx run build --sdist
-
-      - name: Check sdist builds a wheel
-        run: pipx run build --wheel dist/*.tar.gz --outdir /tmp/sdist-wheel
+      # `build` with no target builds the sdist and then a wheel *from that
+      # sdist*, which proves the sdist is self-contained. Only the sdist is
+      # published; the locally-built (unrepaired) wheel is discarded.
+      - name: Build sdist and verify it builds a wheel
+        run: pipx run build
 
       - uses: actions/upload-artifact@v4
         with:
