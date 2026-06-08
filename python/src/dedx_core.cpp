@@ -133,6 +133,11 @@ class Config {
         return copy_ints(cfg_->elements_id, cfg_->elements_length);
     }
     void set_elements_id(const std::vector<int> &v) {
+        // elements_id defines the compound length. If it changes, any previously
+        // set per-element arrays no longer match the new length and would cause
+        // out-of-bounds reads in dedx_load_config(), so drop them.
+        if (v.size() != cfg_->elements_length)
+            clear_dependent_arrays();
         replace_ints(&cfg_->elements_id, v);
         cfg_->elements_length = static_cast<unsigned int>(v.size());
     }
@@ -178,9 +183,22 @@ class Config {
             out.assign(p, p + n);
         return out;
     }
+    // Per-element arrays must be set *after* elements_id and match its length,
+    // otherwise the buffers handed to libdedx would be inconsistent with
+    // elements_length and read out of bounds.
     void check_length(size_t n) const {
-        if (cfg_->elements_length != 0 && n != cfg_->elements_length)
+        if (cfg_->elements_id == nullptr)
+            throw std::invalid_argument("set elements_id before the other element arrays");
+        if (n != cfg_->elements_length)
             throw std::invalid_argument("element array length must match elements_id length");
+    }
+    void clear_dependent_arrays() {
+        std::free(cfg_->elements_atoms);
+        cfg_->elements_atoms = nullptr;
+        std::free(cfg_->elements_mass_fraction);
+        cfg_->elements_mass_fraction = nullptr;
+        std::free(cfg_->elements_i_value);
+        cfg_->elements_i_value = nullptr;
     }
     static void replace_ints(int **slot, const std::vector<int> &v) {
         std::free(*slot);

@@ -34,4 +34,10 @@ target_link_libraries(_core PRIVATE dedx)
 target_include_directories(_core PRIVATE "${PROJECT_SOURCE_DIR}/src")
 
 # Install the compiled module into the libdedx package directory inside the wheel.
-install(TARGETS _core LIBRARY DESTINATION libdedx)
+# Python extension modules are MODULE libraries (LIBRARY artifact on every
+# platform), but RUNTIME is listed too so the install is correct regardless of
+# how a given generator/platform classifies the output.
+install(TARGETS _core
+    LIBRARY DESTINATION libdedx
+    RUNTIME DESTINATION libdedx
+)

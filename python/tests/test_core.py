@@ -119,6 +119,23 @@ def test_custom_compound_by_atoms():
     assert frac[1] > frac[0]
 
 
+def test_element_array_length_guards():
+    cfg = _core.Config()
+    # Setting a per-element array before elements_id is rejected.
+    with pytest.raises(Exception):
+        cfg.elements_mass_fraction = [1.0]
+
+    cfg.elements_id = [1, 8]
+    cfg.elements_mass_fraction = [0.11, 0.89]
+    # Mismatched length is rejected.
+    with pytest.raises(Exception):
+        cfg.elements_atoms = [2, 1, 3]
+
+    # Shrinking elements_id drops the now-stale dependent arrays.
+    cfg.elements_id = [1]
+    assert cfg.elements_mass_fraction == []
+
+
 def test_convert_units():
     values = np.array([50.0, 25.0], dtype=np.float64)
     # MeV cm2/g -> keV/um for liquid water (rho ~ 1 g/cm3): factor ~ 0.1
