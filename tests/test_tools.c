@@ -30,6 +30,7 @@ int main(void) {
     double csda;
     double inverse_csda;
     double stp;
+    double bragg_peak;
     float old_values[2] = {1.0f, 2.0f};
     float new_values[2] = {0.0f, 0.0f};
 
@@ -73,6 +74,22 @@ int main(void) {
         failures += failf("dedx_get_stp value", stp, 1.0);
     }
 
+    /* The Bragg-peak stopping power is the maximum of the curve, so it must
+       exceed the stopping power at 100 MeV (far up the high-energy branch). */
+    bragg_peak = dedx_get_bragg_peak_stp(ws, cfg, &err);
+    if (err != DEDX_OK) {
+        failures += faili("dedx_get_bragg_peak_stp err", err, DEDX_OK);
+    } else if (!(bragg_peak > stp)) {
+        failures += failf("dedx_get_bragg_peak_stp value", bragg_peak, stp);
+    }
+
+    /* Without a nucleon number the Bragg-peak helper must refuse to run. */
+    cfg->ion_a = 0;
+    err = DEDX_OK;
+    bragg_peak = dedx_get_bragg_peak_stp(ws, cfg, &err);
+    failures += faili("dedx_get_bragg_peak_stp ion_a guard", err, DEDX_ERR_ION_A_REQUIRED);
+    cfg->ion_a = 1;
+
     err = convert_units(DEDX_MEVCM2G, DEDX_KEVUM, DEDX_WATER, 2, old_values, new_values);
     if (err != DEDX_OK) {
         failures += faili("convert_units err", err, DEDX_OK);
@@ -95,6 +112,30 @@ int main(void) {
             failures += failf("convert_units reverse first", new_values[0], 10.0);
         if (!approx(new_values[1], 20.0, 1e-6))
             failures += failf("convert_units reverse second", new_values[1], 20.0);
+    }
+
+    /* The Bragg-peak helper loads an unloaded configuration automatically, as
+       documented; verify that documented behavior on a fresh config. */
+    {
+        int err2 = 0;
+        dedx_config *cfg2 = calloc(1, sizeof(dedx_config));
+        dedx_workspace *ws2 = dedx_allocate_workspace(1, &err2);
+        if (cfg2 != NULL && ws2 != NULL && err2 == DEDX_OK) {
+            cfg2->program = DEDX_PSTAR;
+            cfg2->ion = DEDX_PROTON;
+            cfg2->target = DEDX_WATER;
+            cfg2->ion_a = 1;
+            /* deliberately not loaded; the helper must load it itself */
+            bragg_peak = dedx_get_bragg_peak_stp(ws2, cfg2, &err2);
+            if (err2 != DEDX_OK)
+                failures += faili("bragg auto-load err", err2, DEDX_OK);
+            else if (!(bragg_peak > 0.0))
+                failures += failf("bragg auto-load value", bragg_peak, 1.0);
+        } else {
+            failures += faili("bragg auto-load setup", err2, DEDX_OK);
+        }
+        dedx_free_config(cfg2, &err2);
+        dedx_free_workspace(ws2, &err2);
     }
 
     dedx_free_config(cfg, &err);

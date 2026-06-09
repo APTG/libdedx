@@ -57,6 +57,18 @@ int main(void) {
         failures += failf("inverse_stp_simple energy", recovered, energy);
     }
 
+    /* The low-energy branch (side < 0) yields the rising-edge solution, which
+       lies below the high-energy solution for the same stopping power. */
+    err = 0;
+    {
+        double low_branch = dedx_get_inverse_stp_simple(DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, stp_high, -1, &err);
+        if (err != DEDX_OK) {
+            failures += faili("inverse_stp_simple low-branch err", err, DEDX_OK);
+        } else if (!(low_branch > 0.0 && low_branch < recovered)) {
+            failures += failf("inverse_stp_simple low-branch energy", low_branch, recovered);
+        }
+    }
+
     /* Bragg peak stopping power must exceed the stopping power at 100 MeV. */
     err = 0;
     peak = dedx_get_bragg_peak_stp_simple(DEDX_PSTAR, DEDX_PROTON, DEDX_WATER, &err);
@@ -66,14 +78,26 @@ int main(void) {
         failures += failf("bragg_peak_stp_simple value", peak, stp_high);
     }
 
-    /* Error path: an unsupported program/ion combination reports failure. */
+    /* Error path: an unsupported program/ion combination (PSTAR is
+       proton-only) must report DEDX_ERR_ION_NOT_SUPPORTED and return -1 from
+       every flat wrapper, exercising their allocation-cleanup branches. */
+    err = 0;
+    recovered = dedx_get_inverse_csda_simple(DEDX_PSTAR, DEDX_CARBON, DEDX_WATER, 1.0, &err);
+    failures += faili("inverse_csda_simple unsupported err", err, DEDX_ERR_ION_NOT_SUPPORTED);
+    if (!approx(recovered, -1.0, 1e-9))
+        failures += failf("inverse_csda_simple unsupported return", recovered, -1.0);
+
+    err = 0;
+    recovered = dedx_get_inverse_stp_simple(DEDX_PSTAR, DEDX_CARBON, DEDX_WATER, 10.0, 1, &err);
+    failures += faili("inverse_stp_simple unsupported err", err, DEDX_ERR_ION_NOT_SUPPORTED);
+    if (!approx(recovered, -1.0, 1e-9))
+        failures += failf("inverse_stp_simple unsupported return", recovered, -1.0);
+
     err = 0;
     recovered = dedx_get_bragg_peak_stp_simple(DEDX_PSTAR, DEDX_CARBON, DEDX_WATER, &err);
-    if (err == DEDX_OK) {
-        failures += faili("bragg_peak_stp_simple unsupported err", err, DEDX_ERR_ION_NOT_SUPPORTED);
-    } else if (!approx(recovered, -1.0, 1e-9)) {
+    failures += faili("bragg_peak_stp_simple unsupported err", err, DEDX_ERR_ION_NOT_SUPPORTED);
+    if (!approx(recovered, -1.0, 1e-9))
         failures += failf("bragg_peak_stp_simple unsupported return", recovered, -1.0);
-    }
 
     return failures;
 }

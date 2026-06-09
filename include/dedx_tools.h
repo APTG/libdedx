@@ -35,8 +35,13 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
  *  Inverts the stopping power curve. Since stopping power is non-monotonic,
  *  the @p side parameter selects which branch to use.
  *
- *  @param[in]  ws      Workspace with a loaded configuration.
- *  @param[in]  config  Loaded configuration.
+ *  @note This function (re)loads @p config into @p ws internally, so the
+ *        configuration need not be pre-loaded; config->ion_a must be set.
+ *        Because it always loads, do not pre-load @p config into a
+ *        single-dataset workspace, or the dataset will be loaded twice.
+ *
+ *  @param[in]  ws      Workspace into which the configuration is loaded.
+ *  @param[in]  config  Configuration to invert (loaded internally).
  *  @param[in]  stp     Target stopping power in MeV cm²/g.
  *  @param[in]  side    Branch selector: negative selects the low-energy branch
  *                      (below the Bragg peak); zero or positive selects the
@@ -61,8 +66,12 @@ double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float rang
  *  Locates the energy at which the mass stopping power reaches its maximum
  *  (the Bragg peak) and returns the stopping power value there.
  *
- *  @param[in]  ws      Workspace with a loaded configuration.
- *  @param[in]  config  Loaded configuration. config->ion_a must be set.
+ *  @note If @p config is not already loaded into @p ws it is loaded
+ *        automatically; config->ion_a must be set beforehand.
+ *
+ *  @param[in]  ws      Workspace used to evaluate the configuration.
+ *  @param[in]  config  Configuration to evaluate; loaded automatically if not
+ *                      already loaded. config->ion_a must be set.
  *  @param[out] err     Error code; 0 on success.
  *  @return Peak mass stopping power in MeV cm²/g.
  */
