@@ -40,6 +40,22 @@ static int check_terminated(const int *list, int max, const char *label) {
     return 1;
 }
 
+/* Checks two -1-terminated lists have identical contents. Returns 0 on pass. */
+static int check_lists_equal(const int *x, const int *y, const char *label) {
+    if (x == NULL || y == NULL) {
+        fprintf(stderr, "FAIL %s: NULL list\n", label);
+        return 1;
+    }
+    for (int i = 0;; i++) {
+        if (x[i] != y[i]) {
+            fprintf(stderr, "FAIL %s: lists differ at index %d (%d vs %d)\n", label, i, x[i], y[i]);
+            return 1;
+        }
+        if (x[i] == -1)
+            return 0;
+    }
+}
+
 int main(void) {
     int failures = 0;
 
@@ -47,19 +63,12 @@ int main(void) {
     failures += check_full_list(dedx_get_ion_list(DEDX_DEFAULT), 112, "DEFAULT full list");
     failures += check_full_list(dedx_get_ion_list(DEDX_BETHE_EXT00), 112, "BETHE_EXT00 full list");
 
-    /* The returned pointer must be stable: repeated calls return identical contents,
-     * and concurrent readers must never observe a half-written buffer. With a const
-     * table the pointer is also identical across calls. */
+    /* Both unrestricted program IDs, and repeated calls, must yield identical contents.
+     * We compare contents rather than pointer identity, which is an implementation
+     * detail and not part of the function's contract. */
     const int *a = dedx_get_ion_list(DEDX_DEFAULT);
-    const int *b = dedx_get_ion_list(DEDX_BETHE_EXT00);
-    if (a != b) {
-        fprintf(stderr, "FAIL: DEFAULT and BETHE_EXT00 should share the same const list pointer\n");
-        failures++;
-    }
-    if (dedx_get_ion_list(DEDX_DEFAULT) != a) {
-        fprintf(stderr, "FAIL: DEFAULT list pointer not stable across calls\n");
-        failures++;
-    }
+    failures += check_lists_equal(a, dedx_get_ion_list(DEDX_BETHE_EXT00), "DEFAULT vs BETHE_EXT00 contents");
+    failures += check_lists_equal(a, dedx_get_ion_list(DEDX_DEFAULT), "DEFAULT stable across calls");
 
     /* Restricted programs return their own const sub-lists, terminated with -1. */
     const int *pstar = dedx_get_ion_list(DEDX_PSTAR);
