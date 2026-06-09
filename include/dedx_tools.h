@@ -38,7 +38,9 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
  *  @param[in]  ws      Workspace with a loaded configuration.
  *  @param[in]  config  Loaded configuration.
  *  @param[in]  stp     Target stopping power in MeV cm²/g.
- *  @param[in]  side    0 = low-energy branch, 1 = high-energy branch.
+ *  @param[in]  side    Branch selector: negative selects the low-energy branch
+ *                      (below the Bragg peak); zero or positive selects the
+ *                      high-energy branch (above the Bragg peak).
  *  @param[out] err     Error code; 0 on success.
  *  @return Energy in MeV/nucl (MeV per nucleon).
  */
