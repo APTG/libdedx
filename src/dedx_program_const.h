@@ -53,9 +53,16 @@ static const int dedx_program_available_ions[110][20] = {
 };
 
 /* Full ion list for programs with no ion restrictions (DEDX_DEFAULT, DEDX_BETHE_EXT00):
- * ions 1..112 followed by the -1 terminator. Declared const so dedx_get_ion_list()
- * can return it directly instead of filling a function-scoped static buffer at runtime,
- * which made that function not thread-safe. */
+ * the atomic numbers 1..112 of every element that carries periodic-table data, followed
+ * by the -1 terminator. The count 112 matches the periodic-table arrays dedx_amu[] /
+ * dedx_nucl[] in dedx_periodic_table.h; keep them in sync if elements are ever added.
+ *
+ * Declared const so dedx_get_ion_list() can return it directly instead of filling a
+ * function-scoped static buffer at runtime, which made that function not thread-safe.
+ *
+ * NOTE: this table and the dedx_program_available_* availability matrices above are
+ * hand-maintained today. They are expected to be generated from an exported
+ * program/ion/material compatibility matrix in a future change (see issue #138). */
 static const int dedx_full_ion_list[113] = {
     1,   2,   3,   4,   5,   6,   7,   8,   9,  10,
    11,  12,  13,  14,  15,  16,  17,  18,  19,  20,

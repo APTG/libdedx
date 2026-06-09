@@ -3,9 +3,12 @@
 /* Verifies dedx_get_ion_list().
  *
  * Historically the DEDX_DEFAULT / DEDX_BETHE_EXT00 branch filled a function-scoped
- * static buffer on every call and returned a pointer to it, which was a data race
- * under concurrent use. The list is now a const table; these checks lock in its
- * contents and confirm the returned pointer is stable across calls. */
+ * static buffer on every call and returned a pointer into it, which was a data race
+ * under concurrent use (issue #138). The list is now an immutable const table; these
+ * checks lock in its contents (the full list and the restricted sub-lists) and that
+ * repeated calls return identical contents. Contents are compared element-by-element
+ * rather than by pointer identity, which is an implementation detail and not part of
+ * the function's contract. */
 
 /* Checks that list is exactly 1,2,...,count then -1 terminator. Returns 0 on pass. */
 static int check_full_list(const int *list, int count, const char *label) {
