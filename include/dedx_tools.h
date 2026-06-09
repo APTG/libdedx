@@ -54,6 +54,18 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
  */
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err);
 
+/** @brief Return the maximum (Bragg-peak) stopping power.
+ *
+ *  Locates the energy at which the mass stopping power reaches its maximum
+ *  (the Bragg peak) and returns the stopping power value there.
+ *
+ *  @param[in]  ws      Workspace with a loaded configuration.
+ *  @param[in]  config  Loaded configuration. config->ion_a must be set.
+ *  @param[out] err     Error code; 0 on success.
+ *  @return Peak mass stopping power in MeV cm²/g.
+ */
+double dedx_get_bragg_peak_stp(dedx_workspace *ws, dedx_config *config, int *err);
+
 /** @brief Convert an array of stopping power values between unit systems.
  *
  *  @param[in]  old_unit      Source unit (dedx_stp_units).

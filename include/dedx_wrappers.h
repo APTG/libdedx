@@ -97,4 +97,49 @@ int dedx_get_csda_range_table(const int program,
                               const float *energies,
                               double *csda_ranges);
 
+/** @brief One-call inverse CSDA: energy for a given CSDA range.
+ *
+ *  Allocates a fresh workspace and configuration internally, sets the nucleon
+ *  number automatically, and is safe to call without managing object
+ *  lifetimes (suitable for JavaScript/WASM and other flat-API consumers).
+ *
+ *  @param[in]  program  Program identifier.
+ *  @param[in]  ion      Ion identifier.
+ *  @param[in]  target   Target material identifier.
+ *  @param[in]  range    CSDA range in g/cm².
+ *  @param[out] err      Error code; 0 on success.
+ *  @return Kinetic energy in MeV/nucl (MeV per nucleon), or -1 on failure.
+ */
+double dedx_get_inverse_csda_simple(int program, int ion, int target, double range, int *err);
+
+/** @brief One-call inverse stopping power: energy for a given stopping power.
+ *
+ *  Allocates a fresh workspace and configuration internally and sets the
+ *  nucleon number automatically. Because stopping power is non-monotonic the
+ *  @p side parameter selects which branch to invert (see dedx_get_inverse_stp).
+ *
+ *  @param[in]  program  Program identifier.
+ *  @param[in]  ion      Ion identifier.
+ *  @param[in]  target   Target material identifier.
+ *  @param[in]  stp      Target stopping power in MeV cm²/g.
+ *  @param[in]  side     Branch selector (see dedx_get_inverse_stp).
+ *  @param[out] err      Error code; 0 on success.
+ *  @return Kinetic energy in MeV/nucl (MeV per nucleon), or -1 on failure.
+ */
+double dedx_get_inverse_stp_simple(int program, int ion, int target, double stp, int side, int *err);
+
+/** @brief One-call Bragg peak: maximum stopping power for an ion/target pair.
+ *
+ *  Allocates a fresh workspace and configuration internally and sets the
+ *  nucleon number automatically, then returns the peak (maximum) mass
+ *  stopping power.
+ *
+ *  @param[in]  program  Program identifier.
+ *  @param[in]  ion      Ion identifier.
+ *  @param[in]  target   Target material identifier.
+ *  @param[out] err      Error code; 0 on success.
+ *  @return Peak mass stopping power in MeV cm²/g, or -1 on failure.
+ */
+double dedx_get_bragg_peak_stp_simple(int program, int ion, int target, int *err);
+
 #endif // DEDX_WRAPPERS_H

@@ -164,6 +164,31 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
     return (x1 + x2) / 2;
 }
 
+double dedx_get_bragg_peak_stp(dedx_workspace *ws, dedx_config *config, int *err) {
+    if (config->ion_a <= 0) {
+        *err = DEDX_ERR_ION_A_REQUIRED;
+        return -1;
+    }
+    double acc = 1e-5;
+    dedx_tools_settings set;
+
+    if (*err != 0)
+        return -1;
+    if (config->loaded == 0)
+        dedx_load_config(ws, config, err);
+    if (*err != 0)
+        return -1;
+    set.ws = ws;
+    set.cfg = config;
+
+    double peak_energy = find_min(find_min_stp_func, &set, acc * 100);
+    if (peak_energy < 0) {
+        *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
+        return -1;
+    }
+    return dedx_get_stp(ws, config, (float) peak_energy, err);
+}
+
 double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int *err) {
     if (config->ion_a <= 0) {
         *err = DEDX_ERR_ION_A_REQUIRED;

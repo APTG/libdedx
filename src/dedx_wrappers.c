@@ -253,3 +253,98 @@ int dedx_get_csda_range_table(const int program,
 
     return err;
 }
+
+double dedx_get_inverse_csda_simple(int program, int ion, int target, double range, int *err) {
+    int cleanup_err = DEDX_OK;
+    double energy;
+    dedx_config *config = allocate_wrapper_config(program, ion, target, err);
+    dedx_workspace *ws;
+
+    if (*err != 0)
+        return -1.0;
+    config->ion_a = dedx_internal_get_nucleon(config->ion, err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return -1.0;
+    }
+    ws = allocate_wrapper_workspace(err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return -1.0;
+    }
+    dedx_load_config(ws, config, err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return -1.0;
+    }
+
+    energy = dedx_get_inverse_csda(ws, config, (float) range, err);
+    dedx_free_config(config, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
+    if (*err != 0)
+        return -1.0;
+    return energy;
+}
+
+double dedx_get_inverse_stp_simple(int program, int ion, int target, double stp, int side, int *err) {
+    int cleanup_err = DEDX_OK;
+    double energy;
+    dedx_config *config = allocate_wrapper_config(program, ion, target, err);
+    dedx_workspace *ws;
+
+    if (*err != 0)
+        return -1.0;
+    config->ion_a = dedx_internal_get_nucleon(config->ion, err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return -1.0;
+    }
+    ws = allocate_wrapper_workspace(err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return -1.0;
+    }
+
+    /* dedx_get_inverse_stp() loads the configuration internally, so the
+       workspace (allocated for a single dataset) must not be pre-loaded here. */
+    energy = dedx_get_inverse_stp(ws, config, (float) stp, side, err);
+    dedx_free_config(config, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
+    if (*err != 0)
+        return -1.0;
+    return energy;
+}
+
+double dedx_get_bragg_peak_stp_simple(int program, int ion, int target, int *err) {
+    int cleanup_err = DEDX_OK;
+    double peak_stp;
+    dedx_config *config = allocate_wrapper_config(program, ion, target, err);
+    dedx_workspace *ws;
+
+    if (*err != 0)
+        return -1.0;
+    config->ion_a = dedx_internal_get_nucleon(config->ion, err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return -1.0;
+    }
+    ws = allocate_wrapper_workspace(err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        return -1.0;
+    }
+    dedx_load_config(ws, config, err);
+    if (*err != 0) {
+        dedx_free_config(config, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return -1.0;
+    }
+
+    peak_stp = dedx_get_bragg_peak_stp(ws, config, err);
+    dedx_free_config(config, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
+    if (*err != 0)
+        return -1.0;
+    return peak_stp;
+}
