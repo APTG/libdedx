@@ -8,6 +8,10 @@
 
 #include "dedx.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Units for stopping power values.
  */
@@ -70,5 +74,9 @@ int convert_units(const int old_unit,
                   const int no_of_points,
                   const float *old_values,
                   float *new_values);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // DEDX_TOOLS_H

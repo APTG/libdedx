@@ -4,6 +4,10 @@
 #include "dedx_elements.h"
 #include "dedx_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @file dedx.h
  * @brief Public API for libdedx — a stopping power (dE/dx) library.
@@ -293,5 +297,9 @@ float dedx_get_simple_stp(int ion, int target, float energy, int *err);
  *  @param[out] err     Error code; 0 on success.
  */
 void dedx_free_config(dedx_config *config, int *err);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // DEDX_H

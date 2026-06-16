@@ -40,3 +40,9 @@ add_test(NAME getdedx_lookup COMMAND getdedx 2 1 276 100)
 add_test(NAME getdedx_list_programs COMMAND getdedx -1 1 276 100)
 
 install(TARGETS getdedx DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
+# C++ example consumers (demonstrate the extern "C" public headers from C++).
+option(DEDX_BUILD_CXX_EXAMPLES "Build C++ example consumers (requires a C++ compiler)" ON)
+if(DEDX_BUILD_CXX_EXAMPLES)
+    add_subdirectory(cpp)
+endif()
