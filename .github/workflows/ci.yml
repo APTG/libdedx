@@ -72,28 +72,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # setuptools_scm needs history/tags for the version
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Configure
-        run: cmake -S . -B build
-
-      - name: Build
-        run: cmake --build build --parallel
-
-      - name: Install Python package and dev dependencies
-        run: python -m pip install -e "python[dev]"
+      - name: Build and install the Python package (nanobind extension)
+        run: python -m pip install -e ".[dev]"
 
       - name: Run ruff
         if: ${{ matrix.python-version == '3.13' }}
-        working-directory: python
         run: python -m ruff check .
 
       - name: Run Python tests
-        working-directory: python
-        env:
-          LIBDEDX_SO: ${{ github.workspace }}/build/src/libdedx.so
-        run: python -m pytest tests -q
+        run: python -m pytest python/tests -q

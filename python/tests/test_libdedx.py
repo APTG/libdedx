@@ -1,23 +1,24 @@
-"""
-Basic smoke tests for the libdedx Python binding.
+"""High-level smoke tests for the libdedx Python binding.
 
-Uses PSTAR (program=2), Hydrogen (ion=1), Liquid water (target=276)
-as a reference combination with well-known stopping power values.
+Uses PSTAR, hydrogen (Z=1) and liquid water as a reference combination with
+well-known stopping power values.
 """
 
 import libdedx
 
-PROGRAM = 2  # PSTAR
-ION = 1  # Hydrogen (Z=1)
-TARGET = 276  # Liquid water
+PROGRAM = libdedx._core.PSTAR
+ION = libdedx._core.HYDROGEN
+TARGET = libdedx._core.WATER_LIQUID
 
 
-def test_get_version(capsys):
+def test_get_version():
     version = libdedx.get_version()
-    print(version)
-    captured = capsys.readouterr()
     assert version.count(".") == 2
-    assert captured.out.strip() == version
+
+
+def test_version_string_nonempty():
+    assert isinstance(libdedx.version_string(), str)
+    assert libdedx.version_string()
 
 
 def test_get_stp_returns_positive():
@@ -45,8 +46,3 @@ def test_get_csda_table():
     ranges = libdedx.get_csda_table(PROGRAM, ION, TARGET, energies)
     assert len(ranges) == len(energies)
     assert all(r > 0.0 for r in ranges)
-
-
-# TODO: passing an invalid program number currently causes the library to
-# segfault rather than returning an error code. A proper test can be added
-# once input validation is implemented in the C library.

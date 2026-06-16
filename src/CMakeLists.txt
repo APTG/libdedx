@@ -42,7 +42,9 @@ if(NOT WIN32)
     target_link_libraries(dedx PUBLIC m)
 endif()
 
-# Shared library for Python ctypes and other dynamic consumers.
+# Shared library for dynamic consumers. The Python wheel links the static `dedx`
+# target instead, so the shared library is not built under SKBUILD.
+if(NOT SKBUILD)
 add_library(dedx_shared SHARED
     $<TARGET_OBJECTS:dedx_objects>
 )
@@ -68,7 +70,12 @@ endif()
 if(ANDROID)
     target_link_options(dedx_shared PRIVATE -Wl,-z,max-page-size=16384)
 endif()
+endif() # NOT SKBUILD (dedx_shared)
 
+# The C-library install rules are skipped for the Python wheel build (SKBUILD):
+# the extension links `dedx` statically and the wheel should only contain the
+# Python module, not the headers, archives, or exported CMake package.
+if(NOT SKBUILD)
 install(FILES
     "${PROJECT_SOURCE_DIR}/include/dedx.h"
     "${PROJECT_SOURCE_DIR}/include/dedx_elements.h"
@@ -90,3 +97,4 @@ install(EXPORT dedxTargets
     NAMESPACE dedx::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/dedx"
 )
+endif() # NOT SKBUILD

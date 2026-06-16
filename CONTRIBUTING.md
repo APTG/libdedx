@@ -67,3 +67,33 @@ locking.
 The intended fix is to audit the library for shared mutable state and either
 make workspaces single-thread-owned by design or add explicit synchronization
 where shared access is required. This is tracked as a known issue.
+
+The Python binding inherits this limitation: do not share a `Workspace` across
+threads. (Calls do not release the GIL, so binding calls on a shared workspace
+are serialized in practice, but the underlying library is still not thread-safe.)
+
+## Python binding
+
+The Python package lives under `python/` and is a
+[nanobind](https://nanobind.readthedocs.io) extension (`libdedx._core`) built by
+[scikit-build-core](https://scikit-build-core.readthedocs.io). It statically
+links the `dedx` C target, so building it also compiles the C library. The whole
+project is configured from the top-level `pyproject.toml`.
+
+```bash
+pip install -e ".[dev]"   # builds the extension in place
+pytest python/tests
+ruff check .
+```
+
+Notes for contributors:
+
+- The binding source (`python/src/dedx_core.cpp`) is C++17 and follows ordinary
+  C++ conventions; the C "declare variables at the top of the block" rule above
+  applies to the C library, not to this file.
+- `dedx_config` owns the element arrays it is given and frees them in
+  `dedx_free_config()`, so any pointer handed to it from the binding must be
+  `malloc`'d. See the `Config` wrapper for how ownership and array lengths are
+  kept consistent.
+- The package version comes from `setuptools_scm` (git tags) and is fed into the
+  C library so the two stay in lockstep.

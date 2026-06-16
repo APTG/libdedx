@@ -64,6 +64,33 @@ dedx_free_workspace(ws, &err);
 
 See the [examples/](examples/) directory for more usage patterns.
 
+## Python binding
+
+`libdedx` is also available as a Python package with the C library statically
+linked in, so there is no separate install or build step and no runtime
+dependency on a shared library:
+
+```bash
+pip install libdedx
+```
+
+```python
+import libdedx
+from libdedx import _core as dedx
+
+stp = libdedx.simple_stp(dedx.PROTON, dedx.WATER, 100.0)  # MeV cm² / g
+
+# Workspace/config object model for repeated evaluations
+ws = dedx.Workspace()
+cfg = dedx.Config()
+cfg.program, cfg.ion, cfg.target = dedx.PSTAR, dedx.PROTON, dedx.WATER
+ws.load(cfg)
+stp = ws.stp(cfg, 100.0)
+```
+
+See [python/README.md](python/README.md) for the full Python API and the
+development workflow.
+
 ## Building
 
 Requires CMake 3.21+ and a C11 compiler.

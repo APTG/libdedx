@@ -12,6 +12,16 @@ include(CMakePackageConfigHelpers)
 
 option(DEDX_BUILD_EXAMPLES "Build libdedx example programs" ON)
 option(DEDX_BUILD_TESTS "Build libdedx test suite" ON)
+option(DEDX_BUILD_PYTHON "Build the libdedx._core Python extension module" OFF)
+
+# When invoked by scikit-build-core (pip / cibuildwheel) build only the Python
+# extension: skip the examples, tests, and the C-library install/packaging rules
+# so the wheel stays a single self-contained module.
+if(SKBUILD)
+    set(DEDX_BUILD_PYTHON ON)
+    set(DEDX_BUILD_EXAMPLES OFF)
+    set(DEDX_BUILD_TESTS OFF)
+endif()
 
 # ---- Version from git tag ----
 find_package(Git QUIET)
@@ -23,6 +33,12 @@ if(GIT_FOUND)
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
+endif()
+# Under scikit-build-core prefer the version resolved by setuptools_scm so the C
+# library and the Python package stay in lockstep (and so source builds without a
+# .git directory still get a meaningful version).
+if(SKBUILD AND DEFINED SKBUILD_PROJECT_VERSION_FULL AND NOT SKBUILD_PROJECT_VERSION_FULL STREQUAL "")
+    set(GIT_VERSION "${SKBUILD_PROJECT_VERSION_FULL}")
 endif()
 if(NOT GIT_VERSION)
     set(GIT_VERSION "0.0.0-unknown")
@@ -50,7 +66,13 @@ endif()
 if(DEDX_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
+if(DEDX_BUILD_PYTHON)
+    add_subdirectory(python)
+endif()
 
+# The exported CMake package files and CPack packaging are only relevant for a
+# regular C-library install, not for the Python wheel build.
+if(NOT SKBUILD)
 configure_package_config_file(
     "${PROJECT_SOURCE_DIR}/cmake/dedxConfig.cmake.in"
     "${PROJECT_BINARY_DIR}/dedxConfig.cmake"
@@ -126,3 +148,4 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY)
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif() # NOT SKBUILD
