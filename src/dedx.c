@@ -235,14 +235,13 @@ const int *dedx_get_material_list(int program) {
 }
 
 const int *dedx_get_ion_list(int program) {
-    /* returns a list of available ions, terminated with -1 */
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) { /* any ion, no restrictions */
-        static int temp[113], i;
-        for (i = 0; i < 112; i++)
-            temp[i] = i + 1;
-        temp[112] = -1; // stopper
-        return temp;    // TODO: Hey Jakob, er det her lovligt eller et nyt mem leak?
-    } else
+    /* Returns a -1-terminated list of ions available for the program. Both branches
+     * return immutable const data -- the shared full-ion table for unrestricted
+     * programs, or the program's row in dedx_program_available_ions -- so the function
+     * performs no writes and is safe to call concurrently from multiple threads. */
+    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) /* any ion, no restrictions */
+        return dedx_full_ion_list;
+    else
         return dedx_program_available_ions[program];
 }
 
