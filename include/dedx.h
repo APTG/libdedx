@@ -44,7 +44,9 @@ enum {
     DEDX_ICRU73,        /**< ICRU Report 73 (2005) */
     DEDX_ICRU49,        /**< ICRU Report 49 (1993) — protons and alpha particles */
     _DEDX_0008,         /**< Reserved */
-    DEDX_ICRU,          /**< Auto-selects ICRU49 or ICRU73 based on ion type */
+    DEDX_ICRU,          /**< Auto-selects ICRU49 or ICRU73 based on ion type. Falls back to the
+                             Bethe-Bloch formula (see DEDX_BETHE_EXT00) for elemental targets that
+                             no tabulated report covers (e.g. Boron), rather than failing outright. */
     DEDX_DEFAULT = 100, /**< Default program (Bethe formula) */
     DEDX_BETHE_EXT00    /**< Bethe formula with extensions */
 };
@@ -161,6 +163,30 @@ const int *dedx_get_program_list(void);
  *  @return Pointer to a static array terminated by 0; do not free.
  */
 const int *dedx_get_material_list(int program);
+
+/** @brief Maximum number of entries dedx_get_material_list_for_ion() can write. */
+#define DEDX_MAX_MATERIAL_LIST 300
+
+/** @brief Fill the materials actually usable with a specific program/ion combination.
+ *
+ *  Unlike dedx_get_material_list(), which reports a coarse per-program hint,
+ *  this consults the same embedded-data resolution dedx_load_config() uses (including
+ *  DEDX_ICRU's Bethe-Bloch fallback and Bragg-additivity decomposition of compounds),
+ *  so a material appears here if and only if dedx_load_config() is expected to succeed
+ *  for it with this exact ion. Thread-safe: writes only into the caller-supplied
+ *  buffer, no shared or static state.
+ *
+ *  @param[in]  program        Program identifier.
+ *  @param[in]  ion            Ion identifier.
+ *  @param[out] materials      Caller-allocated array of at least DEDX_MAX_MATERIAL_LIST entries.
+ *  @param[in]  max_materials  Capacity of @p materials.
+ *  @param[out] materials_len  Number of material identifiers written.
+ *  @param[out] err            Error code; 0 on success. Set to DEDX_ERR_ION_NOT_SUPPORTED or
+ *                             DEDX_ERR_ESTAR_NOT_IMPL if the program/ion combination itself is
+ *                             invalid (in which case @p materials_len is set to 0).
+ */
+void dedx_get_material_list_for_ion(
+    int program, int ion, int *materials, unsigned int max_materials, unsigned int *materials_len, int *err);
 
 /** @brief Return a null-terminated list of ions supported by a program.
  *  @param[in] program  Program identifier.
