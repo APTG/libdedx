@@ -240,7 +240,12 @@ const int *dedx_get_material_list(int program) {
 /* Checks whether a single element (target <= 99) is reachable for program/ion,
  * mirroring find_data()'s own dispatch (MSTAR's ion remap, DEDX_AUTO's Bethe-Bloch
  * fallback, the resolve-across-sub-tables behavior of the ICRU-family programs) so
- * the answer stays consistent with what dedx_load_config() will actually do. */
+ * the answer stays consistent with what dedx_load_config() will actually do.
+ *
+ * Returns 1 if dedx_load_config() is expected to succeed for this exact
+ * (program, ion, element) combination, 0 otherwise. `element` is assumed to already
+ * be a plain element id (1-99); callers are responsible for that precondition --
+ * see material_id_supported()'s `material <= 99` check below. */
 static int element_supported_for_ion(int program, int ion, int element) {
     int ion_load = ion;
     int resolved;
@@ -264,7 +269,11 @@ static int element_supported_for_ion(int program, int ion, int element) {
 /* Checks whether a material (element or compound) is reachable for program/ion.
  * Compounds are available iff their composition is known and every constituent
  * element is itself reachable, matching the Bragg-additivity decomposition
- * load_compound() performs at calculation time. */
+ * load_compound() performs at calculation time.
+ *
+ * Returns 1 if dedx_load_config() is expected to succeed for this exact
+ * (program, ion, material) combination, 0 otherwise -- for a compound, this recurses
+ * once per constituent element and is 1 only if every one of them is reachable. */
 static int material_id_supported(int program, int ion, int material) {
     float composition[20][2];
     unsigned int comp_len;
@@ -855,7 +864,12 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
  * dedx_internal_validate_config() skips dedx_internal_evaluate_i_pot() for it (that
  * step only runs for program >= 100). For a compound element reached via
  * load_compound(), _temp_i_value is already set per-element there; for a direct
- * elemental target, it still defaults to 0 and must be fetched here. */
+ * elemental target, it still defaults to 0 and must be fetched here.
+ *
+ * Returns 0 on success, with `data` filled in with the computed Bethe-Bloch
+ * stopping-power values and *err set to DEDX_OK, or -1 on failure, with *err set to
+ * the error code -- the same success/failure convention as find_data()/load_bethe_2(),
+ * which this function is a thin wrapper around. */
 static int load_bethe_fallback(stopping_data *data, dedx_config *config, float *energy, int *err) {
     int prog_temp = config->program;
     int state;
