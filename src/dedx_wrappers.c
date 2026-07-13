@@ -59,6 +59,16 @@ void dedx_fill_ion_list(int program, int *ion_list) {
     ion_list[i] = -1;
 }
 
+int dedx_fill_material_list_for_ion(int program, int ion, int *material_list) {
+    unsigned int len = 0;
+    int err = 0;
+
+    /* Reserve the last slot for the -1 terminator. */
+    dedx_get_material_list_for_ion(program, ion, material_list, DEDX_MAX_MATERIAL_LIST - 1, &len, &err);
+    material_list[len] = -1;
+    return err;
+}
+
 static dedx_config *allocate_wrapper_config(int program, int ion, int target, int *err) {
     dedx_config *config;
 

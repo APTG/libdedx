@@ -34,6 +34,23 @@ void dedx_fill_material_list(int program, int *material_list);
  */
 void dedx_fill_ion_list(int program, int *ion_list);
 
+/** @brief Fill an array with the materials actually usable with a program/ion combination.
+ *
+ *  Unlike dedx_fill_material_list(), which reports a coarse per-program hint,
+ *  this reflects exactly what dedx_load_config() can resolve for this specific ion
+ *  (see dedx_get_material_list_for_ion() in dedx.h for details).
+ *
+ *  @param[in]  program        Program identifier.
+ *  @param[in]  ion            Ion identifier.
+ *  @param[out] material_list  Caller-allocated array of at least DEDX_MAX_MATERIAL_LIST
+ *                             entries; filled with material identifiers terminated by -1.
+ *                             One slot is reserved for the terminator, so at most
+ *                             DEDX_MAX_MATERIAL_LIST - 1 material IDs are ever written.
+ *  @return 0 on success, non-zero error code if the program/ion combination itself is invalid
+ *          (e.g. DEDX_ERR_ION_NOT_SUPPORTED); @p material_list is still -1-terminated (empty).
+ */
+int dedx_fill_material_list_for_ion(int program, int ion, int *material_list);
+
 /** @brief Evaluate stopping power at arbitrary energy points.
  *
  *  @param[in]  program      Program identifier.
