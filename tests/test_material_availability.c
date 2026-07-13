@@ -237,10 +237,9 @@ static int test_material_list_for_ion(void) {
     failures += check_err(err, DEDX_ERR_ESTAR_NOT_IMPL, "ESTAR+electron for_ion");
     failures += check_err((int) len, 0, "ESTAR+electron for_ion count");
 
-    /* check_ion() alone accepts any ion in [1, 120] for DEDX_AUTO/DEFAULT/BETHE_EXT00,
-     * but the periodic-table data backing the Bethe evaluation only covers ions up to
-     * 112; an ion in (112, 120] must still be rejected, consistently with what
-     * dedx_load_config() would do. */
+    /* The periodic-table data backing the Bethe evaluation only covers ions up to 112
+     * for DEDX_AUTO/DEFAULT/BETHE_EXT00 (see check_ion()); an ion beyond that must be
+     * rejected, consistently with what dedx_load_config() would do. */
     dedx_get_material_list_for_ion(DEDX_AUTO, 115, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
     failures += check_err(err, DEDX_ERR_ION_NOT_SUPPORTED, "AUTO+ion115 for_ion");
     failures += check_err((int) len, 0, "AUTO+ion115 for_ion count");

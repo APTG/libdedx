@@ -311,19 +311,14 @@ void dedx_get_material_list_for_ion(
     *materials_len = 0;
 
     if (!check_ion(program, ion)) {
+        /* For DEDX_DEFAULT/DEDX_BETHE_EXT00/DEDX_AUTO, check_ion() itself already
+         * enforces the 1-112 range the Bethe evaluation path actually supports (see
+         * its comment), so no separate check is needed here. */
         *err = DEDX_ERR_ION_NOT_SUPPORTED;
         return;
     }
     if (program == DEDX_ESTAR) {
         *err = DEDX_ERR_ESTAR_NOT_IMPL;
-        return;
-    }
-    if ((program == DEDX_DEFAULT || program == DEDX_BETHE_EXT00 || program == DEDX_AUTO) && (ion < 1 || ion > 112)) {
-        /* check_ion() accepts any ion in [1, 120] for these programs, but the Bethe
-         * evaluation path (dedx_internal_get_atom_mass/charge, via dedx_periodic_table)
-         * only has data for ions 1-112. Keep this function consistent with what
-         * dedx_load_config() will actually do for the same ion. */
-        *err = DEDX_ERR_ION_NOT_SUPPORTED;
         return;
     }
 
@@ -625,7 +620,11 @@ static int check_ion(int prog, int ion) {
     int i = 0;
 
     if (prog >= DEDX_DEFAULT || prog == DEDX_AUTO) {
-        if ((ion < 1) || (ion > 120))
+        /* The Bethe evaluation path (dedx_internal_get_atom_mass/charge, via
+         * dedx_periodic_table) only has data for ions 1-112, matching
+         * dedx_full_ion_list -- the same list dedx_get_ion_list() returns for these
+         * programs -- so accept nothing wider than that here. */
+        if ((ion < 1) || (ion > 112))
             return 0;
         return 1;
     }
@@ -832,8 +831,19 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
         return -1;
     }
 
+    /* dedx_internal_get_atom_charge()/get_atom_mass() both reset *err to DEDX_OK and
+     * share the same id < 113 validity check, so this pair always succeeds or fails
+     * together -- one check right after both is enough. It must happen right away,
+     * though: config->target is already known <= 99 (hence < 113) at this point, so
+     * its own charge/mass lookup just below always succeeds and would otherwise
+     * silently overwrite an ion failure here, leaving *err == DEDX_OK with PZ/PA at
+     * their failure sentinel (this is reachable in practice: a compound target
+     * decomposes into elements -- see load_compound() -- before check_ion() ever runs
+     * for its ion). */
     PZ = dedx_internal_get_atom_charge(config->ion, err);
     PA = dedx_internal_get_atom_mass(config->ion, err);
+    if (*err != 0)
+        return -1;
     TZ = dedx_internal_get_atom_charge(config->target, err);
     TA = dedx_internal_get_atom_mass(config->target, err);
     rho = config->rho;
