@@ -57,7 +57,7 @@ static int load_config_clean(dedx_workspace *ws, dedx_config *config, int *err);
 static int find_data(stopping_data *data, dedx_config *config, float *energy, int *err);
 static int load_compound(dedx_workspace *ws, dedx_config *config, int *err);
 static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy, int *err);
-static int load_icru_bethe_fallback(stopping_data *data, dedx_config *config, float *energy, int *err);
+static int load_bethe_fallback(stopping_data *data, dedx_config *config, float *energy, int *err);
 static int element_supported_for_ion(int program, int ion, int element);
 static int material_id_supported(int program, int ion, int material);
 
@@ -231,35 +231,31 @@ const int *dedx_get_program_list(void) {
 
 const int *dedx_get_material_list(int program) {
     /* returns a list of available materials, terminated with -1 */
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT)
+    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT || program == DEDX_AUTO)
         return dedx_program_available_materials[0];
     else
         return dedx_program_available_materials[program];
 }
 
 /* Checks whether a single element (target <= 99) is reachable for program/ion,
- * mirroring find_data()'s own dispatch (MSTAR's ion remap, DEDX_ICRU's Bethe-Bloch
+ * mirroring find_data()'s own dispatch (MSTAR's ion remap, DEDX_AUTO's Bethe-Bloch
  * fallback, the resolve-across-sub-tables behavior of the ICRU-family programs) so
  * the answer stays consistent with what dedx_load_config() will actually do. */
 static int element_supported_for_ion(int program, int ion, int element) {
     int ion_load = ion;
     int resolved;
 
-    if (program == DEDX_DEFAULT || program == DEDX_BETHE_EXT00) {
+    if (program == DEDX_DEFAULT || program == DEDX_BETHE_EXT00 || program == DEDX_AUTO) {
         return 1; /* Bethe formula: any known element, given caller-supplied rho */
     }
-    if (program == DEDX_ESTAR) {
-        return 0;
-    }
+    /* DEDX_ESTAR is not handled specially here: dedx_get_material_list_for_ion() -- the
+     * only caller -- already rejects it with DEDX_ERR_ESTAR_NOT_IMPL before reaching this
+     * function, and dedx_embedded_has_table() below returns 0 for it regardless (no
+     * embedded program data is registered for DEDX_ESTAR). */
     if (program == DEDX_MSTAR && ion > 1) {
         ion_load = 2;
     }
-    if (program == DEDX_ICRU) {
-        /* Falls back to Bethe-Bloch for any element find_data() can't resolve
-         * via a tabulated sub-program -- see load_icru_bethe_fallback(). */
-        return 1;
-    }
-    if (program == DEDX_ICRU49 || program == DEDX_ICRU73) {
+    if (program == DEDX_ICRU || program == DEDX_ICRU49 || program == DEDX_ICRU73) {
         return dedx_embedded_resolve_program(program, ion_load, element, &resolved) == 0;
     }
     return dedx_embedded_has_table(program, ion_load, element);
@@ -275,17 +271,19 @@ static int material_id_supported(int program, int ion, int material) {
     unsigned int i;
     int comp_err = DEDX_OK;
 
-    if (material <= 0) {
+    if (material <= 0) { /* LCOV_EXCL_START -- master material list never contains this, and
+                             composition rows are always positive element IDs in practice */
         return 0;
-    }
+    } /* LCOV_EXCL_STOP */
     if (material <= 99) {
         return element_supported_for_ion(program, ion, material);
     }
 
     dedx_internal_get_composition(material, composition, &comp_len, &comp_err);
-    if (comp_err != DEDX_OK || comp_len == 0) {
+    if (comp_err != DEDX_OK || comp_len == 0) { /* LCOV_EXCL_START -- every compound in the master
+                                                    material list has known embedded composition */
         return 0;
-    }
+    } /* LCOV_EXCL_STOP */
     for (i = 0; i < comp_len; i++) {
         if (!material_id_supported(program, ion, (int) composition[i][0])) {
             return 0;
@@ -311,6 +309,14 @@ void dedx_get_material_list_for_ion(
         *err = DEDX_ERR_ESTAR_NOT_IMPL;
         return;
     }
+    if ((program == DEDX_DEFAULT || program == DEDX_BETHE_EXT00 || program == DEDX_AUTO) && (ion < 1 || ion > 112)) {
+        /* check_ion() accepts any ion in [1, 120] for these programs, but the Bethe
+         * evaluation path (dedx_internal_get_atom_mass/charge, via dedx_periodic_table)
+         * only has data for ions 1-112. Keep this function consistent with what
+         * dedx_load_config() will actually do for the same ion. */
+        *err = DEDX_ERR_ION_NOT_SUPPORTED;
+        return;
+    }
 
     for (i = 0; candidates[i] != -1 && count < max_materials; i++) {
         if (material_id_supported(program, ion, candidates[i])) {
@@ -325,7 +331,7 @@ const int *dedx_get_ion_list(int program) {
      * return immutable const data -- the shared full-ion table for unrestricted
      * programs, or the program's row in dedx_program_available_ions -- so the function
      * performs no writes and is safe to call concurrently from multiple threads. */
-    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT) /* any ion, no restrictions */
+    if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT || program == DEDX_AUTO) /* any ion, no restrictions */
         return dedx_full_ion_list;
     else
         return dedx_program_available_ions[program];
@@ -357,6 +363,13 @@ float dedx_get_min_energy(int program, int ion) {
         energy_min = get_min_energy_icru(ion);
         break;
     case DEDX_ICRU:
+    case DEDX_AUTO:
+        /* DEDX_AUTO resolves through the same tabulated sub-programs as DEDX_ICRU
+         * before falling back to Bethe-Bloch, so these advisory bounds mirror
+         * DEDX_ICRU's. These are best-effort hints, not authoritative: the actual
+         * bounds of whichever tier ends up serving a given target (a tabulated
+         * report, or the DEDX_BETHE_EXT00 fallback) may differ; dedx_get_stp()
+         * still enforces the real bounds of the dataset it loaded. */
         if (ion == DEDX_CARBON)
             energy_min = 0.001f / 12.0f;
         else
@@ -398,6 +411,7 @@ float dedx_get_max_energy(int program, int ion) {
         energy_max = get_max_energy_icru(ion);
         break;
     case DEDX_ICRU:
+    case DEDX_AUTO: /* see the comment in dedx_get_min_energy() */
         if (ion == DEDX_CARBON)
             energy_max = 10000.0f / 12.0f;
         else
@@ -601,7 +615,7 @@ static int check_ion(int prog, int ion) {
     const int *ion_list;
     int i = 0;
 
-    if (prog >= DEDX_DEFAULT) {
+    if (prog >= DEDX_DEFAULT || prog == DEDX_AUTO) {
         if ((ion < 1) || (ion > 120))
             return 0;
         return 1;
@@ -669,6 +683,10 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
 
     if (prog == DEDX_ICRU) {
     } else if (prog == DEDX_ICRU49) {
+    } else if (prog == DEDX_AUTO) {
+        /* Resolve exactly like DEDX_ICRU (its tabulated sub-programs by ion type);
+         * the only difference is what happens below if that resolution fails. */
+        prog_load = DEDX_ICRU;
     } else if (prog == DEDX_ESTAR) {
         *err = DEDX_ERR_ESTAR_NOT_IMPL;
         return -1;
@@ -686,18 +704,19 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
     }
 
     if (dedx_embedded_resolve_program(prog_load, ion_load, target_load, &prog_load) != 0) {
-        /* DEDX_ICRU is documented as auto-selecting the best tabulated report for the
-         * ion; when no tabulated ICRU/PSTAR/ASTAR table covers this element (e.g.
-         * Boron, which none of them tabulate), fall back to the Bethe-Bloch formula
-         * instead of failing outright. Compounds (target > 99) are excluded here: they
-         * are handled below via Bragg-additivity decomposition into elements, each of
-         * which goes through this same fallback individually. Report-specific programs
-         * (PSTAR, ASTAR, ICRU49, ICRU73, ...) intentionally stay literal to their
-         * published data and do not get this fallback. */
-        if (prog == DEDX_ICRU && target_load > 0 && target_load <= 99) {
-            return load_icru_bethe_fallback(data, config, energy, err);
+        /* DEDX_AUTO layers a Bethe-Bloch fallback on top of DEDX_ICRU's tabulated
+         * auto-selection: when no tabulated report covers this element (e.g. Boron,
+         * which none of them tabulate), compute it analytically instead of failing
+         * outright. Compounds (target > 99) are excluded here: they are handled below
+         * via Bragg-additivity decomposition into elements, each of which goes through
+         * this same fallback individually. DEDX_ICRU itself, and the report-specific
+         * programs (PSTAR, ASTAR, ICRU49, ICRU73, ...), intentionally stay literal to
+         * their published data and never get this fallback -- see DEDX_AUTO's docs
+         * in dedx.h for why. */
+        if (prog == DEDX_AUTO && target_load > 0 && target_load <= 99) {
+            return load_bethe_fallback(data, config, energy, err);
         }
-        if (prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73) {
+        if (prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73 || prog == DEDX_AUTO) {
             *err = DEDX_ERR_COMBINATION_NOT_FOUND;
             return -1;
         }
@@ -828,12 +847,16 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
     return 0;
 }
 
-/* Last-resort tier for DEDX_ICRU: compute via the Bethe-Bloch formula using the
+/* Last-resort tier for DEDX_AUTO: compute via the Bethe-Bloch formula using the
  * element's embedded density and mean excitation potential. config->rho is already
- * populated by dedx_internal_validate_rho() before find_data() runs; only the
- * I-value needs fetching here since tabulated (program < 100) configs skip the
- * dedx_internal_evaluate_i_pot() step that normally supplies it. */
-static int load_icru_bethe_fallback(stopping_data *data, dedx_config *config, float *energy, int *err) {
+ * populated by dedx_internal_validate_rho(), which runs unconditionally before
+ * find_data(). config->_temp_i_value, however, is not: DEDX_AUTO is deliberately
+ * grouped with the tabulated report identifiers (< DEDX_DEFAULT), so
+ * dedx_internal_validate_config() skips dedx_internal_evaluate_i_pot() for it (that
+ * step only runs for program >= 100). For a compound element reached via
+ * load_compound(), _temp_i_value is already set per-element there; for a direct
+ * elemental target, it still defaults to 0 and must be fetched here. */
+static int load_bethe_fallback(stopping_data *data, dedx_config *config, float *energy, int *err) {
     int prog_temp = config->program;
     int state;
 
@@ -845,8 +868,10 @@ static int load_icru_bethe_fallback(stopping_data *data, dedx_config *config, fl
             state = dedx_internal_target_is_gas(config->target, err) ? DEDX_GAS : DEDX_CONDENSED;
         }
         config->_temp_i_value = dedx_internal_get_i_value(config->target, state, err);
-        if (*err != DEDX_OK)
+        if (*err != DEDX_OK) { /* LCOV_EXCL_START -- every element in the valid 1-99
+                                   range that reaches this function has embedded I-value data */
             return -1;
+        } /* LCOV_EXCL_STOP */
     }
 
     config->program = DEDX_BETHE_EXT00;

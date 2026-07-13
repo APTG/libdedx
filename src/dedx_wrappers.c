@@ -63,7 +63,8 @@ int dedx_fill_material_list_for_ion(int program, int ion, int *material_list) {
     unsigned int len = 0;
     int err = 0;
 
-    dedx_get_material_list_for_ion(program, ion, material_list, DEDX_MAX_MATERIAL_LIST, &len, &err);
+    /* Reserve the last slot for the -1 terminator. */
+    dedx_get_material_list_for_ion(program, ion, material_list, DEDX_MAX_MATERIAL_LIST - 1, &len, &err);
     material_list[len] = -1;
     return err;
 }

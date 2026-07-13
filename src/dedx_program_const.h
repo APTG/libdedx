@@ -6,7 +6,7 @@
 static const char dedx_program_table[110][20] = {
     // clang-format off
   "(N/A)","ASTAR","PSTAR","ESTAR","MSTAR","ICRU73_OLD","ICRU73","ICRU49","","ICRU", // 0 - 9
-  "","","","","","","","","","",  // 10-19
+  "AUTO","","","","","","","","","",  // 10-19
   "","","","","","","","","","",  // 20-29
   "","","","","","","","","","",  // 30-39
   "","","","","","","","","","",  // 40-49
@@ -19,7 +19,7 @@ static const char dedx_program_table[110][20] = {
 };
 static const char dedx_program_version_table[110][20] = {  // clang-format off
   "(N/A)","1.2","1.2","ESTAR","3.12","2005/06","2005/06-REV","ICRU Report 49 D","","1.0", // 0 - 9
-  "","","","","","","","","","",  // 10-19
+  "1.0","","","","","","","","","",  // 10-19
   "","","","","","","","","","",  // 20-29
   "","","","","","","","","","",  // 30-39
   "","","","","","","","","","",  // 40-49
@@ -35,7 +35,7 @@ static const int dedx_available_programs[20] = {
   DEDX_ASTAR, DEDX_PSTAR,
   DEDX_ESTAR, DEDX_MSTAR,
   DEDX_ICRU73_OLD, DEDX_ICRU73,
-  DEDX_ICRU49, DEDX_ICRU, DEDX_DEFAULT,
+  DEDX_ICRU49, DEDX_ICRU, DEDX_AUTO, DEDX_DEFAULT,
   DEDX_BETHE_EXT00, -1};
 
 static const int dedx_program_available_ions[110][20] = {

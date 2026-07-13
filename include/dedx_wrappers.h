@@ -44,6 +44,8 @@ void dedx_fill_ion_list(int program, int *ion_list);
  *  @param[in]  ion            Ion identifier.
  *  @param[out] material_list  Caller-allocated array of at least DEDX_MAX_MATERIAL_LIST
  *                             entries; filled with material identifiers terminated by -1.
+ *                             One slot is reserved for the terminator, so at most
+ *                             DEDX_MAX_MATERIAL_LIST - 1 material IDs are ever written.
  *  @return 0 on success, non-zero error code if the program/ion combination itself is invalid
  *          (e.g. DEDX_ERR_ION_NOT_SUPPORTED); @p material_list is still -1-terminated (empty).
  */

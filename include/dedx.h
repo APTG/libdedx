@@ -44,9 +44,23 @@ enum {
     DEDX_ICRU73,        /**< ICRU Report 73 (2005) */
     DEDX_ICRU49,        /**< ICRU Report 49 (1993) — protons and alpha particles */
     _DEDX_0008,         /**< Reserved */
-    DEDX_ICRU,          /**< Auto-selects ICRU49 or ICRU73 based on ion type. Falls back to the
-                             Bethe-Bloch formula (see DEDX_BETHE_EXT00) for elemental targets that
-                             no tabulated report covers (e.g. Boron), rather than failing outright. */
+    DEDX_ICRU,          /**< Auto-selects ICRU49 or ICRU73 based on ion type. A real, tabulated
+                             report like the others: it does not fall back to the Bethe-Bloch
+                             formula, so ion/target combinations no ICRU sub-report covers still
+                             fail with DEDX_ERR_COMBINATION_NOT_FOUND. Use DEDX_AUTO for a variant
+                             that also falls back to Bethe-Bloch. */
+    DEDX_AUTO,          /**< Like DEDX_ICRU (auto-selects the best tabulated report for the ion,
+                             preferring directly-tabulated data for a target whenever it exists),
+                             but additionally falls back to the Bethe-Bloch formula (see
+                             DEDX_BETHE_EXT00) for elemental targets no tabulated report covers
+                             (e.g. Boron), rather than failing outright. This mixes a real,
+                             literature-backed dataset with an analytical model as a deliberate,
+                             documented "best effort" hybrid -- comparable to the AUTO mode in
+                             dedx_web -- and is distinct from DEDX_ICRU, which never does this.
+                             Deliberately grouped with the other tabulated report identifiers
+                             (not >= DEDX_DEFAULT) so that a compound target resolves through the
+                             same tabulated-first path as DEDX_ICRU instead of always decomposing
+                             into elements. */
     DEDX_DEFAULT = 100, /**< Default program (Bethe formula) */
     DEDX_BETHE_EXT00    /**< Bethe formula with extensions */
 };
@@ -164,26 +178,40 @@ const int *dedx_get_program_list(void);
  */
 const int *dedx_get_material_list(int program);
 
-/** @brief Maximum number of entries dedx_get_material_list_for_ion() can write. */
-#define DEDX_MAX_MATERIAL_LIST 300
+/** @brief Recommended capacity for materials/material_list buffers passed to
+ *  dedx_get_material_list_for_ion() or its dedx_fill_material_list_for_ion() wrapper.
+ *  Comfortably exceeds the total number of known materials, so passing this size as
+ *  @p max_materials guarantees the result is never truncated. This is a recommended
+ *  buffer size, not a hard cap enforced by the API: dedx_get_material_list_for_ion()
+ *  writes at most @p max_materials entries, whatever value the caller passes for it.
+ */
+#define DEDX_MAX_MATERIAL_LIST 1000
 
 /** @brief Fill the materials actually usable with a specific program/ion combination.
  *
  *  Unlike dedx_get_material_list(), which reports a coarse per-program hint,
  *  this consults the same embedded-data resolution dedx_load_config() uses (including
- *  DEDX_ICRU's Bethe-Bloch fallback and Bragg-additivity decomposition of compounds),
+ *  DEDX_AUTO's Bethe-Bloch fallback and Bragg-additivity decomposition of compounds),
  *  so a material appears here if and only if dedx_load_config() is expected to succeed
  *  for it with this exact ion. Thread-safe: writes only into the caller-supplied
  *  buffer, no shared or static state.
  *
+ *  The output is length-delimited via @p materials_len, not -1-terminated (unlike
+ *  dedx_get_material_list()); use dedx_fill_material_list_for_ion() if you need a
+ *  -1-terminated array instead.
+ *
  *  @param[in]  program        Program identifier.
  *  @param[in]  ion            Ion identifier.
- *  @param[out] materials      Caller-allocated array of at least DEDX_MAX_MATERIAL_LIST entries.
- *  @param[in]  max_materials  Capacity of @p materials.
- *  @param[out] materials_len  Number of material identifiers written.
+ *  @param[out] materials      Caller-allocated array of at least @p max_materials entries;
+ *                             DEDX_MAX_MATERIAL_LIST is a safe capacity to pass here.
+ *  @param[in]  max_materials  Capacity of @p materials; at most this many entries are written.
+ *  @param[out] materials_len  Number of material identifiers written (always <= max_materials).
  *  @param[out] err            Error code; 0 on success. Set to DEDX_ERR_ION_NOT_SUPPORTED or
  *                             DEDX_ERR_ESTAR_NOT_IMPL if the program/ion combination itself is
- *                             invalid (in which case @p materials_len is set to 0).
+ *                             invalid (in which case @p materials_len is set to 0). For
+ *                             DEDX_DEFAULT/DEDX_BETHE_EXT00/DEDX_AUTO, only ions 1-112 are
+ *                             accepted, since that is the actual range covered by the periodic
+ *                             table backing the Bethe-Bloch evaluation.
  */
 void dedx_get_material_list_for_ion(
     int program, int ion, int *materials, unsigned int max_materials, unsigned int *materials_len, int *err);
