@@ -59,21 +59,21 @@ static double adapt_stp(double energy, dedx_tools_settings *set) {
     return 1.0 / stp;
 }
 
-/* Number of log-spaced samples used to locate the Bragg-peak energy before
- * bisecting; matches the proven sampling density from the dedx_web reference
- * implementation this was ported from (see #121). */
+/* Number of log-spaced samples used to locate the energy of maximum stopping
+ * power before bisecting; matches the proven sampling density from the
+ * dedx_web reference implementation this was ported from (see #121). */
 #define DEDX_INVERSE_STP_SAMPLES 40
 
-/* Number of log-spaced samples used by dedx_get_bragg_peak_stp() — denser
- * than DEDX_INVERSE_STP_SAMPLES since it reports the peak value itself
- * rather than just using it to pick a bisection branch (see #121). */
-#define DEDX_BRAGG_PEAK_SAMPLES 300
+/* Number of log-spaced samples used by dedx_get_max_stp() — denser than
+ * DEDX_INVERSE_STP_SAMPLES since it reports the peak value itself rather
+ * than just using it to pick a bisection branch (see #121). */
+#define DEDX_MAX_STP_SAMPLES 300
 
-/* Locate the Bragg-peak energy (the energy of maximum stopping power) within
- * [emin, emax] by sampling on a log-spaced grid of n_samples points. Also
- * reports the STP at the leftmost sample (emin) so callers can tell whether
- * a requested STP lies on the ascending branch. Returns 0 on success, -1 if
- * no sample succeeded. */
+/* Locate the energy of maximum stopping power within [emin, emax] by
+ * sampling on a log-spaced grid of n_samples points. Also reports the STP at
+ * the leftmost sample (emin) so callers can tell whether a requested STP
+ * lies on the ascending branch. Returns 0 on success, -1 if no sample
+ * succeeded. */
 static int find_stp_peak(dedx_workspace *ws,
                          dedx_config *config,
                          double emin,
@@ -157,8 +157,8 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
     double emin = dedx_get_min_energy(config->program, config->ion);
     double emax = dedx_get_max_energy(config->program, config->ion);
 
-    /* Sample the curve to find the Bragg-peak energy, then bisect the
-     * physically correct monotone branch:
+    /* Sample the curve to find the energy of maximum stopping power, then
+     * bisect the physically correct monotone branch:
      *   - no interior peak (monotone descending over the full range):
      *     bisect [emin, emax] on the single descending branch.
      *   - interior peak: side == 0 selects the low/ascending branch
@@ -224,7 +224,7 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
     return (x1 + x2) / 2;
 }
 
-double dedx_get_bragg_peak_stp(dedx_workspace *ws, dedx_config *config, int *err) {
+double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err) {
     if (*err != 0)
         return -1;
     if (config->loaded == 0)
@@ -238,7 +238,7 @@ double dedx_get_bragg_peak_stp(dedx_workspace *ws, dedx_config *config, int *err
     double e_peak;
     double max_stp;
     double stp_at_emin;
-    if (find_stp_peak(ws, config, emin, emax, DEDX_BRAGG_PEAK_SAMPLES, &e_peak, &max_stp, &stp_at_emin) != 0) {
+    if (find_stp_peak(ws, config, emin, emax, DEDX_MAX_STP_SAMPLES, &e_peak, &max_stp, &stp_at_emin) != 0) {
         *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
         return -1;
     }

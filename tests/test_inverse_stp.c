@@ -5,13 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Regression tests for dedx_get_inverse_stp() and dedx_get_bragg_peak_stp()
+/* Regression tests for dedx_get_inverse_stp() and dedx_get_max_stp()
  * (issue #121). The previous implementation used find_min() over a hardcoded
- * x in [0.01, 10] to locate the Bragg peak, which does not match the real
- * tabulated energy range; it also mapped side < 0 (never 0 or 1) to the
- * low-energy branch, so side == 0 and side == 1 were indistinguishable.
- * Both bugs made dedx_get_inverse_stp() fail with DEDX_ERR_ENERGY_OUT_OF_RANGE
- * for ordinary proton/water queries.
+ * x in [0.01, 10] to locate the energy of maximum stopping power, which does
+ * not match the real tabulated energy range; it also mapped side < 0 (never
+ * 0 or 1) to the low-energy branch, so side == 0 and side == 1 were
+ * indistinguishable. Both bugs made dedx_get_inverse_stp() fail with
+ * DEDX_ERR_ENERGY_OUT_OF_RANGE for ordinary proton/water queries.
  */
 
 static int failures = 0;
@@ -78,9 +78,10 @@ int main(void) {
         dedx_free_workspace(ws, &err);
     }
 
-    /* --- Interior Bragg peak, STP reachable on both branches: side=0 (low
-     * energy / ascending) and side=1 (high energy / descending) must select
-     * distinct branches and each round-trip back to the requested STP. */
+    /* --- Interior peak in the STP curve, STP reachable on both branches:
+     * side=0 (low energy / ascending) and side=1 (high energy / descending)
+     * must select distinct branches and each round-trip back to the
+     * requested STP. */
     {
         dedx_workspace *ws = dedx_allocate_workspace(1, &err);
         dedx_config *cfg = make_config(DEDX_PSTAR, DEDX_PROTON, 1, DEDX_WATER);
@@ -110,9 +111,9 @@ int main(void) {
         dedx_free_workspace(ws, &err);
     }
 
-    /* --- Out-of-range STP values (above the Bragg peak, or below the STP at
-     * max energy) must return an error rather than looping to a bogus or
-     * negative energy. */
+    /* --- Out-of-range STP values (above the maximum stopping power, or
+     * below the STP at max energy) must return an error rather than looping
+     * to a bogus or negative energy. */
     {
         dedx_workspace *ws = dedx_allocate_workspace(1, &err);
         dedx_config *cfg = make_config(DEDX_PSTAR, DEDX_PROTON, 1, DEDX_WATER);
@@ -143,13 +144,13 @@ int main(void) {
         dedx_free_workspace(ws, &err);
     }
 
-    /* --- dedx_get_bragg_peak_stp() reports the true maximum of the curve. */
+    /* --- dedx_get_max_stp() reports the true maximum of the curve. */
     {
         dedx_workspace *ws = dedx_allocate_workspace(1, &err);
         dedx_config *cfg = make_config(DEDX_PSTAR, DEDX_PROTON, 1, DEDX_WATER);
         err = 0;
-        double peak = dedx_get_bragg_peak_stp(ws, cfg, &err);
-        expect_int("bragg peak err", err, DEDX_OK);
+        double peak = dedx_get_max_stp(ws, cfg, &err);
+        expect_int("max stp err", err, DEDX_OK);
 
         /* Brute-force reference: sample far more densely and take the max. */
         float emin = dedx_get_min_energy(cfg->program, cfg->ion);
@@ -165,8 +166,8 @@ int main(void) {
             if (sample_err == 0 && s > reference_peak)
                 reference_peak = s;
         }
-        expect_near("bragg peak matches brute-force reference", peak, reference_peak, 5e-2);
-        expect_true("bragg peak is a real maximum", peak > 0.0);
+        expect_near("max stp matches brute-force reference", peak, reference_peak, 5e-2);
+        expect_true("max stp is a real maximum", peak > 0.0);
 
         dedx_free_config(cfg, &err);
         dedx_free_workspace(ws, &err);
