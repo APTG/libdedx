@@ -65,8 +65,12 @@ static double adapt_stp(double energy, dedx_tools_settings *set) {
  * of re-sampling the curve at an arbitrary density. dedx_get_stp() evaluates
  * a spline built from precisely these knots (dedx_spline.c: coef[i].a =
  * stopping[i]), so scanning them finds every feature the public curve can
- * actually exhibit -- no synthetic sampling can do better or worse. */
-static dedx_internal_lookup_data *load_and_get_dataset(dedx_workspace *ws, dedx_config *config, int *err) {
+ * actually exhibit -- no synthetic sampling can do better or worse.
+ *
+ * `static` (file-private, not declared in dedx_tools.h): only this
+ * translation unit needs it, unlike the dedx_internal_* functions declared
+ * in headers such as dedx_data_access.h for use across multiple .c files. */
+static dedx_internal_lookup_data *get_loaded_dataset(dedx_workspace *ws, dedx_config *config, int *err) {
     if (*err != 0)
         return NULL;
     if (config->loaded == 0)
@@ -122,6 +126,19 @@ double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float rang
     return (min + max) / 2;
 }
 
+/* Bisection convergence, as a fraction of the current bracket's energy scale
+ * (see the "relative, not absolute" note in bisect_monotonic_run() below for
+ * why this is relative). 1e-6 is about ten times coarser than a `float`'s
+ * own precision (~1.19e-7 relative, i.e. 24 bits of mantissa): dedx_get_stp()
+ * truncates the search value to a float before evaluating the spline, so
+ * refining much further than the float itself can represent would just
+ * spend extra iterations re-measuring rounding noise. 1e-6 still comfortably
+ * resolves the whole tabulated range: even the widest single monotonic run
+ * seen in practice (proton/water PSTAR's post-peak run, roughly 0.08 to
+ * 10000 MeV/nucleon) converges in under 30 bisection steps, since halving
+ * the bracket is a log2(width/tolerance) process regardless of scale. */
+#define DEDX_INVERSE_STP_REL_ACC 1e-6
+
 /* Bisect the monotonic run of knots [lo_idx, hi_idx] for the energy where
  * the spline equals stp, refining via dedx_get_stp() (not linear knot
  * interpolation) so the result matches what callers would measure with the
@@ -139,26 +156,60 @@ static int bisect_monotonic_run(dedx_workspace *ws,
     double hi_x = data->base[hi_idx].x;
     double lo_v = data->base[lo_idx].a;
     double hi_v = data->base[hi_idx].a;
-    double range_min = lo_v < hi_v ? lo_v : hi_v;
-    double range_max = lo_v > hi_v ? lo_v : hi_v;
+
+    /* This run's STP values span [range_min, range_max] regardless of
+     * whether the run is rising or falling; stp must land in that span for
+     * a solution to exist anywhere on this run. */
+    double range_min;
+    double range_max;
+    if (lo_v < hi_v) {
+        range_min = lo_v;
+        range_max = hi_v;
+    } else {
+        range_min = hi_v;
+        range_max = lo_v;
+    }
     if (stp < range_min || stp > range_max)
         return -1;
 
-    int ascending = hi_v >= lo_v;
+    /* Whether STP rises (ascending) or falls (descending) from lo_x to
+     * hi_x tells us which half to keep at each bisection step below. */
+    int ascending;
+    if (hi_v >= lo_v)
+        ascending = 1;
+    else
+        ascending = 0;
+
+    /* Standard bisection: x1/x2 bracket the root, i.e. dedx_get_stp(x1) and
+     * dedx_get_stp(x2) sit on opposite sides of the target stp. Each step
+     * evaluates the midpoint and keeps whichever half still brackets stp,
+     * halving the bracket width every iteration.
+     *
+     * The stopping test compares the bracket width to x2 itself rather than
+     * to a fixed value: the tabulated energy range spans many decades (e.g.
+     * proton tables run from ~0.001 to 10000 MeV/nucleon), so a single fixed
+     * absolute tolerance would be far too loose relative to energies at the
+     * low end of that range and far tighter than meaningful at the high end
+     * (see DEDX_INVERSE_STP_REL_ACC above). A tolerance relative to the
+     * current bracket keeps the achieved *relative* precision the same
+     * regardless of where in that range the root happens to fall. */
     double x1 = lo_x;
     double x2 = hi_x;
-    double acc = 1e-5;
-    while (fabs(x1 - x2) > acc) {
+    while (fabs(x1 - x2) > DEDX_INVERSE_STP_REL_ACC * fabs(x2)) {
         double x_temp = (x1 + x2) / 2;
         double f_temp = dedx_get_stp(ws, config, (float) x_temp, err);
         if (*err != 0)
             return -1;
         if (ascending) {
+            /* STP too low at the midpoint -> the root is further up. */
             if (f_temp <= stp)
                 x1 = x_temp;
             else
                 x2 = x_temp;
         } else {
+            /* STP still at/above target at the midpoint -> the root is
+             * further up (we're descending, so STP keeps falling as energy
+             * rises). */
             if (f_temp >= stp)
                 x1 = x_temp;
             else
@@ -174,7 +225,7 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
         *err = DEDX_ERR_ION_A_REQUIRED;
         return -1;
     }
-    dedx_internal_lookup_data *data = load_and_get_dataset(ws, config, err);
+    dedx_internal_lookup_data *data = get_loaded_dataset(ws, config, err);
     if (data == NULL)
         return -1;
 
@@ -194,11 +245,21 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
     int prev_dir = 0;
 
     for (int i = 1; i <= data->n; i++) {
+        /* dir is the sign of the step from knot i-1 to knot i: +1 rising,
+         * -1 falling, 0 flat (a flat step doesn't end the current run --
+         * prev_dir is left untouched so a flat plateau stays part of
+         * whichever run it interrupts). Only computed for i < data->n,
+         * since there is no knot i to compare against once i == data->n. */
         int is_turning = 0;
         int dir = 0;
         if (i < data->n) {
             double delta = (double) data->base[i].a - (double) data->base[i - 1].a;
-            dir = (delta > 0) ? 1 : (delta < 0 ? -1 : 0);
+            if (delta > 0)
+                dir = 1;
+            else if (delta < 0)
+                dir = -1;
+            else
+                dir = 0;
             if (dir != 0) {
                 if (prev_dir == 0)
                     prev_dir = dir;
@@ -206,8 +267,15 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
                     is_turning = 1;
             }
         }
+        /* A run ends either at a direction reversal (is_turning, and the
+         * turning knot i-1 is shared with the next run) or at the last
+         * knot (i == data->n, since there's nowhere further to walk). */
         if (i == data->n || is_turning) {
-            int seg_end = (i == data->n) ? (data->n - 1) : (i - 1);
+            int seg_end;
+            if (i == data->n)
+                seg_end = data->n - 1;
+            else
+                seg_end = i - 1;
             if (seg_end > seg_start) {
                 double solution;
                 if (bisect_monotonic_run(ws, config, data, seg_start, seg_end, stp, err, &solution) == 0) {
@@ -231,11 +299,13 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
         *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
         return -1;
     }
-    return (side == 0) ? x_min_found : x_max_found;
+    if (side == 0)
+        return x_min_found;
+    return x_max_found;
 }
 
 double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err) {
-    dedx_internal_lookup_data *data = load_and_get_dataset(ws, config, err);
+    dedx_internal_lookup_data *data = get_loaded_dataset(ws, config, err);
     if (data == NULL)
         return -1;
     double min_stp;
@@ -245,7 +315,7 @@ double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err) {
 }
 
 double dedx_get_min_stp(dedx_workspace *ws, dedx_config *config, int *err) {
-    dedx_internal_lookup_data *data = load_and_get_dataset(ws, config, err);
+    dedx_internal_lookup_data *data = get_loaded_dataset(ws, config, err);
     if (data == NULL)
         return -1;
     double min_stp;
