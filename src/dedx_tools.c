@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "dedx_data_access.h"
+#include "dedx_lookup_data.h"
 
 typedef struct {
     dedx_workspace *ws;
@@ -59,59 +60,39 @@ static double adapt_stp(double energy, dedx_tools_settings *set) {
     return 1.0 / stp;
 }
 
-/* Number of log-spaced samples used to locate the energy of maximum stopping
- * power before bisecting; matches the proven sampling density from the
- * dedx_web reference implementation this was ported from (see #121). */
-#define DEDX_INVERSE_STP_SAMPLES 40
-
-/* Number of log-spaced samples used by dedx_get_max_stp() — denser than
- * DEDX_INVERSE_STP_SAMPLES since it reports the peak value itself rather
- * than just using it to pick a bisection branch (see #121). */
-#define DEDX_MAX_STP_SAMPLES 300
-
-/* Locate the energy of maximum stopping power within [emin, emax] by
- * sampling on a log-spaced grid of n_samples points. Also reports the STP at
- * the leftmost sample (emin) so callers can tell whether a requested STP
- * lies on the ascending branch. Returns 0 on success, -1 if no sample
- * succeeded. */
-static int find_stp_peak(dedx_workspace *ws,
-                         dedx_config *config,
-                         double emin,
-                         double emax,
-                         int n_samples,
-                         double *e_peak,
-                         double *max_stp,
-                         double *stp_at_emin) {
-    double log_emin = log(emin);
-    double log_emax = log(emax);
-    double log_step = (log_emax - log_emin) / (n_samples - 1);
-    int have_sample = 0;
-
-    *max_stp = 0.0;
-    *e_peak = emin;
-    *stp_at_emin = 0.0;
-
-    for (int i = 0; i < n_samples; i++) {
-        /* Use emin itself for the first sample: exp(log(emin)) is not
-         * guaranteed to round-trip to exactly emin, and a reconstructed
-         * value fractionally below the dataset's real lower bound would be
-         * rejected by dedx_get_stp(), leaving stp_at_emin stuck at 0 and
-         * making the ascending-branch check in dedx_get_inverse_stp()
-         * always pass. */
-        double e = (i == 0) ? emin : exp(log_emin + i * log_step);
-        int stp_err = 0;
-        double s = dedx_get_stp(ws, config, (float) e, &stp_err);
-        if (stp_err != 0)
-            continue;
-        have_sample = 1;
-        if (i == 0)
-            *stp_at_emin = s;
-        if (s > *max_stp) {
-            *max_stp = s;
-            *e_peak = e;
-        }
+/* Load (if needed) and return the internal dataset backing a config, so
+ * callers can walk its exact tabulated (energy, STP) knots directly instead
+ * of re-sampling the curve at an arbitrary density. dedx_get_stp() evaluates
+ * a spline built from precisely these knots (dedx_spline.c: coef[i].a =
+ * stopping[i]), so scanning them finds every feature the public curve can
+ * actually exhibit -- no synthetic sampling can do better or worse. */
+static dedx_internal_lookup_data *load_and_get_dataset(dedx_workspace *ws, dedx_config *config, int *err) {
+    if (*err != 0)
+        return NULL;
+    if (config->loaded == 0)
+        dedx_load_config(ws, config, err);
+    if (*err != 0)
+        return NULL;
+    int id = config->cfg_id;
+    if (id < 0 || id >= ws->active_datasets) {
+        *err = DEDX_ERR_INVALID_DATASET_ID;
+        return NULL;
     }
-    return have_sample ? 0 : -1;
+    return ws->loaded_data[id];
+}
+
+static void min_max_stp_over_table(const dedx_internal_lookup_data *data, double *min_stp, double *max_stp) {
+    double lo = data->base[0].a;
+    double hi = data->base[0].a;
+    for (int i = 1; i < data->n; i++) {
+        double v = data->base[i].a;
+        if (v < lo)
+            lo = v;
+        if (v > hi)
+            hi = v;
+    }
+    *min_stp = lo;
+    *max_stp = hi;
 }
 
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err) {
@@ -141,74 +122,37 @@ double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float rang
     return (min + max) / 2;
 }
 
-double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, int side, int *err) {
-    if (config->ion_a <= 0) {
-        *err = DEDX_ERR_ION_A_REQUIRED;
-        return -1;
-    }
-    if (*err != 0)
-        return -1;
-    if (config->loaded == 0)
-        dedx_load_config(ws, config, err);
-    if (*err != 0)
+/* Bisect the monotonic run of knots [lo_idx, hi_idx] for the energy where
+ * the spline equals stp, refining via dedx_get_stp() (not linear knot
+ * interpolation) so the result matches what callers would measure with the
+ * public curve. Returns 0 and sets *solution on success; returns -1 without
+ * touching *err if stp is not bracketed by this run. */
+static int bisect_monotonic_run(dedx_workspace *ws,
+                                dedx_config *config,
+                                const dedx_internal_lookup_data *data,
+                                int lo_idx,
+                                int hi_idx,
+                                float stp,
+                                int *err,
+                                double *solution) {
+    double lo_x = data->base[lo_idx].x;
+    double hi_x = data->base[hi_idx].x;
+    double lo_v = data->base[lo_idx].a;
+    double hi_v = data->base[hi_idx].a;
+    double range_min = lo_v < hi_v ? lo_v : hi_v;
+    double range_max = lo_v > hi_v ? lo_v : hi_v;
+    if (stp < range_min || stp > range_max)
         return -1;
 
+    int ascending = hi_v >= lo_v;
+    double x1 = lo_x;
+    double x2 = hi_x;
     double acc = 1e-5;
-    double emin = dedx_get_min_energy(config->program, config->ion);
-    double emax = dedx_get_max_energy(config->program, config->ion);
-
-    /* Sample the curve to find the energy of maximum stopping power, then
-     * bisect the physically correct monotone branch:
-     *   - no interior peak (monotone descending over the full range):
-     *     bisect [emin, emax] on the single descending branch.
-     *   - interior peak: side == 0 selects the low/ascending branch
-     *     [emin, e_peak]; side == 1 (or any stp below the ascending
-     *     branch's floor at emin) selects the high/descending branch
-     *     [e_peak, emax].
-     * See #121 for why the previous find_min()-based approach failed. */
-    double e_peak;
-    double max_stp;
-    double stp_at_emin;
-    if (find_stp_peak(ws, config, emin, emax, DEDX_INVERSE_STP_SAMPLES, &e_peak, &max_stp, &stp_at_emin) != 0) {
-        *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
-        return -1;
-    }
-
-    int stp_err = 0;
-    double stp_at_emax = dedx_get_stp(ws, config, (float) emax, &stp_err);
-    if (stp_err != 0 || max_stp == 0.0 || stp > max_stp || stp < stp_at_emax) {
-        *err = (stp_err != 0) ? stp_err : DEDX_ERR_ENERGY_OUT_OF_RANGE;
-        return -1;
-    }
-
-    double log_step = (log(emax) - log(emin)) / (DEDX_INVERSE_STP_SAMPLES - 1);
-    int has_peak = e_peak > emin * exp(log_step);
-
-    double x1;
-    double x2;
-    int ascending;
-    if (!has_peak) {
-        x1 = emin;
-        x2 = emax;
-        ascending = 0;
-    } else if (side == 0 && stp >= stp_at_emin) {
-        x1 = emin;
-        x2 = e_peak;
-        ascending = 1;
-    } else {
-        x1 = e_peak;
-        x2 = emax;
-        ascending = 0;
-    }
-
-    double x_temp;
-    double f_temp;
     while (fabs(x1 - x2) > acc) {
-        x_temp = (x1 + x2) / 2;
-        f_temp = dedx_get_stp(ws, config, (float) x_temp, err);
+        double x_temp = (x1 + x2) / 2;
+        double f_temp = dedx_get_stp(ws, config, (float) x_temp, err);
         if (*err != 0)
             return -1;
-
         if (ascending) {
             if (f_temp <= stp)
                 x1 = x_temp;
@@ -221,28 +165,93 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
                 x2 = x_temp;
         }
     }
-    return (x1 + x2) / 2;
+    *solution = (x1 + x2) / 2;
+    return 0;
 }
 
-double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err) {
-    if (*err != 0)
+double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, int side, int *err) {
+    if (config->ion_a <= 0) {
+        *err = DEDX_ERR_ION_A_REQUIRED;
         return -1;
-    if (config->loaded == 0)
-        dedx_load_config(ws, config, err);
-    if (*err != 0)
+    }
+    dedx_internal_lookup_data *data = load_and_get_dataset(ws, config, err);
+    if (data == NULL)
         return -1;
 
-    double emin = dedx_get_min_energy(config->program, config->ion);
-    double emax = dedx_get_max_energy(config->program, config->ion);
+    /* Stopping power vs. energy is not simply unimodal: real tables can rise
+     * to the Bragg peak, fall through the minimum-ionizing point, and rise
+     * again at relativistic energies (e.g. PSTAR/ICRU protons up to 10 GeV)
+     * -- an arbitrary requested STP can be reachable on more than one of
+     * these monotonic runs. Walk the exact tabulated knots once, bisecting
+     * every run that brackets stp, and keep the lowest- and highest-energy
+     * solutions found; side == 0 returns the low-energy one, side == 1 the
+     * high-energy one. For the common single-peak case this is exactly the
+     * old ascending/descending branch choice. See #121. */
+    int found = 0;
+    double x_min_found = 0;
+    double x_max_found = 0;
+    int seg_start = 0;
+    int prev_dir = 0;
 
-    double e_peak;
-    double max_stp;
-    double stp_at_emin;
-    if (find_stp_peak(ws, config, emin, emax, DEDX_MAX_STP_SAMPLES, &e_peak, &max_stp, &stp_at_emin) != 0) {
+    for (int i = 1; i <= data->n; i++) {
+        int is_turning = 0;
+        int dir = 0;
+        if (i < data->n) {
+            double delta = (double) data->base[i].a - (double) data->base[i - 1].a;
+            dir = (delta > 0) ? 1 : (delta < 0 ? -1 : 0);
+            if (dir != 0) {
+                if (prev_dir == 0)
+                    prev_dir = dir;
+                else if (dir != prev_dir)
+                    is_turning = 1;
+            }
+        }
+        if (i == data->n || is_turning) {
+            int seg_end = (i == data->n) ? (data->n - 1) : (i - 1);
+            if (seg_end > seg_start) {
+                double solution;
+                if (bisect_monotonic_run(ws, config, data, seg_start, seg_end, stp, err, &solution) == 0) {
+                    if (!found || solution < x_min_found)
+                        x_min_found = solution;
+                    if (!found || solution > x_max_found)
+                        x_max_found = solution;
+                    found = 1;
+                } else if (*err != 0) {
+                    return -1;
+                }
+            }
+            if (is_turning) {
+                seg_start = i - 1;
+                prev_dir = dir;
+            }
+        }
+    }
+
+    if (!found) {
         *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
         return -1;
     }
+    return (side == 0) ? x_min_found : x_max_found;
+}
+
+double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err) {
+    dedx_internal_lookup_data *data = load_and_get_dataset(ws, config, err);
+    if (data == NULL)
+        return -1;
+    double min_stp;
+    double max_stp;
+    min_max_stp_over_table(data, &min_stp, &max_stp);
     return max_stp;
+}
+
+double dedx_get_min_stp(dedx_workspace *ws, dedx_config *config, int *err) {
+    dedx_internal_lookup_data *data = load_and_get_dataset(ws, config, err);
+    if (data == NULL)
+        return -1;
+    double min_stp;
+    double max_stp;
+    min_max_stp_over_table(data, &min_stp, &max_stp);
+    return min_stp;
 }
 
 double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int *err) {

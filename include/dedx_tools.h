@@ -36,23 +36,22 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
 
 /** @brief Find the energy corresponding to a given stopping power value.
  *
- *  Inverts the stopping power curve. Stopping power rises from a program's
- *  minimum tabulated energy to the energy of maximum stopping power, then
- *  falls off; when the requested @p stp corresponds to two energies, the
- *  @p side parameter selects which branch to use. If the curve is
- *  monotonically decreasing over the whole tabulated range (no interior
- *  peak), @p side is ignored and the single descending branch is used.
+ *  Inverts the stopping power curve. Stopping power is not simply unimodal:
+ *  real tables can rise to a maximum (the Bragg peak) at low energy, fall
+ *  through the minimum-ionizing point, and rise again at relativistic
+ *  energies (e.g. proton tables extending to several GeV), so a requested
+ *  @p stp can be reachable at more than one energy. Among all reachable
+ *  energies, @p side selects which one to return: 0 = the lowest, 1 = the
+ *  highest. When only one energy reaches @p stp, @p side has no effect.
  *
  *  @param[in]  ws      Workspace with a loaded configuration.
  *  @param[in]  config  Loaded configuration.
  *  @param[in]  stp     Target stopping power in MeV cm²/g. Must lie between
- *                       the STP at the program's max energy and the maximum
- *                       stopping power (inclusive, see dedx_get_max_stp());
- *                       otherwise the value is unreachable and an error is
- *                       returned.
- *  @param[in]  side    0 = low-energy (ascending) branch, 1 = high-energy
- *                      (descending) branch. Ignored when the curve has no
- *                      interior peak.
+ *                       dedx_get_min_stp() and dedx_get_max_stp() (inclusive)
+ *                       for this configuration; otherwise the value is
+ *                       unreachable and an error is returned.
+ *  @param[in]  side    0 = lowest-energy solution, 1 = highest-energy
+ *                      solution.
  *  @param[out] err     Error code; 0 on success.
  *  @return Energy in MeV/nucl (MeV per nucleon), or -1 on error.
  */
@@ -71,6 +70,20 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
  *  @return Maximum stopping power in MeV cm²/g, or -1 on error.
  */
 double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err);
+
+/** @brief Find the minimum stopping power over a program's whole tabulated
+ *  energy range.
+ *
+ *  For tables that reach relativistic energies this is typically the
+ *  minimum-ionizing point, not the value at either tabulated endpoint (the
+ *  curve can rise again past it — see dedx_get_inverse_stp()).
+ *
+ *  @param[in]  ws      Workspace with a loaded configuration.
+ *  @param[in]  config  Loaded configuration.
+ *  @param[out] err     Error code; 0 on success.
+ *  @return Minimum stopping power in MeV cm²/g, or -1 on error.
+ */
+double dedx_get_min_stp(dedx_workspace *ws, dedx_config *config, int *err);
 
 /** @brief Find the energy corresponding to a given CSDA range.
  *
