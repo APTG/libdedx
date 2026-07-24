@@ -36,17 +36,36 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
 
 /** @brief Find the energy corresponding to a given stopping power value.
  *
- *  Inverts the stopping power curve. Since stopping power is non-monotonic,
- *  the @p side parameter selects which branch to use.
+ *  Inverts the stopping power curve. Stopping power rises from a program's
+ *  minimum tabulated energy to a Bragg-peak energy, then falls off; when the
+ *  requested @p stp corresponds to two energies, the @p side parameter
+ *  selects which branch to use. If the curve is monotonically decreasing
+ *  over the whole tabulated range (no interior peak), @p side is ignored and
+ *  the single descending branch is used.
  *
  *  @param[in]  ws      Workspace with a loaded configuration.
  *  @param[in]  config  Loaded configuration.
- *  @param[in]  stp     Target stopping power in MeV cm²/g.
- *  @param[in]  side    0 = low-energy branch, 1 = high-energy branch.
+ *  @param[in]  stp     Target stopping power in MeV cm²/g. Must lie between
+ *                       the STP at the program's max energy and the
+ *                       Bragg-peak STP (inclusive); otherwise the value is
+ *                       unreachable and an error is returned.
+ *  @param[in]  side    0 = low-energy (ascending) branch, 1 = high-energy
+ *                      (descending) branch. Ignored when the curve has no
+ *                      interior Bragg peak.
  *  @param[out] err     Error code; 0 on success.
- *  @return Energy in MeV/nucl (MeV per nucleon).
+ *  @return Energy in MeV/nucl (MeV per nucleon), or -1 on error.
  */
 double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, int side, int *err);
+
+/** @brief Find the Bragg-peak stopping power: the maximum stopping power
+ *  over a program's whole tabulated energy range.
+ *
+ *  @param[in]  ws      Workspace with a loaded configuration.
+ *  @param[in]  config  Loaded configuration.
+ *  @param[out] err     Error code; 0 on success.
+ *  @return Maximum stopping power in MeV cm²/g, or -1 on error.
+ */
+double dedx_get_bragg_peak_stp(dedx_workspace *ws, dedx_config *config, int *err);
 
 /** @brief Find the energy corresponding to a given CSDA range.
  *

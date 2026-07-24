@@ -59,42 +59,53 @@ static double adapt_stp(double energy, dedx_tools_settings *set) {
     return 1.0 / stp;
 }
 
-static double find_min_stp_func(double x, dedx_tools_settings *set) {
-    int err = 0;
-    double stp = dedx_get_stp(set->ws, set->cfg, x, &err);
-    if (err != 0 || stp == 0.0)
-        return INFINITY;
-    return 1.0 / stp;
-}
+/* Number of log-spaced samples used to locate the Bragg-peak energy before
+ * bisecting; matches the proven sampling density from the dedx_web reference
+ * implementation this was ported from (see #121). */
+#define DEDX_INVERSE_STP_SAMPLES 40
 
-static double find_min(double (*func)(double x, dedx_tools_settings *set), dedx_tools_settings *set, double acc) {
-    double x[] = {0.01, 10};
-    double f[] = {func(x[0], set), func(x[1], set)};
-    int i = 0;
-    double x_temp = 0;
-    double f_temp = 0;
-    double h = 0;
-    while (fabs(x[1] - x[0]) > acc) {
-        i = 0;
-        h = x[1] - x[0];
-        if (f[1] > f[0])
-            i = 1;
-        // try flip
+/* Number of log-spaced samples used by dedx_get_bragg_peak_stp() — denser
+ * than DEDX_INVERSE_STP_SAMPLES since it reports the peak value itself
+ * rather than just using it to pick a bisection branch (see #121). */
+#define DEDX_BRAGG_PEAK_SAMPLES 300
 
-        x_temp = x[i] + 2 * h * pow(-1, i);
-        f_temp = func(x_temp, set);
-        if (f_temp > f[i]) {
-            // try shrink
-            x_temp = x[i] + 0.5 * h * pow(-1, i);
-            f_temp = func(x_temp, set);
+/* Locate the Bragg-peak energy (the energy of maximum stopping power) within
+ * [emin, emax] by sampling on a log-spaced grid of n_samples points. Also
+ * reports the STP at the leftmost sample (emin) so callers can tell whether
+ * a requested STP lies on the ascending branch. Returns 0 on success, -1 if
+ * no sample succeeded. */
+static int find_stp_peak(dedx_workspace *ws,
+                         dedx_config *config,
+                         double emin,
+                         double emax,
+                         int n_samples,
+                         double *e_peak,
+                         double *max_stp,
+                         double *stp_at_emin) {
+    double log_emin = log(emin);
+    double log_emax = log(emax);
+    double log_step = (log_emax - log_emin) / (n_samples - 1);
+    int have_sample = 0;
 
-            if (f_temp > f[i])
-                return -1;
+    *max_stp = 0.0;
+    *e_peak = emin;
+    *stp_at_emin = 0.0;
+
+    for (int i = 0; i < n_samples; i++) {
+        double e = exp(log_emin + i * log_step);
+        int stp_err = 0;
+        double s = dedx_get_stp(ws, config, (float) e, &stp_err);
+        if (stp_err != 0)
+            continue;
+        have_sample = 1;
+        if (i == 0)
+            *stp_at_emin = s;
+        if (s > *max_stp) {
+            *max_stp = s;
+            *e_peak = e;
         }
-        f[i] = f_temp;
-        x[i] = x_temp;
     }
-    return (x[0] + x[1]) / 2;
+    return have_sample ? 0 : -1;
 }
 
 double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float range, int *err) {
@@ -129,39 +140,103 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
         *err = DEDX_ERR_ION_A_REQUIRED;
         return -1;
     }
-    double acc = 1e-5;
-    dedx_tools_settings set;
-    set.ws = ws;
     if (*err != 0)
         return -1;
-    dedx_load_config(ws, config, err);
-    set.cfg = config;
+    if (config->loaded == 0)
+        dedx_load_config(ws, config, err);
+    if (*err != 0)
+        return -1;
 
-    if (*err != 0)
+    double acc = 1e-5;
+    double emin = dedx_get_min_energy(config->program, config->ion);
+    double emax = dedx_get_max_energy(config->program, config->ion);
+
+    /* Sample the curve to find the Bragg-peak energy, then bisect the
+     * physically correct monotone branch:
+     *   - no interior peak (monotone descending over the full range):
+     *     bisect [emin, emax] on the single descending branch.
+     *   - interior peak: side == 0 selects the low/ascending branch
+     *     [emin, e_peak]; side == 1 (or any stp below the ascending
+     *     branch's floor at emin) selects the high/descending branch
+     *     [e_peak, emax].
+     * See #121 for why the previous find_min()-based approach failed. */
+    double e_peak;
+    double max_stp;
+    double stp_at_emin;
+    if (find_stp_peak(ws, config, emin, emax, DEDX_INVERSE_STP_SAMPLES, &e_peak, &max_stp, &stp_at_emin) != 0) {
+        *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
         return -1;
-    double max = find_min(find_min_stp_func, &set, acc * 100);
+    }
+
+    int stp_err = 0;
+    double stp_at_emax = dedx_get_stp(ws, config, (float) emax, &stp_err);
+    if (stp_err != 0 || max_stp == 0.0 || stp > max_stp || stp < stp_at_emax) {
+        *err = (stp_err != 0) ? stp_err : DEDX_ERR_ENERGY_OUT_OF_RANGE;
+        return -1;
+    }
+
+    double log_step = (log(emax) - log(emin)) / (DEDX_INVERSE_STP_SAMPLES - 1);
+    int has_peak = e_peak > emin * exp(log_step);
+
     double x1;
     double x2;
+    int ascending;
+    if (!has_peak) {
+        x1 = emin;
+        x2 = emax;
+        ascending = 0;
+    } else if (side == 0 && stp >= stp_at_emin) {
+        x1 = emin;
+        x2 = e_peak;
+        ascending = 1;
+    } else {
+        x1 = e_peak;
+        x2 = emax;
+        ascending = 0;
+    }
+
     double x_temp;
     double f_temp;
-    if (side < 0) {
-        x1 = dedx_get_min_energy(config->program, config->ion);
-        x2 = max;
-    } else {
-        x2 = max;
-        x1 = dedx_get_max_energy(config->program, config->ion);
-    }
     while (fabs(x1 - x2) > acc) {
         x_temp = (x1 + x2) / 2;
-        f_temp = dedx_get_stp(set.ws, set.cfg, x_temp, err);
+        f_temp = dedx_get_stp(ws, config, (float) x_temp, err);
+        if (*err != 0)
+            return -1;
 
-        if (f_temp >= stp) {
-            x2 = x_temp;
+        if (ascending) {
+            if (f_temp <= stp)
+                x1 = x_temp;
+            else
+                x2 = x_temp;
         } else {
-            x1 = x_temp;
+            if (f_temp >= stp)
+                x1 = x_temp;
+            else
+                x2 = x_temp;
         }
     }
     return (x1 + x2) / 2;
+}
+
+double dedx_get_bragg_peak_stp(dedx_workspace *ws, dedx_config *config, int *err) {
+    if (*err != 0)
+        return -1;
+    if (config->loaded == 0)
+        dedx_load_config(ws, config, err);
+    if (*err != 0)
+        return -1;
+
+    double emin = dedx_get_min_energy(config->program, config->ion);
+    double emax = dedx_get_max_energy(config->program, config->ion);
+
+    double e_peak;
+    double max_stp;
+    double stp_at_emin;
+    if (find_stp_peak(ws, config, emin, emax, DEDX_BRAGG_PEAK_SAMPLES, &e_peak, &max_stp, &stp_at_emin) != 0) {
+        *err = DEDX_ERR_ENERGY_OUT_OF_RANGE;
+        return -1;
+    }
+    return max_stp;
 }
 
 double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int *err) {
