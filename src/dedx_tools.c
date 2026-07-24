@@ -92,7 +92,13 @@ static int find_stp_peak(dedx_workspace *ws,
     *stp_at_emin = 0.0;
 
     for (int i = 0; i < n_samples; i++) {
-        double e = exp(log_emin + i * log_step);
+        /* Use emin itself for the first sample: exp(log(emin)) is not
+         * guaranteed to round-trip to exactly emin, and a reconstructed
+         * value fractionally below the dataset's real lower bound would be
+         * rejected by dedx_get_stp(), leaving stp_at_emin stuck at 0 and
+         * making the ascending-branch check in dedx_get_inverse_stp()
+         * always pass. */
+        double e = (i == 0) ? emin : exp(log_emin + i * log_step);
         int stp_err = 0;
         double s = dedx_get_stp(ws, config, (float) e, &stp_err);
         if (stp_err != 0)
