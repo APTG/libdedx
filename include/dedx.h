@@ -167,6 +167,38 @@ void dedx_get_composition(int target, float composition[][2], unsigned int *comp
  */
 float dedx_get_i_value(int target, int *err);
 
+/** @brief Return the nucleon number (mass number A) of an elemental ion.
+ *  @param[in]  ion  Elemental ion identifier (atomic number Z, 1–112).
+ *  @param[out] err  Error code; DEDX_OK on success, DEDX_ERR_NOT_AN_ELEMENT
+ *                   if @p ion is outside the tabulated element range.
+ *  @return Nucleon number, or -1 on error.
+ */
+int dedx_get_nucleon_number(int ion, int *err);
+
+/** @brief Return the standard atomic mass of an elemental ion.
+ *  @param[in]  ion  Elemental ion identifier (atomic number Z, 1–112).
+ *  @param[out] err  Error code; DEDX_OK on success, DEDX_ERR_NOT_AN_ELEMENT
+ *                   if @p ion is outside the tabulated element range.
+ *  @return Atomic mass in u (unified atomic mass units), or -1 on error.
+ */
+float dedx_get_atom_mass(int ion, int *err);
+
+/** @brief Return the default density of a target material.
+ *  @param[in]  material  Material identifier.
+ *  @param[out] err       Error code; DEDX_OK on success, DEDX_ERR_TARGET_NOT_FOUND
+ *                        if @p material has no embedded density metadata.
+ *  @return Density in g/cm³, or 0 on error.
+ */
+float dedx_get_density(int material, int *err);
+
+/** @brief Report whether a target material is gaseous.
+ *  @param[in]  target  Material identifier.
+ *  @param[out] err     Error code; always set to DEDX_OK — an unknown target is
+ *                      reported as non-gas rather than as an error.
+ *  @return 1 if the target is flagged gaseous, 0 otherwise (including unknown targets).
+ */
+int dedx_is_gas(int target, int *err);
+
 /** @brief Return a null-terminated list of supported program identifiers.
  *  @return Pointer to a static array terminated by 0; do not free.
  */

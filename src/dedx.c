@@ -224,6 +224,35 @@ float dedx_get_i_value(int target, int *err) {
     return dedx_internal_get_i_value(target, DEDX_GAS, err);
 }
 
+/* Highest atomic number with tabulated mass/nucleon data (see dedx_amu / dedx_nucl). */
+#define DEDX_MAX_ELEMENT_Z 112
+
+int dedx_get_nucleon_number(int ion, int *err) {
+    /* The internal lookup only guards the upper bound; reject ion <= 0 here
+     * so we never index the table with a negative offset. */
+    if (ion < 1 || ion > DEDX_MAX_ELEMENT_Z) {
+        *err = DEDX_ERR_NOT_AN_ELEMENT;
+        return -1;
+    }
+    return dedx_internal_get_nucleon(ion, err);
+}
+
+float dedx_get_atom_mass(int ion, int *err) {
+    if (ion < 1 || ion > DEDX_MAX_ELEMENT_Z) {
+        *err = DEDX_ERR_NOT_AN_ELEMENT;
+        return -1.0f;
+    }
+    return dedx_internal_get_atom_mass(ion, err);
+}
+
+float dedx_get_density(int material, int *err) {
+    return dedx_internal_read_density(material, err);
+}
+
+int dedx_is_gas(int target, int *err) {
+    return dedx_internal_target_is_gas(target, err) != 0 ? 1 : 0;
+}
+
 const int *dedx_get_program_list(void) {
     /* returns a list of available programs, terminated with -1 */
     return dedx_available_programs;
