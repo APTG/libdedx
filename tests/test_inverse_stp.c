@@ -153,23 +153,89 @@ int main(void) {
 
     /* --- Out-of-range STP values (above the global maximum, or below the
      * global minimum) must return an error rather than looping to a bogus or
-     * negative energy. */
+     * negative energy. The bounds are derived from dedx_get_max_stp()/
+     * dedx_get_min_stp() themselves rather than hardcoded constants, so this
+     * test stays valid if the underlying tabulated data is ever updated. */
     {
         dedx_workspace *ws = dedx_allocate_workspace(1, &err);
         dedx_config *cfg = make_config(DEDX_PSTAR, DEDX_PROTON, 1, DEDX_WATER);
 
         err = 0;
-        double e_too_high = dedx_get_inverse_stp(ws, cfg, 2000.0f, 0, &err);
+        double max_stp = dedx_get_max_stp(ws, cfg, &err);
+        expect_int("out-of-range setup: max stp err", err, DEDX_OK);
+        err = 0;
+        double min_stp = dedx_get_min_stp(ws, cfg, &err);
+        expect_int("out-of-range setup: min stp err", err, DEDX_OK);
+
+        float stp_above_max = (float) (max_stp * 2.0);
+        float stp_below_min = (float) (min_stp * 0.5);
+
+        err = 0;
+        double e_too_high = dedx_get_inverse_stp(ws, cfg, stp_above_max, 0, &err);
         expect_int("stp above global max err", err, DEDX_ERR_ENERGY_OUT_OF_RANGE);
         expect_near("stp above global max sentinel", e_too_high, -1.0, 1e-9);
 
         err = 0;
-        double e_too_low = dedx_get_inverse_stp(ws, cfg, 1.0f, 0, &err);
+        double e_too_low = dedx_get_inverse_stp(ws, cfg, stp_below_min, 0, &err);
         expect_int("stp below global min err", err, DEDX_ERR_ENERGY_OUT_OF_RANGE);
         expect_near("stp below global min sentinel", e_too_low, -1.0, 1e-9);
 
         dedx_free_config(cfg, &err);
         dedx_free_workspace(ws, &err);
+    }
+
+    /* --- A config that fails to load (here: a Bethe-type program with a
+     * custom target and no density set, DEDX_ERR_RHO_REQUIRED -- the same
+     * failure test_error_codes.c uses) must propagate that error cleanly out
+     * of all three functions that route through get_loaded_dataset(), not
+     * crash or silently return a bogus value. */
+    {
+        dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+        dedx_config *cfg = make_config(DEDX_BETHE_EXT00, DEDX_PROTON, 1, 0);
+
+        err = 0;
+        double e = dedx_get_inverse_stp(ws, cfg, 100.0f, 0, &err);
+        expect_true("unloadable config: inverse_stp err set", err != DEDX_OK);
+        expect_near("unloadable config: inverse_stp sentinel", e, -1.0, 1e-9);
+
+        err = 0;
+        double max_stp = dedx_get_max_stp(ws, cfg, &err);
+        expect_true("unloadable config: max_stp err set", err != DEDX_OK);
+        expect_near("unloadable config: max_stp sentinel", max_stp, -1.0, 1e-9);
+
+        err = 0;
+        double min_stp = dedx_get_min_stp(ws, cfg, &err);
+        expect_true("unloadable config: min_stp err set", err != DEDX_OK);
+        expect_near("unloadable config: min_stp sentinel", min_stp, -1.0, 1e-9);
+
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws, &err);
+    }
+
+    /* --- A config already loaded into a workspace that was since freed and
+     * replaced (config->loaded == 1, but config->cfg_id is not a valid slot
+     * in the new workspace) must be transparently reloaded into the new
+     * workspace rather than erroring out -- get_loaded_dataset() detects the
+     * stale cfg_id and reloads instead of trusting the loaded flag alone. */
+    {
+        dedx_workspace *ws1 = dedx_allocate_workspace(1, &err);
+        dedx_config *cfg = make_config(DEDX_PSTAR, DEDX_PROTON, 1, DEDX_WATER);
+
+        err = 0;
+        double max_stp_ws1 = dedx_get_max_stp(ws1, cfg, &err);
+        expect_int("stale workspace: first load err", err, DEDX_OK);
+        expect_true("stale workspace: cfg marked loaded", cfg->loaded != 0);
+
+        dedx_free_workspace(ws1, &err);
+
+        dedx_workspace *ws2 = dedx_allocate_workspace(1, &err);
+        err = 0;
+        double max_stp_ws2 = dedx_get_max_stp(ws2, cfg, &err);
+        expect_int("stale workspace: reload into ws2 err", err, DEDX_OK);
+        expect_near("stale workspace: same result after reload", max_stp_ws2, max_stp_ws1, 1e-9);
+
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws2, &err);
     }
 
     /* --- ion_a <= 0 is rejected up front, same contract as before. */

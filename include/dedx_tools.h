@@ -41,17 +41,23 @@ double dedx_get_csda(dedx_workspace *ws, dedx_config *config, float energy, int 
  *  through the minimum-ionizing point, and rise again at relativistic
  *  energies (e.g. proton tables extending to several GeV), so a requested
  *  @p stp can be reachable at more than one energy. Among all reachable
- *  energies, @p side selects which one to return: 0 = the lowest, 1 = the
- *  highest. When only one energy reaches @p stp, @p side has no effect.
+ *  energies, @p side selects which one to return: 0 selects the lowest;
+ *  any other value (the documented convention is 1) selects the highest.
+ *  When only one energy reaches @p stp, @p side has no effect.
  *
- *  @param[in]  ws      Workspace with a loaded configuration.
- *  @param[in]  config  Loaded configuration.
- *  @param[in]  stp     Target stopping power in MeV cm²/g. Must lie between
- *                       dedx_get_min_stp() and dedx_get_max_stp() (inclusive)
- *                       for this configuration; otherwise the value is
- *                       unreachable and an error is returned.
- *  @param[in]  side    0 = lowest-energy solution, 1 = highest-energy
- *                      solution.
+ *  @param[in]  ws      Workspace to hold the loaded configuration.
+ *  @param[in]  config  Configuration to invert against. Loaded automatically
+ *                       if not already (config->loaded == 0): on return,
+ *                       config->loaded and config->cfg_id reflect that load,
+ *                       same as after an explicit dedx_load_config() call.
+ *  @param[in]  stp     Target stopping power in MeV cm²/g. In practice must
+ *                       lie between dedx_get_min_stp() and dedx_get_max_stp()
+ *                       (inclusive) for this configuration -- both computed
+ *                       from the same tabulated data points this function
+ *                       searches -- or the value is unreachable and an error
+ *                       is returned.
+ *  @param[in]  side    0 = lowest-energy solution, any other value =
+ *                      highest-energy solution.
  *  @param[out] err     Error code; 0 on success.
  *  @return Energy in MeV/nucl (MeV per nucleon), or -1 on error.
  */
@@ -62,10 +68,12 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
  *
  *  This is the peak of the stopping-power-vs-energy curve, not the Bragg
  *  peak of a depth-dose curve (which also depends on range straggling and is
- *  not computed by this library).
+ *  not computed by this library). It is computed exactly from the tabulated
+ *  data points backing the configuration, not sampled or estimated.
  *
- *  @param[in]  ws      Workspace with a loaded configuration.
- *  @param[in]  config  Loaded configuration.
+ *  @param[in]  ws      Workspace to hold the loaded configuration.
+ *  @param[in]  config  Configuration to inspect. Loaded automatically if not
+ *                       already (config->loaded == 0); see dedx_get_inverse_stp().
  *  @param[out] err     Error code; 0 on success.
  *  @return Maximum stopping power in MeV cm²/g, or -1 on error.
  */
@@ -76,10 +84,12 @@ double dedx_get_max_stp(dedx_workspace *ws, dedx_config *config, int *err);
  *
  *  For tables that reach relativistic energies this is typically the
  *  minimum-ionizing point, not the value at either tabulated endpoint (the
- *  curve can rise again past it — see dedx_get_inverse_stp()).
+ *  curve can rise again past it — see dedx_get_inverse_stp()). Computed
+ *  exactly from the tabulated data points, like dedx_get_max_stp().
  *
- *  @param[in]  ws      Workspace with a loaded configuration.
- *  @param[in]  config  Loaded configuration.
+ *  @param[in]  ws      Workspace to hold the loaded configuration.
+ *  @param[in]  config  Configuration to inspect. Loaded automatically if not
+ *                       already (config->loaded == 0); see dedx_get_inverse_stp().
  *  @param[out] err     Error code; 0 on success.
  *  @return Minimum stopping power in MeV cm²/g, or -1 on error.
  */

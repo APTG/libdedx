@@ -64,21 +64,44 @@ static double adapt_stp(double energy, dedx_tools_settings *set) {
  * callers can walk its exact tabulated (energy, STP) knots directly instead
  * of re-sampling the curve at an arbitrary density. dedx_get_stp() evaluates
  * a spline built from precisely these knots (dedx_spline.c: coef[i].a =
- * stopping[i]), so scanning them finds every feature the public curve can
- * actually exhibit -- no synthetic sampling can do better or worse.
+ * stopping[i]), so scanning them finds every feature present in the
+ * tabulated values -- though not necessarily every feature of the
+ * interpolated curve dedx_get_stp() actually evaluates, since a spline can
+ * in principle overshoot slightly between two knots. That's a property of
+ * the interpolation, not something this scan (or any sampling density) can
+ * see; it hasn't been observed in the tables this library ships.
  *
  * `static` (file-private, not declared in dedx_tools.h): only this
  * translation unit needs it, unlike the dedx_internal_* functions declared
  * in headers such as dedx_data_access.h for use across multiple .c files. */
 static dedx_internal_lookup_data *get_loaded_dataset(dedx_workspace *ws, dedx_config *config, int *err) {
-    if (*err != 0)
-        return NULL;
+    /* Public entrypoints reset *err themselves (e.g. dedx_get_stp()) rather
+     * than treating an incoming nonzero value as a precondition -- do the
+     * same here so a stale error code left over in the caller's variable
+     * from an unrelated earlier call can't make a valid request fail. */
+    *err = DEDX_OK;
+
+    /* config->loaded == 1 only means *some* workspace holds this config's
+     * data at config->cfg_id -- not necessarily this ws (the config could
+     * have been loaded into a workspace that was since freed and replaced,
+     * or the caller could be reusing one dedx_config across workspaces).
+     * Reload whenever the config hasn't been loaded at all, or its cfg_id
+     * isn't a valid slot in *this* workspace; otherwise skip the reload on
+     * the common already-loaded-here path. */
+    int needs_load = 0;
     if (config->loaded == 0)
+        needs_load = 1;
+    else if (config->cfg_id < 0 || config->cfg_id >= ws->active_datasets)
+        needs_load = 1;
+    if (needs_load)
         dedx_load_config(ws, config, err);
     if (*err != 0)
         return NULL;
+
     int id = config->cfg_id;
     if (id < 0 || id >= ws->active_datasets) {
+        /* Defensive: dedx_load_config() succeeding is expected to always
+         * leave a valid cfg_id, so this should be unreachable in practice. */
         *err = DEDX_ERR_INVALID_DATASET_ID;
         return NULL;
     }
@@ -126,18 +149,17 @@ double dedx_get_inverse_csda(dedx_workspace *ws, dedx_config *config, float rang
     return (min + max) / 2;
 }
 
-/* Bisection convergence, as a fraction of the current bracket's energy scale
- * (see the "relative, not absolute" note in bisect_monotonic_run() below for
- * why this is relative). 1e-6 is about ten times coarser than a `float`'s
- * own precision (~1.19e-7 relative, i.e. 24 bits of mantissa): dedx_get_stp()
- * truncates the search value to a float before evaluating the spline, so
- * refining much further than the float itself can represent would just
- * spend extra iterations re-measuring rounding noise. 1e-6 still comfortably
- * resolves the whole tabulated range: even the widest single monotonic run
- * seen in practice (proton/water PSTAR's post-peak run, roughly 0.08 to
- * 10000 MeV/nucleon) converges in under 30 bisection steps, since halving
- * the bracket is a log2(width/tolerance) process regardless of scale. */
-#define DEDX_INVERSE_STP_REL_ACC 1e-6
+/* Bisection convergence, as an absolute tolerance in *log-energy* space (see
+ * bisect_monotonic_run() below for why bisecting there instead of in the raw
+ * energy value). For small differences, d(ln x) = dx/x, i.e. a difference in
+ * log-space is directly a *relative* difference in the original energy --
+ * so this one constant fixes the achieved relative precision on the energy
+ * result regardless of scale. 1e-6 is about ten times coarser than a
+ * `float`'s own precision (~1.19e-7 relative, i.e. 24 bits of mantissa):
+ * dedx_get_stp() truncates the search value to a float before evaluating
+ * the spline, so refining much further than the float itself can represent
+ * would just spend extra iterations re-measuring rounding noise. */
+#define DEDX_INVERSE_STP_LOG_ACC 1e-6
 
 /* Bisect the monotonic run of knots [lo_idx, hi_idx] for the energy where
  * the spline equals stp, refining via dedx_get_stp() (not linear knot
@@ -180,43 +202,56 @@ static int bisect_monotonic_run(dedx_workspace *ws,
     else
         ascending = 0;
 
-    /* Standard bisection: x1/x2 bracket the root, i.e. dedx_get_stp(x1) and
-     * dedx_get_stp(x2) sit on opposite sides of the target stp. Each step
-     * evaluates the midpoint and keeps whichever half still brackets stp,
-     * halving the bracket width every iteration.
+    /* Bisect in log-energy space rather than raw energy. Two reasons:
      *
-     * The stopping test compares the bracket width to x2 itself rather than
-     * to a fixed value: the tabulated energy range spans many decades (e.g.
-     * proton tables run from ~0.001 to 10000 MeV/nucleon), so a single fixed
-     * absolute tolerance would be far too loose relative to energies at the
-     * low end of that range and far tighter than meaningful at the high end
-     * (see DEDX_INVERSE_STP_REL_ACC above). A tolerance relative to the
-     * current bracket keeps the achieved *relative* precision the same
-     * regardless of where in that range the root happens to fall. */
-    double x1 = lo_x;
-    double x2 = hi_x;
-    while (fabs(x1 - x2) > DEDX_INVERSE_STP_REL_ACC * fabs(x2)) {
-        double x_temp = (x1 + x2) / 2;
+     * 1. The tabulated energy grid is itself predominantly log-spaced (e.g.
+     *    NIST PSTAR/ASTAR-derived tables step by a roughly constant energy
+     *    *ratio*, not a constant energy difference, so that a fixed number
+     *    of points can cover ~0.001 to 10000 MeV/nucleon with even relative
+     *    resolution). Bisecting in the same log-scale as the data matches
+     *    the coordinate the curve actually varies smoothly in.
+     *
+     * 2. It makes the convergence tolerance exactly a relative tolerance on
+     *    the energy result (see DEDX_INVERSE_STP_LOG_ACC above), rather than
+     *    an approximation of one. A run spanning many decades (e.g. the
+     *    post-peak run for proton/water PSTAR, ~0.08 to 10000 MeV/nucleon)
+     *    then converges in a number of steps set by log2(ln(hi_x/lo_x) /
+     *    DEDX_INVERSE_STP_LOG_ACC) -- a few dozen steps regardless of scale
+     *    or of where in the run the root happens to fall, since bisection
+     *    always halves the bracket every step no matter which half contains
+     *    the root.
+     *
+     * dedx_get_stp() evaluates the actual interpolating spline at any energy
+     * (not just at knots), so this is correct even on the tail of a table
+     * where the raw knot spacing itself happens to be linear rather than
+     * log-spaced (observed for a few tables at their highest energies) --
+     * the spline doesn't care how its own knots were spaced, and neither
+     * does bisecting the search variable in log space. */
+    double log_lo = log(lo_x);
+    double log_hi = log(hi_x);
+    while (fabs(log_lo - log_hi) > DEDX_INVERSE_STP_LOG_ACC) {
+        double log_mid = (log_lo + log_hi) / 2;
+        double x_temp = exp(log_mid);
         double f_temp = dedx_get_stp(ws, config, (float) x_temp, err);
         if (*err != 0)
             return -1;
         if (ascending) {
             /* STP too low at the midpoint -> the root is further up. */
             if (f_temp <= stp)
-                x1 = x_temp;
+                log_lo = log_mid;
             else
-                x2 = x_temp;
+                log_hi = log_mid;
         } else {
             /* STP still at/above target at the midpoint -> the root is
              * further up (we're descending, so STP keeps falling as energy
              * rises). */
             if (f_temp >= stp)
-                x1 = x_temp;
+                log_lo = log_mid;
             else
-                x2 = x_temp;
+                log_hi = log_mid;
         }
     }
-    *solution = (x1 + x2) / 2;
+    *solution = exp((log_lo + log_hi) / 2);
     return 0;
 }
 
@@ -235,9 +270,9 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
      * -- an arbitrary requested STP can be reachable on more than one of
      * these monotonic runs. Walk the exact tabulated knots once, bisecting
      * every run that brackets stp, and keep the lowest- and highest-energy
-     * solutions found; side == 0 returns the low-energy one, side == 1 the
-     * high-energy one. For the common single-peak case this is exactly the
-     * old ascending/descending branch choice. See #121. */
+     * solutions found across ALL of them; side == 0 returns the lowest, any
+     * other side value returns the highest. For the common single-peak case
+     * this is exactly the old ascending/descending branch choice. See #121. */
     int found = 0;
     double x_min_found = 0;
     double x_max_found = 0;
@@ -251,15 +286,13 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
          * whichever run it interrupts). Only computed for i < data->n,
          * since there is no knot i to compare against once i == data->n. */
         int is_turning = 0;
-        int dir = 0;
+        int dir = 0; /* stays 0 (flat) unless one of the branches below fires */
         if (i < data->n) {
             double delta = (double) data->base[i].a - (double) data->base[i - 1].a;
             if (delta > 0)
                 dir = 1;
             else if (delta < 0)
                 dir = -1;
-            else
-                dir = 0;
             if (dir != 0) {
                 if (prev_dir == 0)
                     prev_dir = dir;
@@ -279,6 +312,16 @@ double dedx_get_inverse_stp(dedx_workspace *ws, dedx_config *config, float stp, 
             if (seg_end > seg_start) {
                 double solution;
                 if (bisect_monotonic_run(ws, config, data, seg_start, seg_end, stp, err, &solution) == 0) {
+                    /* This run brackets stp, so it contributes one solution.
+                     * Track the lowest- and highest-energy solutions seen so
+                     * far across every run processed so far in this loop --
+                     * not just this one run -- so that once the whole table
+                     * has been walked, x_min_found/x_max_found hold the
+                     * overall lowest/highest reachable energy regardless of
+                     * how many separate runs bracketed stp along the way.
+                     * `!found` covers the very first solution: there is
+                     * nothing yet to compare it against, so it always
+                     * becomes both the running min and the running max. */
                     if (!found || solution < x_min_found)
                         x_min_found = solution;
                     if (!found || solution > x_max_found)
