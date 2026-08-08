@@ -854,10 +854,10 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
 
     dedx_internal_bethe_workspace *bethe =
         (dedx_internal_bethe_workspace *) calloc(1, sizeof(dedx_internal_bethe_workspace));
-    if (bethe == NULL) {
+    if (bethe == NULL) { /* LCOV_EXCL_START -- OOM guard, not exercised by tests */
         *err = DEDX_ERR_NO_MEMORY;
         return -1;
-    }
+    } /* LCOV_EXCL_STOP */
     for (i = 0; i < data->length; i++) {
         data->data[i] = dedx_internal_calculate_bethe_energy(bethe, energy[i], PZ, PA, TZ, TA, rho, pot);
     }
