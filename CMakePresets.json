@@ -29,6 +29,18 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_C_FLAGS": "--coverage -fprofile-arcs -ftest-coverage"
             }
+        },
+        {
+            "name": "sanitize",
+            "displayName": "ASan+UBSan",
+            "binaryDir": "${sourceDir}/build-sanitize",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -g",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+                "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address,undefined"
+            }
         }
     ],
     "buildPresets": [
@@ -43,6 +55,10 @@
         {
             "name": "coverage",
             "configurePreset": "coverage"
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize"
         }
     ],
     "testPresets": [
@@ -54,6 +70,11 @@
         {
             "name": "coverage",
             "configurePreset": "coverage",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize",
             "output": { "outputOnFailure": true }
         }
     ]

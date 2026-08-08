@@ -20,6 +20,13 @@ target_include_directories(dedx_objects PRIVATE
     "${PROJECT_SOURCE_DIR}/src"
     "${PROJECT_BINARY_DIR}"
 )
+# Warnings-as-errors on the library sources only (not tests/examples), so any new
+# warning-worthy code in dedx_objects fails the build instead of silently landing.
+# GCC/Clang only for now: MSVC's warning set (/W4) is a separate, noisier baseline
+# that would need its own pass to clear -- see issue #149 E1.
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(dedx_objects PRIVATE -Wall -Wextra -Werror)
+endif()
 # Version passed as compile definitions, derived from git tag at configure time.
 target_compile_definitions(dedx_objects PRIVATE
     DEDX_VERSION_MAJOR=${DEDX_VERSION_MAJOR}

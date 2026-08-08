@@ -6,6 +6,7 @@ build/
 build-release/
 build-coverage/
 build-packaging/
+build-sanitize/
 _CPack_Packages/
 *.deb
 *.rpm

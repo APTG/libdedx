@@ -74,6 +74,12 @@ float dedx_internal_calculate_bethe_energy(
 
 static float
 evaluate_bethe_model_LEext(float PT, dedx_internal_bethe_model bet, dedx_internal_bethe_gold gold, int *err) {
+    /* err is threaded through for interface symmetry with evaluate_bethe_model() and its
+     * golden-section callers, but this evaluator is pure arithmetic and never sets it
+     * (see #149 E3, which tracks de-duplicating the two evaluators). The cast documents
+     * that this is intentional rather than a bug, without changing the call sites or
+     * the function's signature/ABI. */
+    (void) err;
     double T = PT;
     float dedx;
     double mass = 940 * bet.PA0;
@@ -247,6 +253,9 @@ static void gold_section(dedx_internal_bethe_model bet, dedx_internal_bethe_gold
 }
 
 static float evaluate_bethe_model(float PT, dedx_internal_bethe_model bet, int *err) {
+    /* Same rationale as evaluate_bethe_model_LEext() above: int *err is never used in
+     * this evaluator, so it's cast to void rather than silently ignored. */
+    (void) err;
     double T = PT;
     double mass = 940 * bet.PA0;
 

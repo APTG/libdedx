@@ -58,10 +58,43 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y valgrind
 
-      - name: Valgrind test_bethe_ext00
+      - name: Valgrind full test suite
         run: |
-          valgrind --leak-check=full --track-origins=yes --error-exitcode=1 \
-            ./build/tests/test_bethe_ext00
+          set -e
+          for bin in build/tests/test_*; do
+            # test_availability_exhaustive runs ~102k load/query cycles, which is fine
+            # at ~15s natively or ~25s under ASan+UBSan (see the sanitize job) but takes
+            # 15+ minutes under Valgrind's much heavier instrumentation, for close to
+            # zero incremental memory-safety coverage over what the other test_* binaries
+            # already give Valgrind on the same load/query code paths. Skip it here.
+            if [ "$(basename "$bin")" = "test_availability_exhaustive" ]; then
+              continue
+            fi
+            if [ -x "$bin" ] && [ -f "$bin" ]; then
+              echo "::group::valgrind $bin"
+              valgrind --leak-check=full --track-origins=yes --error-exitcode=1 "$bin"
+              echo "::endgroup::"
+            fi
+          done
+
+  sanitize:
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure
+        run: cmake --preset sanitize
+
+      - name: Build
+        run: cmake --build --preset sanitize --parallel
+
+      - name: Run CTest under ASan+UBSan
+        run: ctest --preset sanitize
+        env:
+          ASAN_OPTIONS: detect_leaks=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
 
   python_tests:
     runs-on: ubuntu-latest
