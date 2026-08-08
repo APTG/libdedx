@@ -12,6 +12,11 @@ include(CMakePackageConfigHelpers)
 
 option(DEDX_BUILD_EXAMPLES "Build libdedx example programs" ON)
 option(DEDX_BUILD_TESTS "Build libdedx test suite" ON)
+# -Wall/-Wextra apply unconditionally (GCC/Clang) below, but -Werror is opt-in and
+# OFF by default: a release/packaging/downstream source build compiled with a newer
+# or different GCC/Clang than CI used could otherwise start failing on a compiler
+# diagnostic that's new, not a regression in this code. CI turns this ON explicitly.
+option(DEDX_WERROR "Treat compiler warnings as errors (GCC/Clang only)" OFF)
 
 # ---- Version from git tag ----
 find_package(Git QUIET)

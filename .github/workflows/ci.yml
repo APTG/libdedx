@@ -20,7 +20,7 @@ jobs:
         run: cmake --version
 
       - name: Configure
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DDEDX_WERROR=ON
 
       - name: Build
         run: cmake --build build --parallel
@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Configure
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DDEDX_WERROR=ON
 
       - name: Build
         run: cmake --build build --parallel
@@ -100,7 +100,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Configure
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DDEDX_WERROR=ON
 
       - name: Build
         run: cmake --build build --parallel
