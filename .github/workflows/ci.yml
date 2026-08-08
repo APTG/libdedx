@@ -2,6 +2,10 @@ name: CI
 
 on: [push, pull_request]
 
+# Build/test only: the token needs no more than read access to the checkout.
+permissions:
+  contents: read
+
 jobs:
   build_and_test:
     runs-on: ${{ matrix.platform }}
