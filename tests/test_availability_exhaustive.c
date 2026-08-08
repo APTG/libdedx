@@ -52,6 +52,7 @@ typedef struct {
     long load_failures;
     long bound_mismatches;
     long dead_configs;
+    long alloc_failures;
 } sweep_stats;
 
 /* Load one (program, ion, target) combination and update stats. Always frees what it
@@ -72,6 +73,24 @@ static void sweep_one(int program, int ion, int target, sweep_stats *stats) {
 
     ws = dedx_allocate_workspace(1, &err);
     cfg = calloc(1, sizeof(dedx_config));
+    if (ws == NULL || cfg == NULL) {
+        /* Hard test failure, not a swept-combination failure: an OOM here means the
+         * sweep itself can no longer be trusted, so report it clearly instead of
+         * dereferencing a NULL workspace/config below. dedx_free_config()/
+         * dedx_free_workspace() are both NULL-safe, so this cleanup is safe even
+         * when only one of the two allocations failed. */
+        fprintf(stderr,
+                "FAIL sweep_one: allocation failed (workspace=%p config=%p) for program=%d ion=%d target=%d\n",
+                (void *) ws,
+                (void *) cfg,
+                program,
+                ion,
+                target);
+        stats->alloc_failures++;
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws, &err);
+        return;
+    }
     cfg->program = program;
     cfg->ion = ion;
     cfg->target = target;
@@ -161,7 +180,7 @@ static int check_baseline(long got, long baseline, const char *label) {
 
 int main(void) {
     const int *programs = dedx_get_program_list();
-    sweep_stats stats = {0, 0, 0, 0};
+    sweep_stats stats = {0, 0, 0, 0, 0};
     int failures = 0;
     int p;
 
@@ -179,11 +198,21 @@ int main(void) {
         }
     }
 
-    printf("test_availability_exhaustive: total=%ld load_failures=%ld bound_mismatches=%ld dead_configs=%ld\n",
+    printf("test_availability_exhaustive: total=%ld load_failures=%ld bound_mismatches=%ld dead_configs=%ld "
+           "alloc_failures=%ld\n",
            stats.total,
            stats.load_failures,
            stats.bound_mismatches,
-           stats.dead_configs);
+           stats.dead_configs,
+           stats.alloc_failures);
+
+    /* Unlike the baselines below, any allocation failure is an unconditional hard
+     * failure -- there is no acceptable count of "the sweep couldn't get memory". */
+    if (stats.alloc_failures > 0) {
+        fprintf(
+            stderr, "FAIL: %ld combination(s) hit an allocation failure; see FAIL lines above\n", stats.alloc_failures);
+        failures++;
+    }
 
     if (stats.total != TOTAL_COMBINATIONS) {
         fprintf(stderr,
