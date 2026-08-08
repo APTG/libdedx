@@ -223,6 +223,17 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
         if (*err != 0)
             return -1;
     }
+
+    /* load_compound() sums weight[i] * compound_data[i].data[j] over
+     * elements_mass_fraction whenever elements_id is set, regardless of program or
+     * target. Neither block above runs for a tabulated program (program < 100) with
+     * a non-zero target, so a caller-supplied elements_id without elements_mass_fraction
+     * (and nothing to derive it from) would otherwise reach that sum with a NULL
+     * weight array. Reject it here instead of dereferencing NULL later. */
+    if (config->elements_id != NULL && config->elements_mass_fraction == NULL) {
+        *err = DEDX_ERR_INCONSISTENT_COMPOUND;
+        return -1;
+    }
     return 0;
 }
 
