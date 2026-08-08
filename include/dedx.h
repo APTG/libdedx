@@ -110,8 +110,16 @@ enum {
 
 /** @} */
 
+/** @brief Minimum buffer size (in bytes, including the terminating NUL) that
+ *  dedx_get_error_code() requires from its @p err_str argument. The longest message
+ *  currently shipped is well under this; the margin is intentional headroom for
+ *  future messages.
+ */
+#define DEDX_ERROR_STRING_MAX 64
+
 /** @brief Translate a numeric error code to a human-readable string.
- *  @param[out] err_str  Buffer to receive the error description (caller-allocated).
+ *  @param[out] err_str  Buffer to receive the error description (caller-allocated,
+ *                       at least DEDX_ERROR_STRING_MAX bytes).
  *  @param[in]  err      Error code returned by a libdedx function.
  */
 void dedx_get_error_code(char *err_str, int err);
@@ -199,14 +207,14 @@ float dedx_get_density(int material, int *err);
  */
 int dedx_is_gas(int target, int *err);
 
-/** @brief Return a null-terminated list of supported program identifiers.
- *  @return Pointer to a static array terminated by 0; do not free.
+/** @brief Return a -1-terminated list of supported program identifiers.
+ *  @return Pointer to a static array terminated by -1; do not free.
  */
 const int *dedx_get_program_list(void);
 
-/** @brief Return a null-terminated list of materials supported by a program.
+/** @brief Return a -1-terminated list of materials supported by a program.
  *  @param[in] program  Program identifier.
- *  @return Pointer to a static array terminated by 0; do not free.
+ *  @return Pointer to a static array terminated by -1; do not free.
  */
 const int *dedx_get_material_list(int program);
 
@@ -248,9 +256,9 @@ const int *dedx_get_material_list(int program);
 void dedx_get_material_list_for_ion(
     int program, int ion, int *materials, unsigned int max_materials, unsigned int *materials_len, int *err);
 
-/** @brief Return a null-terminated list of ions supported by a program.
+/** @brief Return a -1-terminated list of ions supported by a program.
  *  @param[in] program  Program identifier.
- *  @return Pointer to a static array terminated by 0; do not free.
+ *  @return Pointer to a static array terminated by -1; do not free.
  */
 const int *dedx_get_ion_list(int program);
 

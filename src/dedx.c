@@ -108,85 +108,55 @@ void dedx_free_workspace(dedx_workspace *workspace, int *err) {
 }
 
 /*Return an explanation to the error code*/
-void dedx_get_error_code(char *err_str, int err) {
-    switch (err) {
-    case DEDX_OK:
-        strcpy(err_str, "No error.");
-        break;
-    case DEDX_ERR_NO_COMPOS_FILE:
-        strcpy(err_str, "Embedded density/I-value metadata is unavailable.");
-        break;
-    case DEDX_ERR_NO_GAS_FILE:
-        strcpy(err_str, "Embedded gas-state metadata is unavailable.");
-        break;
-    case DEDX_ERR_NO_CHARGE_FILE:
-        strcpy(err_str, "Embedded effective-charge metadata is unavailable.");
-        break;
-    case DEDX_ERR_NO_BINARY_DATA:
-        strcpy(err_str, "Embedded stopping-power data is unavailable.");
-        break;
-    case DEDX_ERR_NO_BINARY_ENERGY:
-        strcpy(err_str, "Embedded energy-grid data is unavailable.");
-        break;
-    case DEDX_ERR_WRITE_FAILED:
-        strcpy(err_str, "Unable to write to disk.");
-        break;
-    case DEDX_ERR_NO_ENERGY_FILE:
-        strcpy(err_str, "Legacy energy source data is unavailable.");
-        break;
-    case DEDX_ERR_NO_DATA_FILE:
-        strcpy(err_str, "Legacy stopping-power source data is unavailable.");
-        break;
-    case DEDX_ERR_NO_NAMES_FILE:
-        strcpy(err_str, "Reserved internal metadata code.");
-        break;
-    case DEDX_ERR_NO_COMPOSITION:
-        strcpy(err_str, "Embedded elemental composition metadata is unavailable.");
-        break;
-    case DEDX_ERR_ENERGY_OUT_OF_RANGE:
-        strcpy(err_str, "Energy out of bounds.");
-        break;
-    case DEDX_ERR_TARGET_NOT_FOUND:
-        strcpy(err_str, "Target is not in the embedded metadata.");
-        break;
-    case DEDX_ERR_COMBINATION_NOT_FOUND:
-        strcpy(err_str, "Target and ion combination is not in the embedded data.");
-        break;
-    case DEDX_ERR_INVALID_DATASET_ID:
-        strcpy(err_str, "ID does not exist.");
-        break;
-    case DEDX_ERR_NOT_AN_ELEMENT:
-        strcpy(err_str, "Target is not an atomic element.");
-        break;
-    case DEDX_ERR_ESTAR_NOT_IMPL:
-        strcpy(err_str, "ESTAR is not implemented yet.");
-        break;
-    case DEDX_ERR_ION_NOT_SUPPORTED_MSTAR:
-        strcpy(err_str, "Ion is not supported for MSTAR.");
-        break;
-    case DEDX_ERR_ION_NOT_SUPPORTED:
-        strcpy(err_str, "Ion is not supported for requested table.");
-        break;
-    case DEDX_ERR_RHO_REQUIRED:
-        strcpy(err_str, "Rho must be specified in this configuration.");
-        break;
-    case DEDX_ERR_ION_A_REQUIRED:
-        strcpy(err_str, "ion_a must be specified in this configuration.");
-        break;
-    case DEDX_ERR_INVALID_I_VALUE:
-        strcpy(err_str, "I value must be larger than zero.");
-        break;
-    case DEDX_ERR_INVALID_INTERPOLATION_MODE:
-        strcpy(err_str, "Interpolation mode is not supported.");
-        break;
-    case DEDX_ERR_NO_MEMORY:
-        strcpy(err_str, "Out of memory");
-        break;
+typedef struct {
+    int code;
+    const char *message;
+} dedx_error_entry;
 
-    default:
-        strcpy(err_str, "No such error code.");
-        break;
+/* One entry per DEDX_ERR_* code in dedx_error.h. Table-driven so that adding a
+ * message can never desync from adding an entry to a switch's case labels --
+ * the previous switch-based version silently fell through to the default
+ * "No such error code." message for DEDX_ERR_INCONSISTENT_COMPOUND because no
+ * case had been added for it. tests/test_error_codes.c walks every code
+ * defined in dedx_error.h and asserts it resolves to a real message here. */
+static const dedx_error_entry dedx_error_table[] = {
+    {DEDX_OK, "No error."},
+    {DEDX_ERR_NO_COMPOS_FILE, "Embedded density/I-value metadata is unavailable."},
+    {DEDX_ERR_NO_GAS_FILE, "Embedded gas-state metadata is unavailable."},
+    {DEDX_ERR_NO_CHARGE_FILE, "Embedded effective-charge metadata is unavailable."},
+    {DEDX_ERR_NO_BINARY_DATA, "Embedded stopping-power data is unavailable."},
+    {DEDX_ERR_NO_BINARY_ENERGY, "Embedded energy-grid data is unavailable."},
+    {DEDX_ERR_WRITE_FAILED, "Unable to write to disk."},
+    {DEDX_ERR_NO_ENERGY_FILE, "Legacy energy source data is unavailable."},
+    {DEDX_ERR_NO_DATA_FILE, "Legacy stopping-power source data is unavailable."},
+    {DEDX_ERR_NO_NAMES_FILE, "Reserved internal metadata code."},
+    {DEDX_ERR_NO_COMPOSITION, "Embedded elemental composition metadata is unavailable."},
+    {DEDX_ERR_ENERGY_OUT_OF_RANGE, "Energy out of bounds."},
+    {DEDX_ERR_TARGET_NOT_FOUND, "Target is not in the embedded metadata."},
+    {DEDX_ERR_COMBINATION_NOT_FOUND, "Target and ion combination is not in the embedded data."},
+    {DEDX_ERR_INVALID_DATASET_ID, "ID does not exist."},
+    {DEDX_ERR_NOT_AN_ELEMENT, "Target is not an atomic element."},
+    {DEDX_ERR_ESTAR_NOT_IMPL, "ESTAR is not implemented yet."},
+    {DEDX_ERR_ION_NOT_SUPPORTED_MSTAR, "Ion is not supported for MSTAR."},
+    {DEDX_ERR_ION_NOT_SUPPORTED, "Ion is not supported for requested table."},
+    {DEDX_ERR_RHO_REQUIRED, "Rho must be specified in this configuration."},
+    {DEDX_ERR_ION_A_REQUIRED, "ion_a must be specified in this configuration."},
+    {DEDX_ERR_INVALID_I_VALUE, "I value must be larger than zero."},
+    {DEDX_ERR_INCONSISTENT_COMPOUND, "Compound specification is inconsistent."},
+    {DEDX_ERR_INVALID_INTERPOLATION_MODE, "Interpolation mode is not supported."},
+    {DEDX_ERR_NO_MEMORY, "Out of memory"},
+};
+
+void dedx_get_error_code(char *err_str, int err) {
+    size_t i;
+
+    for (i = 0; i < sizeof(dedx_error_table) / sizeof(dedx_error_table[0]); i++) {
+        if (dedx_error_table[i].code == err) {
+            strcpy(err_str, dedx_error_table[i].message);
+            return;
+        }
     }
+    strcpy(err_str, "No such error code.");
 }
 
 const char *dedx_get_program_name(int program) {
@@ -228,8 +198,8 @@ float dedx_get_i_value(int target, int *err) {
 #define DEDX_MAX_ELEMENT_Z 112
 
 int dedx_get_nucleon_number(int ion, int *err) {
-    /* The internal lookup only guards the upper bound; reject ion <= 0 here
-     * so we never index the table with a negative offset. */
+    /* dedx_internal_get_nucleon() now also guards ion <= 0, but keep this explicit
+     * check here too so the public wrapper's contract does not rely on that detail. */
     if (ion < 1 || ion > DEDX_MAX_ELEMENT_Z) {
         *err = DEDX_ERR_NOT_AN_ELEMENT;
         return -1;
@@ -884,6 +854,10 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
 
     dedx_internal_bethe_workspace *bethe =
         (dedx_internal_bethe_workspace *) calloc(1, sizeof(dedx_internal_bethe_workspace));
+    if (bethe == NULL) {
+        *err = DEDX_ERR_NO_MEMORY;
+        return -1;
+    }
     for (i = 0; i < data->length; i++) {
         data->data[i] = dedx_internal_calculate_bethe_energy(bethe, energy[i], PZ, PA, TZ, TA, rho, pot);
     }

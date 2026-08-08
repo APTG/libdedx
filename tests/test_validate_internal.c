@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "dedx_error.h"
+#include "dedx_periodic_table.h"
 #include "dedx_validate.h"
 
 static int check_int(int got, int expected, const char *label) {
@@ -205,6 +206,49 @@ static int test_evaluate_i_pot_custom_elements(void) {
     return failures;
 }
 
+/*
+ * Regression test: dedx_amu[]/dedx_nucl[] are indexed by id - 1, so an id <= 0
+ * (e.g. an unchecked custom-compound elements_id[] entry, which is caller-supplied
+ * and never range-checked upstream) used to read out of bounds. The periodic-table
+ * lookups only guarded the upper bound; the lower bound must be guarded too, right
+ * in these functions rather than relying on every caller to check it first.
+ */
+static int test_periodic_table_rejects_nonpositive_id(void) {
+    int failures = 0;
+    int err;
+
+    err = 0;
+    dedx_internal_get_atom_mass(0, &err);
+    failures += check_int(err, DEDX_ERR_NOT_AN_ELEMENT, "atom_mass(0) must be rejected");
+
+    err = 0;
+    dedx_internal_get_atom_mass(-5, &err);
+    failures += check_int(err, DEDX_ERR_NOT_AN_ELEMENT, "atom_mass(-5) must be rejected");
+
+    err = 0;
+    dedx_internal_get_nucleon(0, &err);
+    failures += check_int(err, DEDX_ERR_NOT_AN_ELEMENT, "nucleon(0) must be rejected");
+
+    err = 0;
+    dedx_internal_get_nucleon(-5, &err);
+    failures += check_int(err, DEDX_ERR_NOT_AN_ELEMENT, "nucleon(-5) must be rejected");
+
+    err = 0;
+    dedx_internal_get_atom_charge(0, &err);
+    failures += check_int(err, DEDX_ERR_NOT_AN_ELEMENT, "atom_charge(0) must be rejected");
+
+    err = 0;
+    dedx_internal_get_atom_charge(-5, &err);
+    failures += check_int(err, DEDX_ERR_NOT_AN_ELEMENT, "atom_charge(-5) must be rejected");
+
+    /* The valid range must be unaffected by the added lower-bound guard. */
+    err = 0;
+    failures += check_true(dedx_internal_get_atom_mass(DEDX_HYDROGEN, &err) > 0.0f, "atom_mass(H) still valid");
+    failures += check_int(err, DEDX_OK, "atom_mass(H) err still OK");
+
+    return failures;
+}
+
 int main(void) {
     int failures = 0;
 
@@ -214,6 +258,7 @@ int main(void) {
     failures += test_validate_config_bethe_mass_fraction();
     failures += test_validate_config_resets_stale_err();
     failures += test_evaluate_i_pot_custom_elements();
+    failures += test_periodic_table_rejects_nonpositive_id();
 
     return failures;
 }
