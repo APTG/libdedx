@@ -63,42 +63,7 @@ jobs:
           sudo apt-get install -y valgrind
 
       - name: Valgrind full test suite
-        run: |
-          set -e
-          # Test binaries exempted from this job: still run natively and under
-          # ASan+UBSan (see the sanitize job), just not here. Add a name below --
-          # don't special-case the loop -- if another test earns an exemption.
-          SKIP_VALGRIND=(
-            # ~102k load/query cycles: ~15s natively / ~25s under ASan+UBSan, but 15+
-            # minutes under Valgrind's much heavier instrumentation, for close to zero
-            # incremental memory-safety coverage over what the other test_* binaries
-            # already give Valgrind on the same load/query code paths.
-            test_availability_exhaustive
-          )
-
-          # Without nullglob, an unmatched glob expands to the literal pattern string;
-          # the -f/-x guard below would then just skip that one non-existent "file" and
-          # the loop would exit 0 having valgrinded nothing. nullglob plus the counter
-          # check makes "no test binaries found" a hard failure instead of a silent pass.
-          shopt -s nullglob
-          ran=0
-          for bin in build/tests/test_*; do
-            name="$(basename "$bin")"
-            if printf '%s\n' "${SKIP_VALGRIND[@]}" | grep -qx "$name"; then
-              continue
-            fi
-            if [ -x "$bin" ] && [ -f "$bin" ]; then
-              echo "::group::valgrind $bin"
-              valgrind --leak-check=full --track-origins=yes --error-exitcode=1 "$bin"
-              echo "::endgroup::"
-              ran=$((ran + 1))
-            fi
-          done
-          if [ "$ran" -eq 0 ]; then
-            echo "::error::no test_* binaries found under build/tests/ -- Valgrind ran nothing"
-            exit 1
-          fi
-          echo "Valgrind ran $ran test binaries (skipped: ${SKIP_VALGRIND[*]})"
+        run: .github/scripts/run_valgrind_suite.sh build/tests
 
   sanitize:
     runs-on: ubuntu-latest
