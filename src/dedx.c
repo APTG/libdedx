@@ -863,6 +863,14 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     config->i_value = i_value;
     config->target = target;
 
+    /* Identify the aggregated result as the compound itself (its own id, or 0 for a
+     * caller-defined custom compound), not whatever find_data() last wrote into
+     * compound_data[length - 1] for the final per-constituent element -- data is a
+     * fresh stack local (see the declaration above) with no initializer, so these
+     * fields would otherwise carry indeterminate values into ws->loaded_data[]. */
+    data.ion = config->ion;
+    data.target = target;
+
     /* All constituents are now verified to share one grid, so any compound_data[i].length
      * equals compound_data[0].length -- min() here is belt-and-braces, matching the
      * issue's suggested fix, in case a future change relaxes the check above from
@@ -930,6 +938,8 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
     TA = dedx_internal_get_atom_mass(config->target, err);
     rho = config->rho;
     pot = config->_temp_i_value;
+    data->target = config->target;
+    data->ion = config->ion;
     data->length = 122;
     dedx_internal_read_energy_data(energy, DEDX_BETHE_EXT00, err);
     if (*err != 0)

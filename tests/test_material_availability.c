@@ -1,5 +1,6 @@
 #include <dedx_wrappers.h>
 
+#include "dedx_lookup_data.h"
 #include "test_helpers.h"
 
 /* Regression coverage for issue #51: some ion+material+program combinations were
@@ -228,6 +229,22 @@ static int test_a150_boundary(void) {
     failures +=
         check_err(cfg->bragg_used, 1, "BETHE_EXT00+proton+A150 should Bragg-decompose, not treat id 99 as Z=99");
     if (err == DEDX_OK) {
+        /* Regression check raised in review: load_compound()'s aggregated result was a
+         * fresh stack local with no initializer, so ws->loaded_data[]->ion/target used
+         * to carry indeterminate stack values for every Bragg-decomposed load instead
+         * of the compound's own ion/target -- must now match what was requested, not
+         * e.g. the last constituent element's own id. */
+        dedx_internal_lookup_data *loaded = ws->loaded_data[cfg->cfg_id];
+        if (loaded->ion != DEDX_PROTON || loaded->target != DEDX_A150_TISSUE_EQUIVALENT_PLASTIC) {
+            fprintf(stderr,
+                    "FAIL BETHE_EXT00+proton+A150 loaded ion/target: got ion=%d target=%d, expected ion=%d target=%d\n",
+                    loaded->ion,
+                    loaded->target,
+                    DEDX_PROTON,
+                    DEDX_A150_TISSUE_EQUIVALENT_PLASTIC);
+            failures++;
+        }
+
         bethe_stp = dedx_get_stp(ws, cfg, 100.0f, &err);
         failures += check_err(err, DEDX_OK, "BETHE_EXT00+proton+A150 stp");
         if (err == DEDX_OK) {
