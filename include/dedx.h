@@ -369,6 +369,23 @@ int dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err);
  */
 float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *err);
 
+/** @brief Report the interpolation mode actually used for a loaded configuration.
+ *
+ *  dedx_config::interpolation_mode is the mode the caller requested.
+ *  DEDX_INTERPOLATION_LOG_LOG silently falls back to DEDX_INTERPOLATION_LINEAR
+ *  when the underlying table contains a non-positive energy or stopping-power
+ *  value (log-log space cannot represent zero or negative values), so the
+ *  effective mode used for interpolation can differ from what was requested.
+ *  Call this after dedx_load_config() to find out which mode was actually
+ *  applied to the loaded dataset.
+ *
+ *  @param[in]  ws      Workspace with a loaded configuration.
+ *  @param[in]  config  Loaded configuration (cfg_id must be valid).
+ *  @param[out] err     Error code; 0 on success.
+ *  @return DEDX_INTERPOLATION_LOG_LOG or DEDX_INTERPOLATION_LINEAR.
+ */
+int dedx_get_effective_interpolation_mode(dedx_workspace *ws, dedx_config *config, int *err);
+
 /** @brief One-call stopping power evaluation using the default program for the ion.
  *
  *  Convenience wrapper: allocates a workspace internally, loads the appropriate

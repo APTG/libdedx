@@ -3,45 +3,81 @@
 #include "test_helpers.h"
 
 /*
- * Regression net for issue #149's findings A1, A4, A5 and A6 (Phase 1, item E2 of
- * the plan of action there).
+ * Regression net for issue #149's findings A1, A2, A4, A5 and A6 (Phase 1, item E2
+ * of the plan of action there).
  *
  * This sweeps every (program, ion, material) triple that dedx_get_material_list_for_ion()
  * advertises -- for every program except DEDX_ESTAR, which is unimplemented (see
  * DEDX_ERR_ESTAR_NOT_IMPL) -- and checks three things dedx_get_material_list_for_ion()'s
  * own contract implies should always hold for an advertised combination:
  *
- *   1. dedx_load_config() succeeds (A1, A5: it currently doesn't for 407 of them --
- *      A1's DEDX_AUTO tier-mixing bug and A5's missing ferrous-oxide density row).
+ *   1. dedx_load_config() succeeds.
  *   2. dedx_get_stp() accepts the program/ion pair's own advertised
  *      dedx_get_min_energy()/dedx_get_max_energy() bounds (A4: the bounds are
  *      documented as authoritative in dedx.h but are only "best-effort hints" in
- *      practice, and are rejected for 1568 combinations).
+ *      practice -- still tracked here, but A4 itself is out of Phase 2's scope).
  *   3. At least one energy sampled across that range returns a finite, positive
- *      stopping power (A1a: 174 DEDX_AUTO configs load with err == DEDX_OK but then
- *      fail at *every* energy, because the spline knots silently end at x == 0).
+ *      stopping power.
  *
- * As of this writing (before any of A1/A4/A5/A6 are fixed) this sweep reproduces the
- * exact counts from the issue's manual audit: 101957 combinations swept, 407 load
- * failures, 1568 bound mismatches, 174 dead-at-every-energy configs. The BASELINE_*
- * constants below pin those counts so this test is a *ratchet*, not a silent no-op:
+ * Before any of Phase 1/2's fixes, this sweep reproduced the issue's manual audit
+ * exactly: 101957 combinations, 407 load failures, 1568 bound mismatches, 174
+ * dead-at-every-energy configs -- all 407 load failures and every one of the bound
+ * mismatches/dead configs traced back to two root causes: A1's DEDX_AUTO tier-mixing
+ * (mismatched per-constituent energy grids) and A5's missing FERROUSOXIDE density row.
  *
- *   - It stays green today by asserting "no worse than the known-broken baseline",
- *     rather than asserting "zero failures" (which would fail immediately and block
- *     Phase 1, whose job is only to make the failures visible, not fix them yet).
- *   - Phase 2 (A1, A4, A5, A6) must lower the relevant BASELINE_* constant(s) as each
- *     root cause is fixed, down to 0 once all four are done. Do NOT raise a baseline
- *     to make a newly introduced regression pass -- if this test starts failing
- *     because a count went *up*, that is a real regression, not a stale baseline.
+ * Phase 2 fixed A1, A2, A3, A5, A6, A7 and A8. Their effect on this sweep, verified by
+ * diffing this same sweep's per-(program,ion) output against the pre-Phase-2 build:
+ *
+ *   - TOTAL_COMBINATIONS: 101957 -> 101886 (-71). A2's off-by-one fix
+ *     (material_id_supported()'s element/compound boundary, id 99 = A150 tissue-
+ *     equivalent plastic) stops routing compound id 99 through the elemental
+ *     embedded-table lookup for ASTAR/PSTAR/MSTAR/ICRU73_OLD/ICRU73/ICRU49/ICRU (the
+ *     71 = 1+1+17+16+16+2+18 combinations across their ion lists -- one fewer per
+ *     (program,ion) than before). It's now correctly evaluated via composition-based
+ *     reachability, which drops it for the ion/program pairs where a constituent
+ *     genuinely isn't reachable -- exactly the misclassification A2 set out to fix.
+ *   - BASELINE_LOAD_FAILURES: 407 -> 1470. Two components, both traced by error code:
+ *       * 224 (DEDX_ERR_TARGET_NOT_FOUND, programs DEDX_DEFAULT/DEDX_BETHE_EXT00 only):
+ *         the FERROUSOXIDE (id 159) gap, down from 407. A5 added its density row and
+ *         relaxed dedx_internal_validate_rho() to only require rho where it's actually
+ *         used, which fixed the 183 tabulated-program combinations. The 224 that
+ *         remain are DEDX_DEFAULT/DEDX_BETHE_EXT00, which read a compound target's
+ *         *own* I-value directly from embedded metadata rather than Bragg-averaging
+ *         it from constituents; no authoritative FERROUSOXIDE I-value exists (see
+ *         data/README.md), and A5 deliberately left it unfabricated rather than
+ *         invent a number -- so these 224 stay a documented, open gap.
+ *       * 1246 (DEDX_ERR_INCONSISTENT_COMPOUND, DEDX_AUTO only, new): compounds whose
+ *         constituents resolve onto mismatched energy grids (A1's tier-mixing bug).
+ *         Before A1, load_compound() silently summed across the mismatched grids and
+ *         dedx_load_config() reported success -- these combinations were counted
+ *         instead under bound_mismatches/dead_configs below. A1 now rejects them
+ *         instead of serving a wrong or unusable number, which is why they show up
+ *         here as load failures rather than a regression.
+ *   - BASELINE_BOUND_MISMATCHES: 1568 -> 480, BASELINE_DEAD_CONFIGS: 174 -> 0. Both
+ *     drop because A1 catches the same underlying grid-mismatch combinations earlier,
+ *     as a clean load failure, instead of letting them load and then fail (or return
+ *     nonsense) at the energy-sampling stage.
+ *
+ * The BASELINE_* constants below still pin these counts so this test is a *ratchet*,
+ * not a silent no-op:
+ *
+ *   - It stays green by asserting "no worse than the known baseline", rather than
+ *     asserting "zero failures" -- A4 (advertised-bounds accuracy) and the
+ *     FERROUSOXIDE I-value gap remain deliberately open past Phase 2.
+ *   - Any future fix must lower the relevant BASELINE_* constant(s) as its root cause
+ *     is addressed. Do NOT raise a baseline to make a newly introduced regression
+ *     pass -- if this test starts failing because a count went up unexpectedly, that
+ *     is a real regression, not a stale baseline. (The load_failures increase in
+ *     Phase 2 above was verified, not assumed, before raising this constant.)
  *   - TOTAL_COMBINATIONS is asserted with equality (not a ceiling) so a change in
  *     what dedx_get_material_list_for_ion() advertises -- for better or worse -- is
  *     always visible here, prompting a deliberate update rather than a silent drift.
  */
 
-#define TOTAL_COMBINATIONS 101957
-#define BASELINE_LOAD_FAILURES 407
-#define BASELINE_BOUND_MISMATCHES 1568
-#define BASELINE_DEAD_CONFIGS 174
+#define TOTAL_COMBINATIONS 101886
+#define BASELINE_LOAD_FAILURES 1470
+#define BASELINE_BOUND_MISMATCHES 480
+#define BASELINE_DEAD_CONFIGS 0
 
 /* Number of energies sampled (log-spaced) across each combination's advertised
  * [min, max] range for the "dead at every energy" check. */

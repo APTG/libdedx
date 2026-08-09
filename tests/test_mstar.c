@@ -14,6 +14,60 @@ static int report_mode_equivalence_error(const char *stage, const char *label, i
     return 1;
 }
 
+static int check_err(int got, int expected, const char *label) {
+    if (got != expected) {
+        fprintf(stderr, "FAIL %s: got err=%d, expected %d\n", label, got, expected);
+        return 1;
+    }
+    return 0;
+}
+
+/*
+ * Regression test for issue #149 finding A7: an mstar_mode outside the documented
+ * DEDX_MSTAR_MODE_* set used to fall through dedx_mpaul.c's mode switch to an empty
+ * "illegal mode" branch, silently leaving the computed table all zero with err == 0
+ * instead of reporting an error. dedx_internal_validate_config() must now reject an
+ * unrecognized mode up front, and leave every documented mode (including the '\0'
+ * default) working exactly as before. */
+static int test_invalid_mstar_mode(void) {
+    int failures = 0;
+    int err = 0;
+    dedx_config *cfg = make_mstar_mode_config(DEDX_WATER, 'Z');
+    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_ERR_INVALID_MSTAR_MODE, "MSTAR invalid mode 'Z'");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    /* The documented default ('\0', unset by a caller who never touches mstar_mode)
+     * must still validate cleanly -- the new check must not reject the common case. */
+    err = 0;
+    cfg = make_mstar_mode_config(DEDX_WATER, '\0');
+    ws = dedx_allocate_workspace(1, &err);
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_OK, "MSTAR default mode '\\0'");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    /* mstar_mode is only meaningful for DEDX_MSTAR itself; an unrelated program must
+     * not be rejected just because a caller left garbage in the field (e.g. a struct
+     * reused across loads without being re-zeroed). */
+    err = 0;
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_PSTAR;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = DEDX_WATER;
+    cfg->mstar_mode = 'Z';
+    ws = dedx_allocate_workspace(1, &err);
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_OK, "PSTAR ignores unrelated garbage mstar_mode");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    return failures;
+}
+
 static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, float energy, const char *label) {
     int err = 0;
     int failures = 0;
@@ -170,6 +224,8 @@ int main(void) {
         check_mode_equivalence(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_A, DEDX_MSTAR_MODE_G, 10.0f, "mstar-a-gas");
     failures +=
         check_mode_equivalence(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_B, DEDX_MSTAR_MODE_H, 10.0f, "mstar-b-gas");
+
+    failures += test_invalid_mstar_mode();
 
     return failures;
 }

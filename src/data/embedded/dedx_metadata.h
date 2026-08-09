@@ -19,7 +19,7 @@ typedef struct {
 } dedx_embedded_compos_row;
 
 /** @brief Embedded density and I-value metadata rows keyed by material ID. */
-static const dedx_embedded_compos_row dedx_embedded_compos_rows[285] = {
+static const dedx_embedded_compos_row dedx_embedded_compos_rows[286] = {
     {1, 8.37480000e-05f, 1.92000000e+01f, 1},   {1, 8.37480000e-05f, 2.18000000e+01f, 2},
     {2, 1.66322000e-04f, 4.18000000e+01f, 0},   {3, 5.34000000e-01f, 4.00000000e+01f, 0},
     {4, 1.84800000e+00f, 6.37000000e+01f, 0},   {5, 2.37000000e+00f, 7.60000000e+01f, 0},
@@ -103,6 +103,13 @@ static const dedx_embedded_compos_row dedx_embedded_compos_rows[285] = {
     {154, 1.13000000e+00f, 6.93000000e+01f, 0}, {155, 1.17497000e-03f, 5.07000000e+01f, 0},
     {156, 1.10000000e+00f, 7.33000000e+01f, 0}, {157, 5.20000000e+00f, 2.27300000e+02f, 0},
     {158, 7.15000000e+00f, 2.61000000e+02f, 0}, {158, 7.15000000e+00f, 2.61000000e+02f, 0},
+    /* id 159 (FERROUSOXIDE) previously had no row at all here -- density added per
+     * issue #149 finding A5 (5.7 g/cm^3, the real-world density of FeO/wustite).
+     * i_value is left at 0 (no embedded I-value data) rather than guessed: there is
+     * no raw source file left to regenerate or cross-check this table against (see
+     * data/README.md) and dedx_embedded_get_i_value() already treats a 0.0 result as
+     * "not found" (DEDX_ERR_TARGET_NOT_FOUND) rather than a valid answer. */
+    {159, 5.70000000e+00f, 0.00000000e+00f, 0},
     {160, 1.02400000e+00f, 7.64000000e+01f, 0}, {161, 1.12000000e+00f, 1.43000000e+02f, 0},
     {162, 1.80000000e+00f, 2.84900000e+02f, 0}, {163, 9.50000000e-01f, 1.26600000e+02f, 0},
     {164, 1.50000000e+00f, 2.10500000e+02f, 0}, {165, 1.80000000e+00f, 2.93500000e+02f, 0},

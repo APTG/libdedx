@@ -201,15 +201,19 @@ int main(void) {
     cfg->target = DEDX_WATER;
     err = 0;
     dedx_load_config(ws, cfg, &err);
-    /* Regression test: DEDX_DEFAULT/DEDX_BETHE_EXT00 with a compound target
-     * decomposes into elements (dedx_internal_evaluate_compound(), called eagerly for
-     * program >= 100) before check_ion() would ever run, so an invalid ion has to be
-     * caught inside the Bethe evaluation itself. It previously wasn't: load_bethe_2()
-     * called dedx_internal_get_atom_charge()/get_atom_mass() for the ion and then
-     * again for the (valid) target element, and the target's success silently
-     * overwrote the ion's DEDX_ERR_NOT_AN_ELEMENT, yielding a loaded config with a NaN
-     * stopping power instead of a load failure. */
-    failures += check_err(err, DEDX_ERR_NOT_AN_ELEMENT, "DEFAULT with invalid ion and compound target");
+    /* Regression test, updated for issue #149 finding A8: DEDX_DEFAULT/DEDX_BETHE_EXT00
+     * with a compound target decomposes into elements (dedx_internal_evaluate_compound(),
+     * called eagerly for program >= 100) -- this used to happen before check_ion() would
+     * ever run, so an invalid ion was only ever caught deep inside the Bethe evaluation
+     * itself, as DEDX_ERR_NOT_AN_ELEMENT (a NULL dereference away from load_bethe_2()'s
+     * atom-charge/mass lookups silently overwriting the ion's own failure with the
+     * target's success, and yielding a loaded config with a NaN stopping power instead
+     * of a load failure). dedx_internal_validate_config() now calls
+     * dedx_internal_check_ion() unconditionally, before dedx_internal_evaluate_compound()
+     * ever runs, so this is now caught immediately and uniformly as
+     * DEDX_ERR_ION_NOT_SUPPORTED -- the same code the elemental-target case below already
+     * expects. */
+    failures += check_err(err, DEDX_ERR_ION_NOT_SUPPORTED, "DEFAULT with invalid ion and compound target");
     failures += check_err(cfg->loaded, 0, "failed load should not mark config loaded");
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
@@ -250,6 +254,33 @@ int main(void) {
     dedx_load_config(ws, cfg, &err);
     failures += check_err(err, DEDX_ERR_INCONSISTENT_COMPOUND, "elements_id without weights must be rejected");
     failures += check_err(cfg->loaded, 0, "failed load should not mark config loaded");
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    /* Regression test for issue #149 finding A8's own reproducer: dedx_load_config()
+     * used to dispatch straight to load_compound() whenever elements_id != NULL,
+     * bypassing check_ion() entirely (only load_config_clean()'s tabulated-program
+     * path called it). A custom compound with an ion a tabulated, report-specific
+     * program like DEDX_PSTAR (proton-only) does not support therefore failed deep
+     * inside the Bragg decomposition with DEDX_ERR_COMBINATION_NOT_FOUND instead of
+     * the clear, immediate DEDX_ERR_ION_NOT_SUPPORTED an elemental target already got.
+     * dedx_internal_validate_config() now calls dedx_internal_check_ion() up front for
+     * every dedx_load_config() call, compound or not, so both paths agree. */
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_PSTAR; /* proton-only */
+    cfg->ion = DEDX_CARBON;    /* PSTAR does not support carbon */
+    cfg->target = 0;
+    cfg->elements_length = 2;
+    cfg->elements_id = calloc(2, sizeof(int));
+    cfg->elements_id[0] = DEDX_HYDROGEN;
+    cfg->elements_id[1] = DEDX_OXYGEN;
+    cfg->elements_atoms = calloc(2, sizeof(int));
+    cfg->elements_atoms[0] = 2;
+    cfg->elements_atoms[1] = 1;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_ERR_ION_NOT_SUPPORTED, "PSTAR+carbon+custom compound (A8)");
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 

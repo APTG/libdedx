@@ -50,6 +50,7 @@ extern "C" {
 #define DEDX_ERR_INVALID_I_VALUE 210            /**< mean excitation potential must be > 0 */
 #define DEDX_ERR_INCONSISTENT_COMPOUND 211      /**< inconsistent compound specification */
 #define DEDX_ERR_INVALID_INTERPOLATION_MODE 212 /**< interpolation mode is not supported */
+#define DEDX_ERR_INVALID_MSTAR_MODE 213         /**< mstar_mode is not one of the DEDX_MSTAR_MODE_* values */
 /** @} */
 
 /** @defgroup err_memory Memory errors (301)

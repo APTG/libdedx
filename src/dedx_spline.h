@@ -19,8 +19,13 @@
  *  @param[in]  stopping  Stopping-power values on @p energy.
  *  @param[in]  n         Number of valid grid points.
  *  @param[in]  interpolation_mode  Requested interpolation mode.
+ *  @return The interpolation mode actually used: DEDX_INTERPOLATION_LINEAR if
+ *          linear was requested, or if log-log was requested but the table
+ *          contains a non-positive energy or stopping-power value and the
+ *          implementation silently fell back to linear-space coefficients;
+ *          DEDX_INTERPOLATION_LOG_LOG otherwise.
  */
-void dedx_internal_calculate_coefficients(
+int dedx_internal_calculate_coefficients(
     dedx_internal_spline_base *coef, float *energy, float *stopping, int n, int interpolation_mode);
 
 /** @brief Evaluate a precomputed stopping-power spline at one energy value.

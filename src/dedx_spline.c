@@ -79,7 +79,7 @@ calculate_linear_coefficients(dedx_internal_spline_base *coef, const float *ener
     }
 }
 
-void dedx_internal_calculate_coefficients(
+int dedx_internal_calculate_coefficients(
     dedx_internal_spline_base *coef, float *energy, float *stopping, int n, int interpolation_mode) {
     int i;
     float log_energy[DEDX_MAX_ELEMENTS];
@@ -91,17 +91,17 @@ void dedx_internal_calculate_coefficients(
     float z[DEDX_MAX_ELEMENTS];
 
     if (n < 2)
-        return;
+        return interpolation_mode;
 
     if (interpolation_mode == DEDX_INTERPOLATION_LINEAR) {
         calculate_linear_coefficients(coef, energy, stopping, n);
-        return;
+        return DEDX_INTERPOLATION_LINEAR;
     }
 
     for (i = 0; i < n; i++) {
         if (energy[i] <= 0.0f || stopping[i] <= 0.0f) {
             calculate_linear_coefficients(coef, energy, stopping, n);
-            return;
+            return DEDX_INTERPOLATION_LINEAR;
         }
         coef[i].a = stopping[i];
         coef[i].x = energy[i];
@@ -136,6 +136,8 @@ void dedx_internal_calculate_coefficients(
         coef[i].b = (log_stopping[i + 1] - log_stopping[i]) / h[i] - h[i] * (coef[i + 1].c + 2.0f * coef[i].c) / 3.0f;
         coef[i].d = (coef[i + 1].c - coef[i].c) / (3.0f * h[i]);
     }
+
+    return DEDX_INTERPOLATION_LOG_LOG;
 }
 
 float dedx_internal_evaluate_spline(

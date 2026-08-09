@@ -52,7 +52,6 @@ static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, ded
 static int check_energy_bounds(dedx_internal_lookup_data *data, float energy);
 static float get_min_energy_icru(int ion);
 static float get_max_energy_icru(int ion);
-static int check_ion(int prog, int ion);
 static int load_config_clean(dedx_workspace *ws, dedx_config *config, int *err);
 static int find_data(stopping_data *data, dedx_config *config, float *energy, int *err);
 static int load_compound(dedx_workspace *ws, dedx_config *config, int *err);
@@ -144,6 +143,7 @@ static const dedx_error_entry dedx_error_table[] = {
     {DEDX_ERR_INVALID_I_VALUE, "I value must be larger than zero."},
     {DEDX_ERR_INCONSISTENT_COMPOUND, "Compound specification is inconsistent."},
     {DEDX_ERR_INVALID_INTERPOLATION_MODE, "Interpolation mode is not supported."},
+    {DEDX_ERR_INVALID_MSTAR_MODE, "mstar_mode is not a recognized DEDX_MSTAR_MODE_* value."},
     {DEDX_ERR_NO_MEMORY, "Out of memory"},
 };
 
@@ -236,15 +236,16 @@ const int *dedx_get_material_list(int program) {
         return dedx_program_available_materials[program];
 }
 
-/* Checks whether a single element (target <= 99) is reachable for program/ion,
- * mirroring find_data()'s own dispatch (MSTAR's ion remap, DEDX_AUTO's Bethe-Bloch
- * fallback, the resolve-across-sub-tables behavior of the ICRU-family programs) so
- * the answer stays consistent with what dedx_load_config() will actually do.
+/* Checks whether a single element (target <= DEDX_MAX_ELEMENT_ID) is reachable for
+ * program/ion, mirroring find_data()'s own dispatch (MSTAR's ion remap, DEDX_AUTO's
+ * Bethe-Bloch fallback, the resolve-across-sub-tables behavior of the ICRU-family
+ * programs) so the answer stays consistent with what dedx_load_config() will
+ * actually do.
  *
  * Returns 1 if dedx_load_config() is expected to succeed for this exact
  * (program, ion, element) combination, 0 otherwise. `element` is assumed to already
- * be a plain element id (1-99); callers are responsible for that precondition --
- * see material_id_supported()'s `material <= 99` check below. */
+ * be a plain element id (1..DEDX_MAX_ELEMENT_ID); callers are responsible for that
+ * precondition -- see material_id_supported()'s own boundary check below. */
 static int element_supported_for_ion(int program, int ion, int element) {
     int ion_load = ion;
     int resolved;
@@ -283,8 +284,23 @@ static int material_id_supported(int program, int ion, int material) {
                              composition rows are always positive element IDs in practice */
         return 0;
     } /* LCOV_EXCL_STOP */
-    if (material <= 99) {
+    if (material <= DEDX_MAX_ELEMENT_ID) {
         return element_supported_for_ion(program, ion, material);
+    }
+
+    /* Analytical programs (program >= DEDX_DEFAULT) evaluate the Bethe-Bloch formula
+     * directly on this exact compound target and need its own embedded density (see
+     * dedx_internal_validate_rho()) -- a compound missing that row, as FERROUSOXIDE
+     * did before issue #149's finding A5 was fixed, can't be loaded even though every
+     * constituent element below is individually Bethe-supported. Tabulated programs
+     * never read rho at all (element_supported_for_ion() already documents the same
+     * scoping for elements), so this check only applies to program >= DEDX_DEFAULT. */
+    if (program >= DEDX_DEFAULT) {
+        int density_err = DEDX_OK;
+        dedx_internal_read_density(material, &density_err);
+        if (density_err != DEDX_OK) {
+            return 0;
+        }
     }
 
     dedx_internal_get_composition(material, composition, &comp_len, &comp_err);
@@ -309,10 +325,10 @@ void dedx_get_material_list_for_ion(
     *err = DEDX_OK;
     *materials_len = 0;
 
-    if (!check_ion(program, ion)) {
-        /* For DEDX_DEFAULT/DEDX_BETHE_EXT00/DEDX_AUTO, check_ion() itself already
-         * enforces the 1-112 range the Bethe evaluation path actually supports (see
-         * its comment), so no separate check is needed here. */
+    if (!dedx_internal_check_ion(program, ion)) {
+        /* For DEDX_DEFAULT/DEDX_BETHE_EXT00/DEDX_AUTO, dedx_internal_check_ion() itself
+         * already enforces the 1-112 range the Bethe evaluation path actually supports
+         * (see its comment), so no separate check is needed here. */
         *err = DEDX_ERR_ION_NOT_SUPPORTED;
         return;
     }
@@ -476,6 +492,19 @@ float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *e
                                          ws->loaded_data[id]->interpolation_mode);
 }
 
+int dedx_get_effective_interpolation_mode(dedx_workspace *ws, dedx_config *config, int *err) {
+    int id = config->cfg_id;
+
+    *err = DEDX_OK;
+
+    if (id < 0 || id >= ws->active_datasets) {
+        *err = DEDX_ERR_INVALID_DATASET_ID;
+        return 0;
+    }
+
+    return ws->loaded_data[id]->interpolation_mode;
+}
+
 void dedx_free_config(dedx_config *config, int *err) {
     if (config != NULL) {
         if (config->elements_id != NULL)
@@ -546,6 +575,7 @@ float dedx_get_simple_stp(int ion, int target, float energy, int *err) {
 static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, dedx_config *config, int *err) {
     int active_dataset = ws->active_datasets;
     int prog = config->program;
+    int effective_interpolation_mode;
 
     *err = DEDX_OK;
 
@@ -554,7 +584,7 @@ static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, ded
         return -1;
     }
 
-    dedx_internal_calculate_coefficients(
+    effective_interpolation_mode = dedx_internal_calculate_coefficients(
         ws->loaded_data[active_dataset]->base, energy, data->data, data->length, config->interpolation_mode);
 
     ws->loaded_data[active_dataset]->acc.cache = 0;
@@ -563,7 +593,14 @@ static int load_data(dedx_workspace *ws, stopping_data *data, float *energy, ded
     ws->loaded_data[active_dataset]->ion = data->ion;
     ws->loaded_data[active_dataset]->target = data->target;
     ws->loaded_data[active_dataset]->datapoints = data->length;
-    ws->loaded_data[active_dataset]->interpolation_mode = config->interpolation_mode;
+    // Store the mode actually used, not merely the one requested: a log-log
+    // request silently downgrades to linear when the table contains a
+    // non-positive energy or stopping-power value (see issue #149 finding
+    // A6). Recording the effective mode makes that downgrade observable via
+    // dedx_get_effective_interpolation_mode() instead of only being
+    // recoverable indirectly through dedx_internal_evaluate_spline()'s own
+    // isnan() self-detection.
+    ws->loaded_data[active_dataset]->interpolation_mode = effective_interpolation_mode;
 
     ws->active_datasets++;
     return active_dataset;
@@ -614,49 +651,27 @@ static float get_max_energy_icru(int ion) {
     return energy_max;
 }
 
-static int check_ion(int prog, int ion) {
-    const int *ion_list;
-    int i = 0;
-
-    if (prog >= DEDX_DEFAULT || prog == DEDX_AUTO) {
-        /* The Bethe evaluation path (dedx_internal_get_atom_mass/charge, via
-         * dedx_periodic_table) only has data for ions 1-112, matching
-         * dedx_full_ion_list -- the same list dedx_get_ion_list() returns for these
-         * programs -- so accept nothing wider than that here. */
-        if ((ion < 1) || (ion > 112))
-            return 0;
-        return 1;
-    }
-
-    ion_list = dedx_get_ion_list(prog);
-    while (ion_list[i] != -1) {
-        if (ion_list[i] == ion)
-            return 1;
-        ++i;
-    }
-    return 0;
-}
-
 static int load_config_clean(dedx_workspace *ws, dedx_config *config, int *err) {
     float energy[DEDX_MAX_ELEMENTS];
     int cfg;
-    int prog = config->program;
-    int ion = config->ion;
     int target = config->target;
     stopping_data data;
 
     config->bragg_used = 0;
     *err = DEDX_OK;
 
-    if (!check_ion(prog, ion)) {
-        *err = DEDX_ERR_ION_NOT_SUPPORTED;
-        return -1;
-    }
+    /* The ion check used to live here, but only load_config_clean() called it -- the
+     * custom-compound path (dedx_load_config() dispatching straight to
+     * load_compound()) skipped it entirely and could fail with a misleading
+     * DEDX_ERR_COMBINATION_NOT_FOUND instead of DEDX_ERR_ION_NOT_SUPPORTED for an
+     * unsupported ion (see issue #149 finding A8). dedx_internal_validate_config()
+     * now calls dedx_internal_check_ion() unconditionally before dispatch, so both
+     * paths get the same check and the same correct error code. */
     config->_temp_i_value = config->i_value;
     find_data(&data, config, energy, err);
 
     if (*err != 0) {
-        if (*err == DEDX_ERR_COMBINATION_NOT_FOUND && target > 99) {
+        if (*err == DEDX_ERR_COMBINATION_NOT_FOUND && target > DEDX_MAX_ELEMENT_ID) {
             *err = DEDX_OK;
             dedx_internal_evaluate_compound(config, err);
             if (*err != 0)
@@ -714,13 +729,13 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
         /* DEDX_AUTO layers a Bethe-Bloch fallback on top of DEDX_ICRU's tabulated
          * auto-selection: when no tabulated report covers this element (e.g. Boron,
          * which none of them tabulate), compute it analytically instead of failing
-         * outright. Compounds (target > 99) are excluded here: they are handled below
-         * via Bragg-additivity decomposition into elements, each of which goes through
-         * this same fallback individually. DEDX_ICRU itself, and the report-specific
-         * programs (PSTAR, ASTAR, ICRU49, ICRU73, ...), intentionally stay literal to
-         * their published data and never get this fallback -- see DEDX_AUTO's docs
-         * in dedx.h for why. */
-        if (prog == DEDX_AUTO && target_load > 0 && target_load <= 99) {
+         * outright. Compounds (target > DEDX_MAX_ELEMENT_ID) are excluded here: they
+         * are handled below via Bragg-additivity decomposition into elements, each of
+         * which goes through this same fallback individually. DEDX_ICRU itself, and
+         * the report-specific programs (PSTAR, ASTAR, ICRU49, ICRU73, ...),
+         * intentionally stay literal to their published data and never get this
+         * fallback -- see DEDX_AUTO's docs in dedx.h for why. */
+        if (prog == DEDX_AUTO && target_load > 0 && target_load <= DEDX_MAX_ELEMENT_ID) {
             return load_bethe_fallback(data, config, energy, err);
         }
         if (prog == DEDX_ICRU || prog == DEDX_ICRU49 || prog == DEDX_ICRU73 || prog == DEDX_AUTO) {
@@ -756,11 +771,15 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     int length = config->elements_length;
     int *targets = config->elements_id;
     float *weight;
-    float energy[DEDX_MAX_ELEMENTS];
+    float energy[DEDX_MAX_ELEMENTS];   /* reference energy grid, from constituent 0 */
+    float energy_i[DEDX_MAX_ELEMENTS]; /* scratch grid for constituent i > 0, compared below */
     float i_value;
     int target;
     stopping_data data;
-    stopping_data *compound_data = malloc(sizeof(stopping_data) * length);
+    /* calloc, not malloc: zero-initializes every constituent's data[DEDX_MAX_ELEMENTS]
+     * array up front, so a constituent shorter than data.length (see min-length below)
+     * contributes 0.0 rather than uninitialized heap to the Bragg sum. */
+    stopping_data *compound_data = calloc((size_t) length, sizeof(stopping_data));
 
     *err = DEDX_OK;
 
@@ -771,9 +790,26 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     weight = config->elements_mass_fraction;
     i_value = config->i_value;
     target = config->target;
+
+    /* Resolve the compound's own physical state (gas vs condensed) before looking up
+     * any constituent's I-value below. dedx_internal_validate_state() only runs for
+     * program >= 100 in dedx_internal_validate_config(), so a tabulated-program
+     * compound -- the common case reaching this function, via load_config_clean()'s
+     * fallback -- would otherwise still have compound_state == DEDX_DEFAULT_STATE
+     * here, and dedx_embedded_get_i_value() only applies the condensed-phase
+     * correction for an explicitly resolved DEDX_CONDENSED state. Uses config->target
+     * (the compound's own id, saved above), not yet overwritten by the loop below. */
+    if (config->compound_state == DEDX_DEFAULT_STATE) {
+        dedx_internal_validate_state(config, err);
+        if (*err != 0) {
+            free(compound_data);
+            return -1;
+        }
+    }
+
     for (i = 0; i < length; i++) {
         config->target = targets[i];
-        // For custom compounds (target > 99 or target == 0), the elements_i_value
+        // For custom compounds (target > DEDX_MAX_ELEMENT_ID or target == 0), the elements_i_value
         // array might be provided explicitly or omitted entirely.
         if (config->elements_i_value != NULL) {
             config->_temp_i_value = config->elements_i_value[i];
@@ -785,7 +821,7 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
                 return -1;
             }
             if (config->elements_i_value[i] == 0.0) {
-                config->_temp_i_value = dedx_get_i_value(targets[i], err);
+                config->_temp_i_value = dedx_internal_get_i_value(targets[i], config->compound_state, err);
                 if (*err != 0) {
                     free(compound_data);
                     return -1;
@@ -793,15 +829,32 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
             }
         } else {
             // If the elements_i_value array was not provided at all, we must initialize
-            // the _temp_i_value for the Bethe algorithm using the default I-value for the element.
-            config->_temp_i_value = dedx_get_i_value(targets[i], err);
+            // the _temp_i_value for the Bethe algorithm using the default I-value for the element,
+            // evaluated at the compound's own physical state (see above) -- not the gas-only
+            // state the public dedx_get_i_value() accessor hardcodes.
+            config->_temp_i_value = dedx_internal_get_i_value(targets[i], config->compound_state, err);
             if (*err != 0) {
                 free(compound_data);
                 return -1;
             }
         }
-        find_data(&compound_data[i], config, energy, err);
+        find_data(&compound_data[i], config, (i == 0) ? energy : energy_i, err);
         if (*err != 0) {
+            free(compound_data);
+            return -1;
+        }
+        /* Constituents can resolve onto different energy grids: DEDX_AUTO's per-element
+         * fallback tries a tabulated report (e.g. the 133-point PSTAR-family grid) first
+         * and falls back to the 122-point Bethe grid only for elements no report
+         * tabulates, so one compound can end up with a mix. Summing across mismatched
+         * x-axes (dedx.c historically used compound_data[0].length for every
+         * constituent) silently mixes tiers with different bin boundaries and, for
+         * constituents shorter than that length, uninitialized data. Reject the mix
+         * instead of serving a wrong or unusable number for it. */
+        if (i > 0
+            && (compound_data[i].length != compound_data[0].length
+                || memcmp(energy_i, energy, sizeof(float) * compound_data[0].length) != 0)) {
+            *err = DEDX_ERR_INCONSISTENT_COMPOUND;
             free(compound_data);
             return -1;
         }
@@ -809,13 +862,23 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
 
     config->i_value = i_value;
     config->target = target;
-    for (j = 0; j < compound_data[0].length; j++) {
+
+    /* All constituents are now verified to share one grid, so any compound_data[i].length
+     * equals compound_data[0].length -- min() here is belt-and-braces, matching the
+     * issue's suggested fix, in case a future change relaxes the check above from
+     * "reject a mismatch" to "resample onto a common grid". */
+    data.length = compound_data[0].length;
+    for (i = 1; i < length; i++) {
+        if (compound_data[i].length < data.length)
+            data.length = compound_data[i].length;
+    }
+
+    for (j = 0; j < data.length; j++) {
         data.data[j] = 0.0;
         for (i = 0; i < length; i++) {
             data.data[j] += weight[i] * compound_data[i].data[j];
         }
     }
-    data.length = compound_data[0].length;
     free(compound_data);
     return load_data(ws, &data, energy, config, err);
 }
@@ -825,20 +888,40 @@ static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy,
     float PZ, PA, TZ, TA, rho, pot;
 
     *err = DEDX_OK;
-    if (config->target > 99) {
+    /* Zero the whole struct up front, matching read_embedded_stopping_data()'s own
+     * convention: only data->data[0..121] gets written below (data->length = 122),
+     * so any caller that reads past data->length -- or a fixed-length copy of the
+     * whole struct -- sees zeros instead of whatever was on the heap/stack before. */
+    memset(data, 0, sizeof(*data));
+    if (config->target > DEDX_MAX_ELEMENT_ID) {
         *err = DEDX_ERR_COMBINATION_NOT_FOUND;
+        return -1;
+    }
+    if (config->rho <= 0.0f) {
+        /* dedx_internal_validate_rho() only hard-fails validation for program >=
+         * DEDX_DEFAULT; DEDX_AUTO (and, transitively, load_compound()'s per-constituent
+         * Bethe fallback) can reach here with rho still unset when the target's
+         * embedded density row is missing (see issue #149 finding A5). Catch it here,
+         * at the actual point of need, rather than silently computing with rho == 0 --
+         * the density-effect term below (hnp = 28.8 * sqrt(rho * TZ/TA)) would
+         * otherwise divide/log by a rho-derived zero and produce Inf/NaN instead of a
+         * clean error. */
+        *err = DEDX_ERR_RHO_REQUIRED;
         return -1;
     }
 
     /* dedx_internal_get_atom_charge()/get_atom_mass() both reset *err to DEDX_OK and
      * share the same id < 113 validity check, so this pair always succeeds or fails
      * together -- one check right after both is enough. It must happen right away,
-     * though: config->target is already known <= 99 (hence < 113) at this point, so
-     * its own charge/mass lookup just below always succeeds and would otherwise
-     * silently overwrite an ion failure here, leaving *err == DEDX_OK with PZ/PA at
-     * their failure sentinel (this is reachable in practice: a compound target
-     * decomposes into elements -- see load_compound() -- before check_ion() ever runs
-     * for its ion). */
+     * though: config->target is already known <= DEDX_MAX_ELEMENT_ID (hence < 113) at
+     * this point, so its own charge/mass lookup just below always succeeds and would
+     * otherwise silently overwrite an ion failure here, leaving *err == DEDX_OK with
+     * PZ/PA at their failure sentinel. This is no longer reachable via the public API
+     * (dedx_internal_validate_config() now calls dedx_internal_check_ion() up front
+     * for every dedx_load_config() call, compound or not -- see issue #149 finding A8),
+     * but the ordering is cheap defense-in-depth against any future internal caller
+     * that reaches load_bethe_2() with an ion dedx_internal_check_ion() didn't
+     * validate first. */
     PZ = dedx_internal_get_atom_charge(config->ion, err);
     PA = dedx_internal_get_atom_mass(config->ion, err);
     if (*err != 0)

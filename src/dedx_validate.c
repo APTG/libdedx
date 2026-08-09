@@ -18,7 +18,28 @@ int dedx_internal_set_names(dedx_config *config, int *err) {
 
 int dedx_internal_validate_rho(dedx_config *config, int *err) {
     if (config->rho <= 0.0 && config->target != 0) {
-        config->rho = dedx_internal_read_density(config->target, err);
+        int density_err = DEDX_OK;
+        float density = dedx_internal_read_density(config->target, &density_err);
+
+        if (density_err == DEDX_OK) {
+            config->rho = density;
+        } else if (config->program >= DEDX_DEFAULT) {
+            /* Only programs that evaluate the Bethe-Bloch formula directly on this
+             * exact target (program >= DEDX_DEFAULT) definitely need rho here.
+             * Tabulated report lookups (PSTAR, ICRU*, MSTAR, ...) never read
+             * config->rho at all, and DEDX_AUTO only needs it if it falls through to
+             * the Bethe tier for a specific ion/element -- which load_bethe_2() now
+             * checks itself right before it would otherwise divide/log by a
+             * rho-derived term (see there), rather than speculatively failing every
+             * combination up front just because the embedded density table happens
+             * to be missing a row for this target. That used to block 407
+             * tabulated-program combinations for exactly one such gap (FERROUSOXIDE,
+             * id 159) -- see issue #149 finding A5. */
+            *err = density_err;
+        }
+        /* else: a tabulated program (or DEDX_AUTO, conditionally) with a target that
+         * has no embedded density row. config->rho stays <= 0.0; that's fine unless
+         * something downstream actually needs it, which is checked there instead. */
     } else if (config->rho <= 0.0 && config->target == 0 && config->program >= 100) {
         *err = DEDX_ERR_RHO_REQUIRED;
     }
@@ -32,6 +53,53 @@ static int dedx_internal_validate_interpolation_mode(dedx_config *config, int *e
         return -1;
     }
     return 0;
+}
+
+int dedx_internal_check_ion(int prog, int ion) {
+    const int *ion_list;
+    int i = 0;
+
+    if (prog >= DEDX_DEFAULT || prog == DEDX_AUTO) {
+        /* The Bethe evaluation path (dedx_internal_get_atom_mass/charge, via
+         * dedx_periodic_table) only has data for ions 1-112, matching
+         * dedx_full_ion_list -- the same list dedx_get_ion_list() returns for these
+         * programs -- so accept nothing wider than that here. */
+        if ((ion < 1) || (ion > 112))
+            return 0;
+        return 1;
+    }
+
+    ion_list = dedx_get_ion_list(prog);
+    while (ion_list[i] != -1) {
+        if (ion_list[i] == ion)
+            return 1;
+        ++i;
+    }
+    return 0;
+}
+
+/* config->mstar_mode is only ever read on the MSTAR path (dedx_internal_convert_
+ * energy_to_mstar(), via find_data()), so a garbage value left in it is otherwise
+ * inert for every other program -- don't reject a config over a field it will never
+ * use. On the MSTAR path itself, an unrecognized mode used to fall through
+ * dedx_internal_calculate_mspaul_coef()'s cascading if/else chain into a silent
+ * "illegal mode" branch that left the computed coefficient at 0, so the config loaded
+ * successfully but every stopping-power query came back as 0 with err == DEDX_OK
+ * (see issue #149 finding A7). '\0' (the calloc-zeroed default) means "use
+ * DEDX_MSTAR_MODE_DEFAULT" and is valid; anything else must be one of the six
+ * documented DEDX_MSTAR_MODE_* letters. */
+static int dedx_internal_validate_mstar_mode(dedx_config *config, int *err) {
+    char mode = config->mstar_mode;
+
+    if (config->program != DEDX_MSTAR) {
+        return 0;
+    }
+    if (mode == '\0' || mode == DEDX_MSTAR_MODE_A || mode == DEDX_MSTAR_MODE_B || mode == DEDX_MSTAR_MODE_G
+        || mode == DEDX_MSTAR_MODE_H || mode == DEDX_MSTAR_MODE_C || mode == DEDX_MSTAR_MODE_D) {
+        return 0;
+    }
+    *err = DEDX_ERR_INVALID_MSTAR_MODE;
+    return -1;
 }
 
 int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
@@ -87,7 +155,7 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
 int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
     unsigned int i = 0;
 
-    if (config->target > 0 && config->target <= 99) {
+    if (config->target > 0 && config->target <= DEDX_MAX_ELEMENT_ID) {
         *err = DEDX_OK;
         return 0;
     }
@@ -188,6 +256,16 @@ int dedx_internal_validate_config(dedx_config *config, int *err) {
      * failure, so a stale non-zero value left in *err by the caller would
      * otherwise be mistaken for a validation error. */
     *err = DEDX_OK;
+
+    if (!dedx_internal_check_ion(config->program, config->ion)) {
+        *err = DEDX_ERR_ION_NOT_SUPPORTED;
+        return -1;
+    }
+
+    dedx_internal_validate_mstar_mode(config, err);
+    if (*err != 0) {
+        return -1;
+    }
 
     dedx_internal_validate_interpolation_mode(config, err);
     if (*err != 0) {
