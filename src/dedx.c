@@ -62,7 +62,7 @@ static int element_supported_for_ion(int program, int ion, int element);
 static int material_id_supported(int program, int ion, int material);
 
 dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
-    int i = 0;
+    unsigned int i = 0;
     *err = DEDX_OK;
 
     dedx_workspace *temp = calloc(1, sizeof(dedx_workspace));
@@ -79,7 +79,7 @@ dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
     for (i = 0; i < count; i++) {
         temp->loaded_data[i] = calloc(1, sizeof(dedx_internal_lookup_data));
         if (temp->loaded_data[i] == NULL) { /* LCOV_EXCL_START */
-            int j;
+            unsigned int j;
             for (j = 0; j < i; j++)
                 free(temp->loaded_data[j]);
             free((void *) temp->loaded_data);
@@ -752,7 +752,7 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
 
 static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     int i = 0;
-    int j = 0;
+    unsigned int j = 0;
     int length = config->elements_length;
     int *targets = config->elements_id;
     float *weight;
@@ -821,7 +821,7 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
 }
 
 static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy, int *err) {
-    int i = 0;
+    unsigned int i = 0;
     float PZ, PA, TZ, TA, rho, pot;
 
     *err = DEDX_OK;

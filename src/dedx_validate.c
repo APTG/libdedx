@@ -35,7 +35,7 @@ static int dedx_internal_validate_interpolation_mode(dedx_config *config, int *e
 }
 
 int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
-    int i;
+    unsigned int i;
 
     if (config->elements_i_value == NULL && config->target != 0) {
         if (config->i_value == 0.0) {
@@ -85,7 +85,7 @@ int dedx_internal_evaluate_i_pot(dedx_config *config, int *err) {
 }
 
 int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
-    int i = 0;
+    unsigned int i = 0;
 
     if (config->target > 0 && config->target <= 99) {
         *err = DEDX_OK;
@@ -123,7 +123,7 @@ int dedx_internal_evaluate_compound(dedx_config *config, int *err) {
         }
         config->elements_length = compos_len;
     } else if (config->elements_mass_fraction == NULL && config->elements_atoms != NULL) {
-        int length = config->elements_length;
+        unsigned int length = config->elements_length;
         int *atoms_per_element = config->elements_atoms;
         float *density = malloc(sizeof(float) * length);
         float *weight = malloc(sizeof(float) * length);
@@ -249,7 +249,7 @@ int dedx_internal_validate_state(dedx_config *config, int *err) {
 }
 
 int dedx_internal_calculate_element_i_pot(dedx_config *config, int *err) {
-    int i;
+    unsigned int i;
     float charge_avg = 0;
     float avg_pot = 0;
     float log_x, i_pot_x;

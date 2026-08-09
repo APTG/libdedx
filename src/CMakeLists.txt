@@ -20,6 +20,23 @@ target_include_directories(dedx_objects PRIVATE
     "${PROJECT_SOURCE_DIR}/src"
     "${PROJECT_BINARY_DIR}"
 )
+# Warnings on the library sources only (not tests/examples). GCC/Clang only for now:
+# MSVC's warning set (/W4) is a separate, noisier baseline that would need its own
+# pass to clear -- see issue #149 E1. NOT MSVC also excludes clang-cl
+# (CMAKE_C_COMPILER_ID is "Clang" there too, but it's the MSVC-compatible driver, so
+# GCC-style -Wall/-Wextra/-Werror aren't the right flags for it either).
+#
+# -Werror is gated behind DEDX_WERROR (see its definition in the top-level
+# CMakeLists.txt for why it isn't unconditional): CI passes -DDEDX_WERROR=ON so any
+# new warning-worthy code fails the build there, without also making a release,
+# packaging, or downstream source build fail on a compiler diagnostic that's merely
+# new to whatever GCC/Clang version that build happens to use.
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND NOT MSVC)
+    target_compile_options(dedx_objects PRIVATE -Wall -Wextra)
+    if(DEDX_WERROR)
+        target_compile_options(dedx_objects PRIVATE -Werror)
+    endif()
+endif()
 # Version passed as compile definitions, derived from git tag at configure time.
 target_compile_definitions(dedx_objects PRIVATE
     DEDX_VERSION_MAJOR=${DEDX_VERSION_MAJOR}
