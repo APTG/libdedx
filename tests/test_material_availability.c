@@ -213,7 +213,8 @@ static int test_a150_boundary(void) {
     dedx_config *cfg;
     float pstar_stp, bethe_stp;
 
-    pstar_stp = dedx_get_simple_stp_for_program(DEDX_PSTAR, DEDX_PROTON, DEDX_A150_TISSUE_EQUIVALENT_PLASTIC, 100.0f, &err);
+    pstar_stp =
+        dedx_get_simple_stp_for_program(DEDX_PSTAR, DEDX_PROTON, DEDX_A150_TISSUE_EQUIVALENT_PLASTIC, 100.0f, &err);
     failures += check_err(err, DEDX_OK, "PSTAR+proton+A150 stp");
 
     ws = dedx_allocate_workspace(1, &err);
@@ -224,7 +225,8 @@ static int test_a150_boundary(void) {
     err = 0;
     dedx_load_config(ws, cfg, &err);
     failures += check_err(err, DEDX_OK, "BETHE_EXT00+proton+A150 load");
-    failures += check_err(cfg->bragg_used, 1, "BETHE_EXT00+proton+A150 should Bragg-decompose, not treat id 99 as Z=99");
+    failures +=
+        check_err(cfg->bragg_used, 1, "BETHE_EXT00+proton+A150 should Bragg-decompose, not treat id 99 as Z=99");
     if (err == DEDX_OK) {
         bethe_stp = dedx_get_stp(ws, cfg, 100.0f, &err);
         failures += check_err(err, DEDX_OK, "BETHE_EXT00+proton+A150 stp");

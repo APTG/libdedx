@@ -341,9 +341,7 @@ static int check_effective_interpolation_mode_downgrade(void) {
         return 1;
     }
     if (mode != DEDX_INTERPOLATION_LINEAR) {
-        fprintf(stderr,
-                "FAIL A6: effective mode should downgrade to linear for ICRU73+Na+Ar, got %d\n",
-                mode);
+        fprintf(stderr, "FAIL A6: effective mode should downgrade to linear for ICRU73+Na+Ar, got %d\n", mode);
         return 1;
     }
     return requested_ok ? 0 : 1;
