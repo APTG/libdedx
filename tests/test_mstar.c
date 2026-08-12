@@ -68,6 +68,57 @@ static int test_invalid_mstar_mode(void) {
     return failures;
 }
 
+/*
+ * Regression pin raised in review of issue #149's Phase 2 PR (finding B1):
+ * load_compound() resolving config->compound_state before its per-constituent loop
+ * (added for A3, so Bethe-type constituents get the *compound's* gas/condensed state
+ * rather than the public dedx_get_i_value()'s hardcoded gas default) has a side effect
+ * on DEDX_MSTAR specifically. resolve_mstar_mode() (dedx_mstar.c) also reads
+ * config->compound_state, and only falls back to its own per-target gas check when
+ * compound_state is still DEDX_DEFAULT_STATE; once load_compound() resolves it first,
+ * MSTAR mode 'a'/'b' letters now pick gas ('g'/'h') or condensed ('c'/'d') from the
+ * *compound's* own state for every constituent, rather than each constituent element's
+ * own state as before. For a gas compound like BUTANE this changes MSTAR's numeric
+ * output by a large margin (mode flips from 'g' to 'h' end to end) -- previously an
+ * undocumented, untested side effect of A3; not a computed-value regression on its
+ * own (the new behavior is arguably more physically correct: Bragg additivity treats
+ * a compound's condensed/gas state as a property of the compound, not of each atom in
+ * isolation -- the same convention this fix already applies for I-values), but it
+ * needed to be a pinned, visible number instead of an unremarked diff.
+ *
+ * These values are the current output of this branch, not independently verified
+ * against dedx_web or the MSTAR/ICRU literature -- that cross-check is out of scope
+ * for what this test can do. Their job is only to make a *future* change to this
+ * resolution path show up here instead of silently drifting again.
+ */
+static int test_gas_compound_uses_compound_state_not_constituent(void) {
+    int failures = 0;
+    const float energy_grid[] = {0.07f, 1.0f, 10.0f, 78.0f, 1000.0f};
+
+    /* BUTANE is a gas: with the default mstar_mode ('\0' -> DEDX_MSTAR_MODE_DEFAULT ==
+     * 'b'), resolve_mstar_mode() must now pick 'h' from the compound's own state. */
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_BUTANE, '\0'), energy_grid[0], 7027.838867f, "mstar-butane-gas");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_BUTANE, '\0'), energy_grid[1], 7598.953613f, "mstar-butane-gas");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_BUTANE, '\0'), energy_grid[2], 1849.043213f, "mstar-butane-gas");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_BUTANE, '\0'), energy_grid[3], 350.166901f, "mstar-butane-gas");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_BUTANE, '\0'), energy_grid[4], 86.426956f, "mstar-butane-gas");
+
+    /* WATER is condensed, so its resolved mode ('d') is unaffected either way -- these
+     * match the pre-existing explicit-mode-'d' values below exactly, confirming the
+     * default-mode path still resolves the same way for a condensed compound. */
+    failures += check_config_stp(
+        make_mstar_mode_config(DEDX_WATER, '\0'), energy_grid[0], 5589.206055f, "mstar-water-condensed");
+    failures +=
+        check_config_stp(make_mstar_mode_config(DEDX_WATER, '\0'), energy_grid[4], 80.005943f, "mstar-water-condensed");
+
+    return failures;
+}
+
 static int check_mode_equivalence(int target, char lhs_mode, char rhs_mode, float energy, const char *label) {
     int err = 0;
     int failures = 0;
@@ -226,6 +277,7 @@ int main(void) {
         check_mode_equivalence(DEDX_AIR_DRY_NEAR_SEA_LEVEL, DEDX_MSTAR_MODE_B, DEDX_MSTAR_MODE_H, 10.0f, "mstar-b-gas");
 
     failures += test_invalid_mstar_mode();
+    failures += test_gas_compound_uses_compound_state_not_constituent();
 
     return failures;
 }

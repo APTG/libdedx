@@ -144,6 +144,7 @@ static const dedx_error_entry dedx_error_table[] = {
     {DEDX_ERR_INCONSISTENT_COMPOUND, "Compound specification is inconsistent."},
     {DEDX_ERR_INVALID_INTERPOLATION_MODE, "Interpolation mode is not supported."},
     {DEDX_ERR_INVALID_MSTAR_MODE, "mstar_mode is not a recognized DEDX_MSTAR_MODE_* value."},
+    {DEDX_ERR_INCONSISTENT_ENERGY_GRID, "Compound constituents resolved onto mismatched energy grids."},
     {DEDX_ERR_NO_MEMORY, "Out of memory"},
 };
 
@@ -266,6 +267,17 @@ static int element_supported_for_ion(int program, int ion, int element) {
     return dedx_embedded_has_table(program, ion_load, element);
 }
 
+/* For DEDX_AUTO specifically: which tier a single element resolves to, mirroring
+ * find_data()'s own dispatch exactly (prog_load = DEDX_ICRU, same ion, same element).
+ * Returns 1 for the tabulated-report tier, 0 for the Bethe-Bloch fallback tier.
+ * Only meaningful for an element id already known reachable via
+ * element_supported_for_ion() -- callers are responsible for that precondition, same
+ * as element_supported_for_ion() itself documents for its own `element` parameter. */
+static int element_is_tabulated_for_auto(int ion, int element) {
+    int resolved;
+    return dedx_embedded_resolve_program(DEDX_ICRU, ion, element, &resolved) == 0;
+}
+
 /* Checks whether a material (element or compound) is reachable for program/ion.
  * Compounds are available iff their composition is known and every constituent
  * element is itself reachable, matching the Bragg-additivity decomposition
@@ -279,6 +291,17 @@ static int material_id_supported(int program, int ion, int material) {
     unsigned int comp_len;
     unsigned int i;
     int comp_err = DEDX_OK;
+    /* DEDX_AUTO-only bookkeeping for the grid-tier check below (issue #149 finding
+     * A1/B4): a compound whose constituents resolve to different tiers -- one
+     * tabulated, one Bethe-fallback -- will be rejected by load_compound() with
+     * DEDX_ERR_INCONSISTENT_ENERGY_GRID, since the two tiers are not sampled on the
+     * same energy grid. Before this check, material_id_supported() only knew whether
+     * DEDX_AUTO could reach each constituent *at all* (element_supported_for_ion()
+     * always returns 1 for it, any known element), not which tier -- so it kept
+     * advertising exactly the compounds A1 correctly started rejecting, which is the
+     * false-advertisement regression the review of this PR flagged. */
+    int auto_tier_seen = 0;
+    int auto_tier_tabulated = 0;
 
     if (material <= 0) { /* LCOV_EXCL_START -- master material list never contains this, and
                              composition rows are always positive element IDs in practice */
@@ -294,11 +317,23 @@ static int material_id_supported(int program, int ion, int material) {
      * did before issue #149's finding A5 was fixed, can't be loaded even though every
      * constituent element below is individually Bethe-supported. Tabulated programs
      * never read rho at all (element_supported_for_ion() already documents the same
-     * scoping for elements), so this check only applies to program >= DEDX_DEFAULT. */
+     * scoping for elements), so this check only applies to program >= DEDX_DEFAULT.
+     *
+     * The same programs also read the compound's own I-value directly (see
+     * load_compound()'s elements_i_value == NULL branch via dedx_internal_evaluate_i_pot()),
+     * rather than Bragg-averaging it from constituents -- so a compound with a density
+     * row but no I-value row (FERROUSOXIDE, deliberately: see finding A5's PR
+     * description) is still unreachable for these programs specifically. */
     if (program >= DEDX_DEFAULT) {
         int density_err = DEDX_OK;
+        int i_value_err = DEDX_OK;
+
         dedx_internal_read_density(material, &density_err);
         if (density_err != DEDX_OK) {
+            return 0;
+        }
+        dedx_internal_get_i_value(material, DEDX_DEFAULT_STATE, &i_value_err);
+        if (i_value_err != DEDX_OK) {
             return 0;
         }
     }
@@ -309,8 +344,19 @@ static int material_id_supported(int program, int ion, int material) {
         return 0;
     } /* LCOV_EXCL_STOP */
     for (i = 0; i < comp_len; i++) {
-        if (!material_id_supported(program, ion, (int) composition[i][0])) {
+        int constituent = (int) composition[i][0];
+
+        if (!material_id_supported(program, ion, constituent)) {
             return 0;
+        }
+        if (program == DEDX_AUTO && constituent > 0 && constituent <= DEDX_MAX_ELEMENT_ID) {
+            int tabulated = element_is_tabulated_for_auto(ion, constituent);
+            if (!auto_tier_seen) {
+                auto_tier_tabulated = tabulated;
+                auto_tier_seen = 1;
+            } else if (tabulated != auto_tier_tabulated) {
+                return 0;
+            }
         }
     }
     return 1;
@@ -498,8 +544,13 @@ int dedx_get_effective_interpolation_mode(dedx_workspace *ws, dedx_config *confi
     *err = DEDX_OK;
 
     if (id < 0 || id >= ws->active_datasets) {
+        /* -1, not 0: DEDX_INTERPOLATION_LOG_LOG == 0, so a caller that forgets to
+         * check *err would otherwise read a failed call as "log-log", which is
+         * exactly the wrong answer for a function whose entire purpose is exposing
+         * a downgrade away from log-log (see issue #149 finding A6) -- flagged in
+         * review as a real footgun for this specific accessor. */
         *err = DEDX_ERR_INVALID_DATASET_ID;
-        return 0;
+        return -1;
     }
 
     return ws->loaded_data[id]->interpolation_mode;
@@ -774,7 +825,9 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     float energy[DEDX_MAX_ELEMENTS];   /* reference energy grid, from constituent 0 */
     float energy_i[DEDX_MAX_ELEMENTS]; /* scratch grid for constituent i > 0, compared below */
     float i_value;
+    float temp_i_value;
     int target;
+    int rc = -1;
     stopping_data data;
     /* calloc, not malloc: zero-initializes every constituent's data[DEDX_MAX_ELEMENTS]
      * array up front, so a constituent shorter than data.length (see min-length below)
@@ -789,6 +842,7 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     }
     weight = config->elements_mass_fraction;
     i_value = config->i_value;
+    temp_i_value = config->_temp_i_value;
     target = config->target;
 
     /* Resolve the compound's own physical state (gas vs condensed) before looking up
@@ -802,8 +856,7 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     if (config->compound_state == DEDX_DEFAULT_STATE) {
         dedx_internal_validate_state(config, err);
         if (*err != 0) {
-            free(compound_data);
-            return -1;
+            goto cleanup;
         }
     }
 
@@ -817,14 +870,12 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
             // If it is exactly 0.0, we fallback to the default I-value for the element.
             if (config->elements_i_value[i] < 0.0) {
                 *err = DEDX_ERR_INVALID_I_VALUE;
-                free(compound_data);
-                return -1;
+                goto cleanup;
             }
             if (config->elements_i_value[i] == 0.0) {
                 config->_temp_i_value = dedx_internal_get_i_value(targets[i], config->compound_state, err);
                 if (*err != 0) {
-                    free(compound_data);
-                    return -1;
+                    goto cleanup;
                 }
             }
         } else {
@@ -834,14 +885,12 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
             // state the public dedx_get_i_value() accessor hardcodes.
             config->_temp_i_value = dedx_internal_get_i_value(targets[i], config->compound_state, err);
             if (*err != 0) {
-                free(compound_data);
-                return -1;
+                goto cleanup;
             }
         }
         find_data(&compound_data[i], config, (i == 0) ? energy : energy_i, err);
         if (*err != 0) {
-            free(compound_data);
-            return -1;
+            goto cleanup;
         }
         /* Constituents can resolve onto different energy grids: DEDX_AUTO's per-element
          * fallback tries a tabulated report (e.g. the 133-point PSTAR-family grid) first
@@ -854,13 +903,13 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
         if (i > 0
             && (compound_data[i].length != compound_data[0].length
                 || memcmp(energy_i, energy, sizeof(float) * compound_data[0].length) != 0)) {
-            *err = DEDX_ERR_INCONSISTENT_COMPOUND;
-            free(compound_data);
-            return -1;
+            *err = DEDX_ERR_INCONSISTENT_ENERGY_GRID;
+            goto cleanup;
         }
     }
 
     config->i_value = i_value;
+    config->_temp_i_value = temp_i_value;
     config->target = target;
 
     /* Identify the aggregated result as the compound itself (its own id, or 0 for a
@@ -889,6 +938,19 @@ static int load_compound(dedx_workspace *ws, dedx_config *config, int *err) {
     }
     free(compound_data);
     return load_data(ws, &data, energy, config, err);
+
+cleanup:
+    /* Every early failure above runs config->target through the current constituent
+     * element (targets[i]), not the compound's own id, and may have overwritten
+     * config->i_value/_temp_i_value too -- restore all three so a caller who reuses
+     * this config after a failed load (e.g. "try DEDX_AUTO, fall back to DEDX_PSTAR
+     * on error") sees the compound they asked for, not whichever element load_compound()
+     * happened to be resolving when it gave up. See issue #149 finding B5. */
+    config->target = target;
+    config->i_value = i_value;
+    config->_temp_i_value = temp_i_value;
+    free(compound_data);
+    return rc;
 }
 
 static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy, int *err) {

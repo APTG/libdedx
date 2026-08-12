@@ -57,6 +57,8 @@ static int dedx_internal_validate_interpolation_mode(dedx_config *config, int *e
 
 int dedx_internal_check_ion(int prog, int ion) {
     const int *ion_list;
+    const int *programs;
+    int prog_known = 0;
     int i = 0;
 
     if (prog >= DEDX_DEFAULT || prog == DEDX_AUTO) {
@@ -69,7 +71,29 @@ int dedx_internal_check_ion(int prog, int ion) {
         return 1;
     }
 
+    /* prog must be a recognized program id before it's safe to hand to
+     * dedx_get_ion_list(): that indexes dedx_program_available_ions[] directly by
+     * prog, and rows the table doesn't explicitly initialize are zero-filled, not
+     * -1-terminated, so an unrecognized id (a typo, a stale constant, prog < 0) makes
+     * the ion_list loop below walk off the end of the table looking for a terminator
+     * that row will never have -- a real, ASan-reproducible global-buffer-overflow.
+     * This was already latent on the elemental-target path before this PR (see issue
+     * #149 finding B3, deferred to Phase 3 for the full accessor-hardening sweep), but
+     * moving the check_ion() call here made it newly reachable from the
+     * custom-compound path too (finding A8) -- that path used to bypass this function
+     * entirely. Guard it here rather than let A8 grow the crash's reach. */
+    programs = dedx_get_program_list();
+    for (i = 0; programs[i] != -1; i++) {
+        if (programs[i] == prog) {
+            prog_known = 1;
+            break;
+        }
+    }
+    if (!prog_known)
+        return 0;
+
     ion_list = dedx_get_ion_list(prog);
+    i = 0;
     while (ion_list[i] != -1) {
         if (ion_list[i] == ion)
             return 1;

@@ -171,6 +171,15 @@ float dedx_internal_evaluate_spline(
         const float dx = x - coef[i].x;
         const float dx2 = dx * dx;
 
+        /* isnan(coef[i].log_x) is this function's own, independent detection of
+         * dedx_internal_calculate_coefficients()'s log-log-to-linear downgrade (see
+         * its NAN-marking in calculate_linear_coefficients()) -- it's what already
+         * kept computed values correct even before that downgrade was made visible to
+         * callers. dedx_get_effective_interpolation_mode() (issue #149 finding A6)
+         * exposes the same fact through the public API; the two are deliberately
+         * redundant, not alternatives -- this one guards a single evaluation from
+         * NaN/garbage no matter what a caller passed as interpolation_mode, while that
+         * one lets a caller find out about the downgrade without evaluating anything. */
         if (interpolation_mode == DEDX_INTERPOLATION_LINEAR || isnan(coef[i].log_x)) {
             return coef[i].a + coef[i].b * dx + coef[i].c * dx2 + coef[i].d * dx2 * dx;
         }

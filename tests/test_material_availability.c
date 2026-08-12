@@ -155,8 +155,12 @@ static int test_auto_bethe_fallback(void) {
      * (whichever constituent happened to be first) regardless of whether the other
      * constituent's own grid matched, silently truncating or mixing energy bins.
      * Post-A1, mismatched per-constituent grids are detected and rejected with
-     * DEDX_ERR_INCONSISTENT_COMPOUND instead of being served as a wrong or
-     * silently-truncated number -- so this load is now expected to fail cleanly. */
+     * DEDX_ERR_INCONSISTENT_ENERGY_GRID instead of being served as a wrong or
+     * silently-truncated number -- so this load is now expected to fail cleanly.
+     * (A dedicated code, not a reuse of DEDX_ERR_INCONSISTENT_COMPOUND: the caller's
+     * compound specification here is perfectly valid -- BoronCarbide is one real
+     * material id -- the problem is purely that its constituents resolved onto
+     * different embedded energy grids, which is diagnosable on its own.) */
     ws = dedx_allocate_workspace(1, &err);
     cfg = calloc(1, sizeof(dedx_config));
     cfg->program = DEDX_AUTO;
@@ -164,8 +168,15 @@ static int test_auto_bethe_fallback(void) {
     cfg->target = DEDX_BORON_CARBIDE;
     err = 0;
     dedx_load_config(ws, cfg, &err);
-    failures += check_err(err, DEDX_ERR_INCONSISTENT_COMPOUND, "AUTO+proton+BoronCarbide load (mismatched grids)");
+    failures += check_err(err, DEDX_ERR_INCONSISTENT_ENERGY_GRID, "AUTO+proton+BoronCarbide load (mismatched grids)");
     failures += check_err(cfg->bragg_used, 1, "AUTO+proton+BoronCarbide should still attempt Bragg additivity");
+    /* Regression check for issue #149 finding B5: a failed load_compound() used to
+     * leave config->target pointing at whichever constituent element it was resolving
+     * when it gave up (here, boron or carbon -- not BoronCarbide), so a caller who
+     * reused the config afterward (e.g. "try AUTO, fall back to PSTAR on error") would
+     * silently query the wrong target. It must come back exactly as the caller left
+     * it. */
+    failures += check_err(cfg->target, DEDX_BORON_CARBIDE, "failed AUTO+BoronCarbide load must not corrupt target");
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 
@@ -290,9 +301,15 @@ static int test_ferrous_oxide_tabulated_program(void) {
     dedx_load_config(ws, cfg, &err);
     failures += check_err(err, DEDX_OK, "PSTAR+proton+FerrousOxide load");
     if (err == DEDX_OK) {
-        /* Density must have been resolved from the embedded table, not left at 0. */
-        if (cfg->rho <= 0.0f) {
-            fprintf(stderr, "FAIL PSTAR+proton+FerrousOxide: rho not populated (%f)\n", (double) cfg->rho);
+        /* Density must have been resolved from the embedded table to the specific,
+         * cited literature value (data/README.md), not merely to "something positive"
+         * -- a bare rho > 0 check would pass a typo'd 57.0 or 0.57 just as happily as
+         * the real 5.7 g/cm^3, and this value feeds live physics (the Bethe
+         * density-effect term for DEDX_AUTO's fallback tier), not just metadata. */
+        if (fabsf(cfg->rho - 5.7f) > 1e-4f) {
+            fprintf(stderr,
+                    "FAIL PSTAR+proton+FerrousOxide: rho=%f, expected 5.7 (see data/README.md)\n",
+                    (double) cfg->rho);
             failures++;
         }
         stp = dedx_get_stp(ws, cfg, 100.0f, &err);
@@ -417,12 +434,19 @@ static int test_material_list_for_ion(void) {
     failures += check_absent(materials, DEDX_BORON, "ICRU+proton for_ion");
     failures += check_absent(materials, DEDX_BORON_CARBIDE, "ICRU+proton for_ion");
 
-    /* DEDX_AUTO does fall back -- both appear. */
+    /* DEDX_AUTO does fall back for the pure element -- Boron appears. BoronCarbide
+     * does not: it Bragg-decomposes into boron (Bethe-fallback tier) and carbon
+     * (tabulated tier), which resolve onto different energy grids and would fail to
+     * load with DEDX_ERR_INCONSISTENT_ENERGY_GRID (see test_auto_bethe_fallback()
+     * above) -- material_id_supported() now predicts that tier mismatch instead of
+     * advertising a combination dedx_load_config() is known to reject (issue #149
+     * finding B4: the availability API must stay accurate, not just "falls back
+     * rather than failing outright"). */
     dedx_get_material_list_for_ion(DEDX_AUTO, DEDX_PROTON, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
     failures += check_err(err, DEDX_OK, "AUTO+proton for_ion err");
     materials[len] = -1;
     failures += check_present(materials, DEDX_BORON, "AUTO+proton for_ion");
-    failures += check_present(materials, DEDX_BORON_CARBIDE, "AUTO+proton for_ion");
+    failures += check_absent(materials, DEDX_BORON_CARBIDE, "AUTO+proton for_ion");
 
     dedx_get_material_list_for_ion(DEDX_ICRU73, DEDX_LITHIUM, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
     failures += check_err(err, DEDX_OK, "ICRU73+lithium for_ion err");

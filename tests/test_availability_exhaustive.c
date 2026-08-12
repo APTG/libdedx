@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include "test_helpers.h"
 
@@ -25,67 +26,90 @@
  * mismatches/dead configs traced back to two root causes: A1's DEDX_AUTO tier-mixing
  * (mismatched per-constituent energy grids) and A5's missing FERROUSOXIDE density row.
  *
- * Phase 2 fixed A1, A2, A3, A5, A6, A7 and A8. Their effect on this sweep, verified by
- * diffing this same sweep's per-(program,ion) output against the pre-Phase-2 build:
+ * Phase 2 fixed A1, A2, A3, A5, A6, A7 and A8, and (in review) B2-B4 below. Load
+ * failures are asserted *per error code*, not as one aggregate ceiling: an aggregate
+ * budget can absorb a brand-new failure mode as long as some other one improved by at
+ * least as much in the same run, which is exactly the kind of silent trade a ratchet
+ * is supposed to catch. TOTAL_COMBINATIONS is still asserted separately, with
+ * equality, so a change in what dedx_get_material_list_for_ion() advertises is always
+ * visible here too.
  *
- *   - TOTAL_COMBINATIONS: 101957 -> 101886 (-71). A2's off-by-one fix
- *     (material_id_supported()'s element/compound boundary, id 99 = A150 tissue-
- *     equivalent plastic) stops routing compound id 99 through the elemental
- *     embedded-table lookup for ASTAR/PSTAR/MSTAR/ICRU73_OLD/ICRU73/ICRU49/ICRU (the
- *     71 = 1+1+17+16+16+2+18 combinations across their ion lists -- one fewer per
- *     (program,ion) than before). It's now correctly evaluated via composition-based
- *     reachability, which drops it for the ion/program pairs where a constituent
- *     genuinely isn't reachable -- exactly the misclassification A2 set out to fix.
- *   - BASELINE_LOAD_FAILURES: 407 -> 1470. Two components, both traced by error code:
- *       * 224 (DEDX_ERR_TARGET_NOT_FOUND, programs DEDX_DEFAULT/DEDX_BETHE_EXT00 only):
- *         the FERROUSOXIDE (id 159) gap, down from 407. A5 added its density row and
- *         relaxed dedx_internal_validate_rho() to only require rho where it's actually
- *         used, which fixed the 183 tabulated-program combinations. The 224 that
- *         remain are DEDX_DEFAULT/DEDX_BETHE_EXT00, which read a compound target's
- *         *own* I-value directly from embedded metadata rather than Bragg-averaging
- *         it from constituents; no authoritative FERROUSOXIDE I-value exists (see
- *         data/README.md), and A5 deliberately left it unfabricated rather than
- *         invent a number -- so these 224 stay a documented, open gap.
- *       * 1246 (DEDX_ERR_INCONSISTENT_COMPOUND, DEDX_AUTO only, new): compounds whose
- *         constituents resolve onto mismatched energy grids (A1's tier-mixing bug).
- *         Before A1, load_compound() silently summed across the mismatched grids and
- *         dedx_load_config() reported success -- these combinations were counted
- *         instead under bound_mismatches/dead_configs below. A1 now rejects them
- *         instead of serving a wrong or unusable number, which is why they show up
- *         here as load failures rather than a regression.
- *   - BASELINE_BOUND_MISMATCHES: 1568 -> 480, BASELINE_DEAD_CONFIGS: 174 -> 0. Both
- *     drop because A1 catches the same underlying grid-mismatch combinations earlier,
- *     as a clean load failure, instead of letting them load and then fail (or return
- *     nonsense) at the energy-sampling stage.
+ * History, verified at each step by diffing this sweep's per-(program,ion) output
+ * against the previous build and tracing every failure by error code -- not assumed:
  *
- * The BASELINE_* constants below still pin these counts so this test is a *ratchet*,
- * not a silent no-op:
- *
- *   - It stays green by asserting "no worse than the known baseline", rather than
- *     asserting "zero failures" -- A4 (advertised-bounds accuracy) and the
- *     FERROUSOXIDE I-value gap remain deliberately open past Phase 2.
- *   - Any future fix must lower the relevant BASELINE_* constant(s) as its root cause
- *     is addressed. Do NOT raise a baseline to make a newly introduced regression
- *     pass -- if this test starts failing because a count went up unexpectedly, that
- *     is a real regression, not a stale baseline. (The load_failures increase in
- *     Phase 2 above was verified, not assumed, before raising this constant.)
- *   - TOTAL_COMBINATIONS is asserted with equality (not a ceiling) so a change in
- *     what dedx_get_material_list_for_ion() advertises -- for better or worse -- is
- *     always visible here, prompting a deliberate update rather than a silent drift.
+ *   - A2's off-by-one fix (material_id_supported()'s element/compound boundary, id 99
+ *     = A150 tissue-equivalent plastic) stops routing compound id 99 through the
+ *     elemental embedded-table lookup for ASTAR/PSTAR/MSTAR/ICRU73_OLD/ICRU73/ICRU49/
+ *     ICRU. TOTAL_COMBINATIONS: 101957 -> 101886 (-71 = 1+1+17+16+16+2+18, one fewer
+ *     per (program,ion) across those programs' ion lists).
+ *   - A1 rejects DEDX_AUTO compounds whose constituents resolve onto mismatched
+ *     energy grids (DEDX_ERR_INCONSISTENT_ENERGY_GRID) instead of silently mixing or
+ *     truncating them -- previously counted under bound_mismatches/dead_configs
+ *     instead, or not counted as broken at all. A5 fixes 183 of the original 407
+ *     FERROUSOXIDE (id 159) failures (adds its density row, only requires rho where a
+ *     program actually reads it); the remaining 224 (DEDX_ERR_TARGET_NOT_FOUND, for
+ *     DEDX_DEFAULT/DEDX_BETHE_EXT00 only, which read a compound's *own* I-value
+ *     directly rather than Bragg-averaging it, and no authoritative FERROUSOXIDE
+ *     I-value exists to fill that row with -- see data/README.md) were, at that point,
+ *     a deliberate, documented, *open* gap on the load_failures side. At that
+ *     intermediate point load_failures read 407 -> 1470 (224 remaining + 1246 new
+ *     DEDX_ERR_INCONSISTENT_ENERGY_GRID) and bound_mismatches/dead_configs dropped
+ *     1568 -> 480 and 174 -> 0.
+ *   - In review of this PR, material_id_supported() was taught both of the
+ *     constraints above instead of only reproducing dedx_load_config()'s answer after
+ *     the fact (finding B4): it now predicts a DEDX_AUTO grid-tier mismatch the same
+ *     way find_data() resolves it (dedx_embedded_resolve_program() per constituent),
+ *     and it now checks I-value availability for program >= DEDX_DEFAULT the same way
+ *     it already checked density, closing the FERROUSOXIDE gap above to zero *on the
+ *     advertising side* without fabricating the I-value itself -- the material simply
+ *     stops being advertised for the two programs that need a number nobody can
+ *     verify. This is what actually brought load_failures down, not a raised ceiling:
+ *     TOTAL_COMBINATIONS 101886 -> 100222 (-1664, the compounds/programs that would
+ *     have failed and are no longer advertised), load_failures 1470 -> 108,
+ *     bound_mismatches 480 -> 470.
+ *   - The 108 that remain are DEDX_MSTAR only, all DEDX_ERR_ION_NOT_SUPPORTED_MSTAR:
+ *     ions 12-15 combined with a gas target hit an "illegal mode" branch in
+ *     dedx_mpaul.c that predates this whole PR (reproduced identically against
+ *     `main`, e.g. DEDX_MSTAR + ion 12 + DEDX_ARGON) -- previously silent (a
+ *     nonsense stopping power with err == DEDX_OK, also found in review, finding B2),
+ *     now a clean, correctly-reported error. material_id_supported() does not yet
+ *     model this for MSTAR specifically -- doing so needs either an mstar_mode
+ *     parameter on the availability query (an API change) or a hardcoded assumption
+ *     about the default mode, neither of which this PR takes on -- so it stays a
+ *     documented, open gap here, the same shape as the FERROUSOXIDE gap before it.
  */
 
-#define TOTAL_COMBINATIONS 101886
-#define BASELINE_LOAD_FAILURES 1470
-#define BASELINE_BOUND_MISMATCHES 480
+#define TOTAL_COMBINATIONS 100222
+
+/* Every (error code, count) pair load failures are currently expected to fall into.
+ * Equality per code, not a ceiling: a future fix should remove an entry (or lower its
+ * count) as its root cause is addressed, and any load failure whose code isn't listed
+ * here at all is an unconditional hard failure below, not something a budget can
+ * quietly absorb. */
+typedef struct {
+    int code;
+    long baseline;
+} error_baseline;
+
+static const error_baseline LOAD_FAILURE_BASELINES[] = {
+    /* DEDX_MSTAR ions 12-15 + a gas target -- see the history note above. */
+    {DEDX_ERR_ION_NOT_SUPPORTED_MSTAR, 108},
+};
+
+#define BASELINE_BOUND_MISMATCHES 470
 #define BASELINE_DEAD_CONFIGS 0
 
 /* Number of energies sampled (log-spaced) across each combination's advertised
  * [min, max] range for the "dead at every energy" check. */
 #define SAMPLE_COUNT 9
 
+/* One counter per entry in LOAD_FAILURE_BASELINES, in the same order, plus a catch-all
+ * for any error code not listed there. */
 typedef struct {
     long total;
     long load_failures;
+    long load_failures_by_code[sizeof(LOAD_FAILURE_BASELINES) / sizeof(LOAD_FAILURE_BASELINES[0])];
+    long load_failures_unexpected;
     long bound_mismatches;
     long dead_configs;
     long alloc_failures;
@@ -133,7 +157,29 @@ static void sweep_one(int program, int ion, int target, sweep_stats *stats) {
     err = 0;
     rc = dedx_load_config(ws, cfg, &err);
     if (rc != 0 || err != DEDX_OK) {
+        size_t code_i;
+        int matched = 0;
+
         stats->load_failures++;
+        for (code_i = 0; code_i < sizeof(LOAD_FAILURE_BASELINES) / sizeof(LOAD_FAILURE_BASELINES[0]); code_i++) {
+            if (LOAD_FAILURE_BASELINES[code_i].code == err) {
+                stats->load_failures_by_code[code_i]++;
+                matched = 1;
+                break;
+            }
+        }
+        if (!matched) {
+            stats->load_failures_unexpected++;
+            if (stats->load_failures_unexpected <= 5) {
+                fprintf(stderr,
+                        "FAIL sweep_one: unexpected error code %d for program=%d ion=%d target=%d "
+                        "(not in LOAD_FAILURE_BASELINES)\n",
+                        err,
+                        program,
+                        ion,
+                        target);
+            }
+        }
         dedx_free_config(cfg, &err);
         dedx_free_workspace(ws, &err);
         return;
@@ -202,8 +248,8 @@ static int check_baseline(long got, long baseline, const char *label) {
         return 1;
     }
     if (got < baseline) {
-        /* Progress! Not a failure, but flag it so whoever fixed part of A1/A4/A5/A6
-         * remembers to tighten the baseline in this file as part of that change. */
+        /* Progress! Not a failure, but flag it so whoever fixed part of the remaining
+         * gap remembers to tighten the baseline in this file as part of that change. */
         fprintf(stderr,
                 "NOTE %s: %ld is below the recorded baseline of %ld -- please lower "
                 "BASELINE_* in tests/test_availability_exhaustive.c to match\n",
@@ -216,9 +262,12 @@ static int check_baseline(long got, long baseline, const char *label) {
 
 int main(void) {
     const int *programs = dedx_get_program_list();
-    sweep_stats stats = {0, 0, 0, 0, 0};
+    sweep_stats stats;
     int failures = 0;
     int p;
+    size_t code_i;
+
+    memset(&stats, 0, sizeof(stats));
 
     for (p = 0; programs[p] != -1; p++) {
         int program = programs[p];
@@ -241,6 +290,13 @@ int main(void) {
            stats.bound_mismatches,
            stats.dead_configs,
            stats.alloc_failures);
+    for (code_i = 0; code_i < sizeof(LOAD_FAILURE_BASELINES) / sizeof(LOAD_FAILURE_BASELINES[0]); code_i++) {
+        printf(
+            "  load_failures[err=%d]=%ld\n", LOAD_FAILURE_BASELINES[code_i].code, stats.load_failures_by_code[code_i]);
+    }
+    if (stats.load_failures_unexpected > 0) {
+        printf("  load_failures[unexpected]=%ld\n", stats.load_failures_unexpected);
+    }
 
     /* Unlike the baselines below, any allocation failure is an unconditional hard
      * failure -- there is no acceptable count of "the sweep couldn't get memory". */
@@ -259,7 +315,23 @@ int main(void) {
                 TOTAL_COMBINATIONS);
         failures++;
     }
-    failures += check_baseline(stats.load_failures, BASELINE_LOAD_FAILURES, "load_failures");
+
+    /* Any load failure whose error code isn't in LOAD_FAILURE_BASELINES at all is a
+     * brand-new failure mode -- always a hard failure, never just a NOTE, regardless
+     * of how the aggregate count moves. */
+    if (stats.load_failures_unexpected > 0) {
+        fprintf(stderr,
+                "FAIL load_failures_unexpected: %ld load failure(s) used an error code not listed in "
+                "LOAD_FAILURE_BASELINES -- see the FAIL lines above for examples; add a traced entry "
+                "instead of ignoring it\n",
+                stats.load_failures_unexpected);
+        failures++;
+    }
+    for (code_i = 0; code_i < sizeof(LOAD_FAILURE_BASELINES) / sizeof(LOAD_FAILURE_BASELINES[0]); code_i++) {
+        char label[64];
+        snprintf(label, sizeof(label), "load_failures[err=%d]", LOAD_FAILURE_BASELINES[code_i].code);
+        failures += check_baseline(stats.load_failures_by_code[code_i], LOAD_FAILURE_BASELINES[code_i].baseline, label);
+    }
     failures += check_baseline(stats.bound_mismatches, BASELINE_BOUND_MISMATCHES, "bound_mismatches");
     failures += check_baseline(stats.dead_configs, BASELINE_DEAD_CONFIGS, "dead_configs");
 

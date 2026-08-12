@@ -132,8 +132,18 @@ float dedx_internal_calculate_mspaul_coef(char mode, int ion, int target, float 
         b = 0.38887;
         c = 2.84076;
     } else {
-
-        // illegal mode
+        /* mode 'h' is only enumerated above for ion in {3..11, 16, 17, 18} -- a
+         * documented, resolvable mode (DEDX_MSTAR_MODE_B/H both resolve to it for a
+         * gaseous target) can still land here for ion 12-15, leaving a/b/c at their
+         * declared defaults (5.0, -1, -1) and silently computing a nonsense
+         * coefficient below with *err left at DEDX_OK. Issue #149's finding A7 fixed
+         * config->mstar_mode validation one layer up, but that only rejects letters
+         * outside DEDX_MSTAR_MODE_*; it does not -- and structurally cannot -- catch
+         * this, since 'h' is itself one of those six valid letters. Report it here,
+         * at the actual point where mode+ion has no implemented coefficient, instead
+         * of one layer up where the combination still looks fine. */
+        *err = DEDX_ERR_ION_NOT_SUPPORTED_MSTAR;
+        return 0.0f;
     }
 
     if (mode == 'c' || mode == 'd') {
@@ -178,7 +188,14 @@ float dedx_internal_calculate_mspaul_coef(char mode, int ion, int target, float 
         }
 
         else if (mode == 'd') {
-            // illegal mode
+            /* Reached only for z2 <= 4 or z2 >= 93 (z2 <= 3 is remapped to mode 'c'
+             * above, before this chain) -- outside the effective-charge ranges the
+             * FACTOR correction above is parametrized for. FOUT itself is still a
+             * valid mode-'d' value (a/b/c come from the ion-based polynomials above,
+             * not from z2), but silently leaving FACTOR at its neutral 1.0 here would
+             * skip a correction the literature model expects for this z2 instead of
+             * flagging that it isn't implemented for it. */
+            *err = DEDX_ERR_ION_NOT_SUPPORTED_MSTAR;
         }
 
         FOUT = FOUT * FACTOR;

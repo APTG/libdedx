@@ -57,6 +57,12 @@ static int test_error_code_strings_complete(void) {
     failures += check_has_message(DEDX_ERR_INVALID_I_VALUE, "DEDX_ERR_INVALID_I_VALUE");
     failures += check_has_message(DEDX_ERR_INCONSISTENT_COMPOUND, "DEDX_ERR_INCONSISTENT_COMPOUND");
     failures += check_has_message(DEDX_ERR_INVALID_INTERPOLATION_MODE, "DEDX_ERR_INVALID_INTERPOLATION_MODE");
+    /* DEDX_ERR_INVALID_MSTAR_MODE was missing from this completeness sweep when it was
+     * introduced (issue #149 finding A7) -- caught in review; added here so the table
+     * this test walks and the codes dedx_error.h defines can't silently drift apart
+     * again, which is the entire point of this test (see the comment above). */
+    failures += check_has_message(DEDX_ERR_INVALID_MSTAR_MODE, "DEDX_ERR_INVALID_MSTAR_MODE");
+    failures += check_has_message(DEDX_ERR_INCONSISTENT_ENERGY_GRID, "DEDX_ERR_INCONSISTENT_ENERGY_GRID");
     failures += check_has_message(DEDX_ERR_NO_MEMORY, "DEDX_ERR_NO_MEMORY");
 
     /* An unrecognised code must still fall back to the default message rather than,

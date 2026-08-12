@@ -390,7 +390,9 @@ static int check_effective_interpolation_mode_invalid_id(void) {
 
     cfg->cfg_id = -1;
     mode = dedx_get_effective_interpolation_mode(ws, cfg, &err);
-    if (err != DEDX_ERR_INVALID_DATASET_ID || mode != 0) {
+    /* -1, not 0 (== DEDX_INTERPOLATION_LOG_LOG): a caller that forgets to check *err
+     * must not be able to mistake a failed call for "log-log" -- raised in review. */
+    if (err != DEDX_ERR_INVALID_DATASET_ID || mode != -1) {
         fprintf(stderr, "FAIL A6 invalid cfg_id: err=%d mode=%d\n", err, mode);
         failures++;
     }
