@@ -104,15 +104,25 @@ typedef struct {
     long baseline;
 } error_baseline;
 
-/* Empty: as of the MSTAR-availability follow-up below, every load failure this sweep
- * used to hit has a root cause that's either fixed outright or -- for the two open,
- * documented physics-data gaps (FERROUSOXIDE's I-value, the ICRU73 Na-in-Ar zero) --
- * no longer advertised as available in the first place, so this sweep now expects
- * dedx_load_config() to succeed for every combination it's asked to check. A future
- * regression that adds even one new load failure is therefore always a hard FAIL via
- * load_failures_unexpected below (any error code, since none has an entry here to
- * match against), not something a baseline entry could absorb. */
-static const error_baseline LOAD_FAILURE_BASELINES[] = {};
+/* Effectively empty: as of the MSTAR-availability follow-up below, every load failure
+ * this sweep used to hit has a root cause that's either fixed outright or -- for the
+ * two open, documented physics-data gaps (FERROUSOXIDE's I-value, the ICRU73 Na-in-Ar
+ * zero) -- no longer advertised as available in the first place, so this sweep now
+ * expects dedx_load_config() to succeed for every combination it's asked to check. A
+ * future regression that adds even one new load failure is therefore always a hard
+ * FAIL via load_failures_unexpected below (any error code, since none has a real entry
+ * here to match against), not something a baseline entry could absorb.
+ *
+ * A literal `{}` initializer here would be a GCC/Clang extension, not standard C --
+ * MSVC (a supported CI target) rejects it, and rejects the resulting zero-length
+ * `load_failures_by_code[0]` array member below even harder ("illegal zero-sized
+ * array"). {-1, 0} is a sentinel, not a real baseline: -1 is not a DEDX_ERR_* value
+ * (see dedx_error.h) and dedx_load_config() never sets *err to it, so it can never
+ * match a real failure in the loop below -- it exists purely to keep this a portable,
+ * non-empty, one-element array. */
+static const error_baseline LOAD_FAILURE_BASELINES[] = {
+    {-1, 0},
+};
 
 #define BASELINE_BOUND_MISMATCHES 470
 #define BASELINE_DEAD_CONFIGS 0
