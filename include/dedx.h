@@ -60,7 +60,19 @@ enum {
                              Deliberately grouped with the other tabulated report identifiers
                              (not >= DEDX_DEFAULT) so that a compound target resolves through the
                              same tabulated-first path as DEDX_ICRU instead of always decomposing
-                             into elements. */
+                             into elements.
+         
+                             This "best effort" promise has one hole: a compound whose
+                             constituents resolve to *different* tiers -- one tabulated, one
+                             Bethe-fallback -- can end up on mismatched energy grids, since the
+                             two tiers are not sampled at the same points. Rather than silently
+                             mixing or truncating those grids, dedx_load_config() rejects the
+                             mix with DEDX_ERR_INCONSISTENT_ENERGY_GRID (see issue #149 finding
+                             A1). This is a real, if narrow, exception to "falls back rather than
+                             failing outright" above -- it affects compounds like boron carbide,
+                             where boron is Bethe-only but carbon is tabulated. Callers that need
+                             every advertised DEDX_AUTO compound to load must be prepared to
+                             handle this error, not just DEDX_ERR_COMBINATION_NOT_FOUND. */
     DEDX_DEFAULT = 100, /**< Default program (Bethe formula) */
     DEDX_BETHE_EXT00    /**< Bethe formula with extensions */
 };
@@ -368,6 +380,25 @@ int dedx_load_config(dedx_workspace *ws, dedx_config *config, int *err);
  *  @return Mass stopping power in MeV cm²/g.
  */
 float dedx_get_stp(dedx_workspace *ws, dedx_config *config, float energy, int *err);
+
+/** @brief Report the interpolation mode actually used for a loaded configuration.
+ *
+ *  dedx_config::interpolation_mode is the mode the caller requested.
+ *  DEDX_INTERPOLATION_LOG_LOG silently falls back to DEDX_INTERPOLATION_LINEAR
+ *  when the underlying table contains a non-positive energy or stopping-power
+ *  value (log-log space cannot represent zero or negative values), so the
+ *  effective mode used for interpolation can differ from what was requested.
+ *  Call this after dedx_load_config() to find out which mode was actually
+ *  applied to the loaded dataset.
+ *
+ *  @param[in]  ws      Workspace with a loaded configuration.
+ *  @param[in]  config  Loaded configuration (cfg_id must be valid).
+ *  @param[out] err     Error code; 0 on success.
+ *  @return DEDX_INTERPOLATION_LOG_LOG or DEDX_INTERPOLATION_LINEAR on success, or -1
+ *          if @p config has no valid loaded dataset (check @p err, not the return
+ *          value, to distinguish failure from DEDX_INTERPOLATION_LOG_LOG == 0).
+ */
+int dedx_get_effective_interpolation_mode(dedx_workspace *ws, dedx_config *config, int *err);
 
 /** @brief One-call stopping power evaluation using the default program for the ion.
  *

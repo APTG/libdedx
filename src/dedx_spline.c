@@ -79,7 +79,7 @@ calculate_linear_coefficients(dedx_internal_spline_base *coef, const float *ener
     }
 }
 
-void dedx_internal_calculate_coefficients(
+int dedx_internal_calculate_coefficients(
     dedx_internal_spline_base *coef, float *energy, float *stopping, int n, int interpolation_mode) {
     int i;
     float log_energy[DEDX_MAX_ELEMENTS];
@@ -91,17 +91,17 @@ void dedx_internal_calculate_coefficients(
     float z[DEDX_MAX_ELEMENTS];
 
     if (n < 2)
-        return;
+        return interpolation_mode;
 
     if (interpolation_mode == DEDX_INTERPOLATION_LINEAR) {
         calculate_linear_coefficients(coef, energy, stopping, n);
-        return;
+        return DEDX_INTERPOLATION_LINEAR;
     }
 
     for (i = 0; i < n; i++) {
         if (energy[i] <= 0.0f || stopping[i] <= 0.0f) {
             calculate_linear_coefficients(coef, energy, stopping, n);
-            return;
+            return DEDX_INTERPOLATION_LINEAR;
         }
         coef[i].a = stopping[i];
         coef[i].x = energy[i];
@@ -136,6 +136,8 @@ void dedx_internal_calculate_coefficients(
         coef[i].b = (log_stopping[i + 1] - log_stopping[i]) / h[i] - h[i] * (coef[i + 1].c + 2.0f * coef[i].c) / 3.0f;
         coef[i].d = (coef[i + 1].c - coef[i].c) / (3.0f * h[i]);
     }
+
+    return DEDX_INTERPOLATION_LOG_LOG;
 }
 
 float dedx_internal_evaluate_spline(
@@ -169,6 +171,15 @@ float dedx_internal_evaluate_spline(
         const float dx = x - coef[i].x;
         const float dx2 = dx * dx;
 
+        /* isnan(coef[i].log_x) is this function's own, independent detection of
+         * dedx_internal_calculate_coefficients()'s log-log-to-linear downgrade (see
+         * its NAN-marking in calculate_linear_coefficients()) -- it's what already
+         * kept computed values correct even before that downgrade was made visible to
+         * callers. dedx_get_effective_interpolation_mode() (issue #149 finding A6)
+         * exposes the same fact through the public API; the two are deliberately
+         * redundant, not alternatives -- this one guards a single evaluation from
+         * NaN/garbage no matter what a caller passed as interpolation_mode, while that
+         * one lets a caller find out about the downgrade without evaluating anything. */
         if (interpolation_mode == DEDX_INTERPOLATION_LINEAR || isnan(coef[i].log_x)) {
             return coef[i].a + coef[i].b * dx + coef[i].c * dx2 + coef[i].d * dx2 * dx;
         }

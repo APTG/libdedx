@@ -1,4 +1,49 @@
+#include "dedx_lookup_data.h"
 #include "test_helpers.h"
+
+/*
+ * Regression test raised in review of issue #149's Phase 2 PR: load_bethe_2()'s
+ * memset(data, 0, sizeof(*data)) (added for A1, to stop the tail of the 150-float
+ * data->data[] array from carrying uninitialized heap/stack past data->length) also
+ * zeroes data->target and data->ion -- and neither was ever repopulated afterward, so
+ * load_data() persisted 0/0 into ws->loaded_data[]->ion/target for every Bethe-formula
+ * dataset instead of the actual ion/target that was loaded. Nothing in the public API
+ * currently reads that stored metadata back out, so this had no observable effect on
+ * computed stopping powers -- but it is exactly the kind of silently-wrong internal
+ * state this audit is about, so it is now set explicitly, matching what
+ * read_embedded_stopping_data() already does for the tabulated-report path. */
+static int test_bethe_records_ion_and_target(void) {
+    int failures = 0;
+    int err = 0;
+    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+    dedx_config *cfg = calloc(1, sizeof(dedx_config));
+
+    cfg->program = DEDX_BETHE_EXT00;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = DEDX_CARBON;
+    cfg->rho = 2.0f;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    if (err != DEDX_OK) {
+        fprintf(stderr, "FAIL bethe ion/target load: err=%d\n", err);
+        failures++;
+    } else {
+        dedx_internal_lookup_data *loaded = ws->loaded_data[cfg->cfg_id];
+        if (loaded->ion != DEDX_PROTON || loaded->target != DEDX_CARBON) {
+            fprintf(stderr,
+                    "FAIL bethe ion/target: got ion=%d target=%d, expected ion=%d target=%d\n",
+                    loaded->ion,
+                    loaded->target,
+                    DEDX_PROTON,
+                    DEDX_CARBON);
+            failures++;
+        }
+    }
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    return failures;
+}
 
 static dedx_config *make_bethe_default_config(int ion, int target) {
     dedx_config *cfg = calloc(1, sizeof(dedx_config));
@@ -443,6 +488,8 @@ int main(void) {
         make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[3], 3.095e+02f, "bethe-null-i");
     failures += check_config_stp(
         make_bethe_null_i_config(DEDX_CARBON, DEDX_ALANINE), energy_grid[4], 7.733e+01f, "bethe-null-i");
+
+    failures += test_bethe_records_ion_and_target();
 
     return failures;
 }

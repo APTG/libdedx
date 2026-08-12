@@ -48,6 +48,7 @@ static int test_validate_config_custom_atoms(void) {
     dedx_config *cfg = alloc_config();
 
     cfg->program = DEDX_PSTAR;
+    cfg->ion = DEDX_PROTON;
     cfg->target = 0;
     cfg->elements_length = 2;
     cfg->elements_id = calloc(2, sizeof(int));
@@ -85,6 +86,7 @@ static int test_validate_config_bethe_custom_atoms(void) {
     dedx_config *cfg = alloc_config();
 
     cfg->program = DEDX_BETHE_EXT00;
+    cfg->ion = DEDX_PROTON;
     cfg->target = 0;
     cfg->rho = 1.0f; /* required for Bethe-type programs with a custom compound */
     cfg->elements_length = 2;
@@ -124,6 +126,7 @@ static int test_validate_config_bethe_mass_fraction(void) {
     dedx_config *cfg = alloc_config();
 
     cfg->program = DEDX_BETHE_EXT00;
+    cfg->ion = DEDX_PROTON;
     cfg->target = 0;
     cfg->rho = 1.0f;
     cfg->elements_length = 2;
@@ -160,6 +163,7 @@ static int test_validate_config_resets_stale_err(void) {
     dedx_config *cfg = alloc_config();
 
     cfg->program = DEDX_PSTAR;
+    cfg->ion = DEDX_PROTON;
     cfg->target = 0;
     cfg->elements_length = 2;
     cfg->elements_id = calloc(2, sizeof(int));

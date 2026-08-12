@@ -1,5 +1,6 @@
 #include <dedx_wrappers.h>
 
+#include "dedx_lookup_data.h"
 #include "test_helpers.h"
 
 /* Regression coverage for issue #51: some ion+material+program combinations were
@@ -118,8 +119,9 @@ static int test_report_specific_programs_reject_boron(void) {
     return failures;
 }
 
-/* ...while DEDX_AUTO falls back to the Bethe-Bloch formula for the same element,
- * both directly and via Bragg-additivity decomposition of a Boron compound. */
+/* ...while DEDX_AUTO falls back to the Bethe-Bloch formula for the same element
+ * directly, and attempts Bragg-additivity decomposition for a Boron compound (see
+ * below for why that particular compound is expected to fail post-#149-A1). */
 static int test_auto_bethe_fallback(void) {
     int failures = 0;
     int err;
@@ -145,6 +147,20 @@ static int test_auto_bethe_fallback(void) {
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 
+    /* Boron carbide (B4C) is Bragg-decomposed into boron (not tabulated by any
+     * report -- Bethe fallback, 122-point grid) and carbon (tabulated -- PSTAR-family
+     * 133-point grid). This is the exact scenario issue #149's finding A1c used as its
+     * worked example of "silent range truncation": before that fix, load_compound()
+     * summed the two constituents' stopping powers over compound_data[0].length
+     * (whichever constituent happened to be first) regardless of whether the other
+     * constituent's own grid matched, silently truncating or mixing energy bins.
+     * Post-A1, mismatched per-constituent grids are detected and rejected with
+     * DEDX_ERR_INCONSISTENT_ENERGY_GRID instead of being served as a wrong or
+     * silently-truncated number -- so this load is now expected to fail cleanly.
+     * (A dedicated code, not a reuse of DEDX_ERR_INCONSISTENT_COMPOUND: the caller's
+     * compound specification here is perfectly valid -- BoronCarbide is one real
+     * material id -- the problem is purely that its constituents resolved onto
+     * different embedded energy grids, which is diagnosable on its own.) */
     ws = dedx_allocate_workspace(1, &err);
     cfg = calloc(1, sizeof(dedx_config));
     cfg->program = DEDX_AUTO;
@@ -152,8 +168,15 @@ static int test_auto_bethe_fallback(void) {
     cfg->target = DEDX_BORON_CARBIDE;
     err = 0;
     dedx_load_config(ws, cfg, &err);
-    failures += check_err(err, DEDX_OK, "AUTO+proton+BoronCarbide load");
-    failures += check_err(cfg->bragg_used, 1, "AUTO+proton+BoronCarbide should decompose via Bragg additivity");
+    failures += check_err(err, DEDX_ERR_INCONSISTENT_ENERGY_GRID, "AUTO+proton+BoronCarbide load (mismatched grids)");
+    failures += check_err(cfg->bragg_used, 1, "AUTO+proton+BoronCarbide should still attempt Bragg additivity");
+    /* Regression check for issue #149 finding B5: a failed load_compound() used to
+     * leave config->target pointing at whichever constituent element it was resolving
+     * when it gave up (here, boron or carbon -- not BoronCarbide), so a caller who
+     * reused the config afterward (e.g. "try AUTO, fall back to PSTAR on error") would
+     * silently query the wrong target. It must come back exactly as the caller left
+     * it. */
+    failures += check_err(cfg->target, DEDX_BORON_CARBIDE, "failed AUTO+BoronCarbide load must not corrupt target");
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
 
@@ -182,6 +205,251 @@ static int test_auto_bethe_fallback(void) {
     failures += check_err(err, DEDX_ERR_COMBINATION_NOT_FOUND, "PSTAR+proton+BoronCarbide");
     dedx_free_config(cfg, &err);
     dedx_free_workspace(ws, &err);
+
+    return failures;
+}
+
+/*
+ * Regression test for issue #149 finding A2: material id 99 (A150 tissue-equivalent
+ * plastic) is a compound, one past the last real element id (DEDX_MAX_ELEMENT_ID ==
+ * 98), but several `<= 99` / `> 99` off-by-one boundary checks used to treat it as an
+ * element instead -- evaluating the Bethe-Bloch formula with the atomic mass/charge of
+ * elemental einsteinium (Z=99) rather than decomposing A150's real composition. The
+ * issue's own suggested regression test: `bragg_used == 1` and Bethe ~= tabulated
+ * within a few % for id 99. Before the fix this was PSTAR=7.3376, BETHE=5.1799 (~29%
+ * off, Es-252's Z/A, not A150's); after the fix BETHE tracks PSTAR to well under 1%. */
+static int test_a150_boundary(void) {
+    int failures = 0;
+    int err;
+    dedx_workspace *ws;
+    dedx_config *cfg;
+    float pstar_stp, bethe_stp;
+
+    pstar_stp =
+        dedx_get_simple_stp_for_program(DEDX_PSTAR, DEDX_PROTON, DEDX_A150_TISSUE_EQUIVALENT_PLASTIC, 100.0f, &err);
+    failures += check_err(err, DEDX_OK, "PSTAR+proton+A150 stp");
+
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_BETHE_EXT00;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = DEDX_A150_TISSUE_EQUIVALENT_PLASTIC;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_OK, "BETHE_EXT00+proton+A150 load");
+    failures +=
+        check_err(cfg->bragg_used, 1, "BETHE_EXT00+proton+A150 should Bragg-decompose, not treat id 99 as Z=99");
+    if (err == DEDX_OK) {
+        /* Regression check raised in review: load_compound()'s aggregated result was a
+         * fresh stack local with no initializer, so ws->loaded_data[]->ion/target used
+         * to carry indeterminate stack values for every Bragg-decomposed load instead
+         * of the compound's own ion/target -- must now match what was requested, not
+         * e.g. the last constituent element's own id. */
+        dedx_internal_lookup_data *loaded = ws->loaded_data[cfg->cfg_id];
+        if (loaded->ion != DEDX_PROTON || loaded->target != DEDX_A150_TISSUE_EQUIVALENT_PLASTIC) {
+            fprintf(stderr,
+                    "FAIL BETHE_EXT00+proton+A150 loaded ion/target: got ion=%d target=%d, expected ion=%d target=%d\n",
+                    loaded->ion,
+                    loaded->target,
+                    DEDX_PROTON,
+                    DEDX_A150_TISSUE_EQUIVALENT_PLASTIC);
+            failures++;
+        }
+
+        bethe_stp = dedx_get_stp(ws, cfg, 100.0f, &err);
+        failures += check_err(err, DEDX_OK, "BETHE_EXT00+proton+A150 stp");
+        if (err == DEDX_OK) {
+            float rel_diff = fabsf(bethe_stp - pstar_stp) / pstar_stp;
+            if (rel_diff > 0.02f) {
+                fprintf(stderr,
+                        "FAIL A150 boundary: BETHE=%.4f vs PSTAR=%.4f differ by %.2f%% (expected < 2%%)\n",
+                        (double) bethe_stp,
+                        (double) pstar_stp,
+                        (double) (rel_diff * 100.0f));
+                failures++;
+            }
+        }
+    }
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    return failures;
+}
+
+/*
+ * Regression test for issue #149 finding A5: dedx_internal_validate_rho() used to
+ * hard-fail whenever a target's embedded density row was missing, for *every*
+ * program -- even tabulated report lookups that never read config->rho at all. Only
+ * one material was affected (FERROUSOXIDE, id 159), but it broke the material for all
+ * 407 program/ion pairs that advertised it. The fix adds the missing density row and
+ * only requires it for programs that actually evaluate the Bethe-Bloch formula
+ * directly on the target (program >= DEDX_DEFAULT); tabulated programs like PSTAR
+ * must now load FERROUSOXIDE without the caller ever supplying rho themselves. */
+static int test_ferrous_oxide_tabulated_program(void) {
+    int failures = 0;
+    int err;
+    dedx_workspace *ws;
+    dedx_config *cfg;
+    float stp;
+
+    ws = dedx_allocate_workspace(1, &err);
+    cfg = calloc(1, sizeof(dedx_config));
+    cfg->program = DEDX_PSTAR;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = DEDX_FERROUS_OXIDE;
+    err = 0;
+    dedx_load_config(ws, cfg, &err);
+    failures += check_err(err, DEDX_OK, "PSTAR+proton+FerrousOxide load");
+    if (err == DEDX_OK) {
+        /* Density must have been resolved from the embedded table to the specific,
+         * cited literature value (data/README.md), not merely to "something positive"
+         * -- a bare rho > 0 check would pass a typo'd 57.0 or 0.57 just as happily as
+         * the real 5.7 g/cm^3, and this value feeds live physics (the Bethe
+         * density-effect term for DEDX_AUTO's fallback tier), not just metadata. */
+        if (fabsf(cfg->rho - 5.7f) > 1e-4f) {
+            fprintf(stderr,
+                    "FAIL PSTAR+proton+FerrousOxide: rho=%f, expected 5.7 (see data/README.md)\n",
+                    (double) cfg->rho);
+            failures++;
+        }
+        stp = dedx_get_stp(ws, cfg, 100.0f, &err);
+        if (err != DEDX_OK || stp <= 0.0f) {
+            fprintf(stderr, "FAIL PSTAR+proton+FerrousOxide stp: err=%d stp=%f\n", err, (double) stp);
+            failures++;
+        }
+    }
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+
+    return failures;
+}
+
+/*
+ * Regression test for issue #149 finding A3: load_compound() used to seed each
+ * constituent's I-value via the public dedx_get_i_value(), which hardcodes
+ * DEDX_GAS -- so config->compound_state was silently ignored for every Bragg-
+ * decomposed compound whose elements_i_value wasn't already supplied by the caller
+ * (the common case for DEDX_AUTO, which never runs dedx_internal_evaluate_i_pot()
+ * since that only happens for program >= DEDX_DEFAULT). Boron is not itself
+ * tabulated by any report, so DEDX_AUTO resolves it through the Bethe-Bloch fallback
+ * inside load_compound(), where the I-value -- and hence compound_state -- directly
+ * affects the computed stopping power. A single-element "compound" isolates
+ * load_compound()'s own I-value lookup from Bragg-averaging effects. Before the fix,
+ * DEDX_GAS and DEDX_CONDENSED produced the identical (gas-phase) number; they must
+ * now differ, since DEDX_CONDENSED applies the solid-state I correction. */
+static int test_compound_state_affects_bethe_fallback(void) {
+    int failures = 0;
+    int err;
+    float gas_stp, condensed_stp;
+
+    {
+        dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+        dedx_config *cfg = calloc(1, sizeof(dedx_config));
+        cfg->program = DEDX_AUTO;
+        cfg->ion = DEDX_PROTON;
+        cfg->target = 0;
+        cfg->compound_state = DEDX_GAS;
+        cfg->rho = 2.34f; /* boron's density; required for the Bethe fallback tier */
+        cfg->elements_length = 1;
+        cfg->elements_id = calloc(1, sizeof(int));
+        cfg->elements_id[0] = DEDX_BORON;
+        cfg->elements_atoms = calloc(1, sizeof(int));
+        cfg->elements_atoms[0] = 1;
+        err = 0;
+        dedx_load_config(ws, cfg, &err);
+        failures += check_err(err, DEDX_OK, "AUTO+proton+gas-boron load");
+        gas_stp = dedx_get_stp(ws, cfg, 100.0f, &err);
+        failures += check_err(err, DEDX_OK, "AUTO+proton+gas-boron stp");
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws, &err);
+    }
+    {
+        dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+        dedx_config *cfg = calloc(1, sizeof(dedx_config));
+        cfg->program = DEDX_AUTO;
+        cfg->ion = DEDX_PROTON;
+        cfg->target = 0;
+        cfg->compound_state = DEDX_CONDENSED;
+        cfg->rho = 2.34f;
+        cfg->elements_length = 1;
+        cfg->elements_id = calloc(1, sizeof(int));
+        cfg->elements_id[0] = DEDX_BORON;
+        cfg->elements_atoms = calloc(1, sizeof(int));
+        cfg->elements_atoms[0] = 1;
+        err = 0;
+        dedx_load_config(ws, cfg, &err);
+        failures += check_err(err, DEDX_OK, "AUTO+proton+condensed-boron load");
+        condensed_stp = dedx_get_stp(ws, cfg, 100.0f, &err);
+        failures += check_err(err, DEDX_OK, "AUTO+proton+condensed-boron stp");
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws, &err);
+    }
+
+    if (gas_stp > 0.0f && condensed_stp > 0.0f) {
+        float rel_diff = fabsf(condensed_stp - gas_stp) / gas_stp;
+        if (rel_diff < 1e-3f) {
+            fprintf(stderr,
+                    "FAIL A3: gas (%.6f) and condensed (%.6f) boron stp are identical -- "
+                    "compound_state is not reaching load_compound()'s I-value lookup\n",
+                    (double) gas_stp,
+                    (double) condensed_stp);
+            failures++;
+        }
+    }
+
+    return failures;
+}
+
+/*
+ * Regression test for a review follow-up to issue #149 findings B2/B4:
+ * dedx_mpaul.c's mode 'h' fit is only parametrized for ions {3-11,16,17,18} (see
+ * B2's fix, which reports DEDX_ERR_ION_NOT_SUPPORTED_MSTAR for the rest instead of
+ * silently computing with placeholder coefficients); ions 12-15 on a gas target hit
+ * that gap. material_id_supported() must not advertise a combination
+ * dedx_load_config() is known to reject the same way it already stopped advertising
+ * DEDX_AUTO's mismatched-grid compounds (B4) -- otherwise this reopens the exact
+ * false-advertisement defect class issue #149 was raised about, just for MSTAR
+ * instead of DEDX_AUTO.
+ *
+ * BUTANE is a gas whose non-gas constituent (carbon) makes the compound-vs-element
+ * state distinction observable: the check has to use BUTANE's own resolved state
+ * (gas -> mode 'h'), not carbon's own elemental state (condensed -> mode 'd', which
+ * is fully parametrized and would wrongly predict availability). WATER is condensed,
+ * so ion 13 must stay available there -- this is an ion/mode-combination gap, not a
+ * blanket rejection of ions 12-15. */
+static int test_mstar_availability_reflects_coefficient_gap(void) {
+    int failures = 0;
+    int materials[DEDX_MAX_MATERIAL_LIST + 1];
+    unsigned int len;
+    int err;
+    int ion;
+
+    for (ion = 12; ion <= 15; ion++) {
+        char label[64];
+
+        snprintf(label, sizeof(label), "MSTAR+ion%d for_ion", ion);
+        dedx_get_material_list_for_ion(DEDX_MSTAR, ion, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
+        failures += check_err(err, DEDX_OK, label);
+        materials[len] = -1;
+        failures += check_absent(materials, DEDX_BUTANE, label);
+        failures += check_present(materials, DEDX_WATER, label);
+    }
+
+    /* A direct dedx_load_config() call must agree with what's (no longer) advertised
+     * above -- the availability API and the loader must never disagree. */
+    {
+        dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+        dedx_config *cfg = calloc(1, sizeof(dedx_config));
+
+        cfg->program = DEDX_MSTAR;
+        cfg->ion = 13;
+        cfg->target = DEDX_BUTANE;
+        err = 0;
+        dedx_load_config(ws, cfg, &err);
+        failures += check_err(err, DEDX_ERR_ION_NOT_SUPPORTED_MSTAR, "MSTAR+ion13+BUTANE load");
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws, &err);
+    }
 
     return failures;
 }
@@ -220,12 +488,19 @@ static int test_material_list_for_ion(void) {
     failures += check_absent(materials, DEDX_BORON, "ICRU+proton for_ion");
     failures += check_absent(materials, DEDX_BORON_CARBIDE, "ICRU+proton for_ion");
 
-    /* DEDX_AUTO does fall back -- both appear. */
+    /* DEDX_AUTO does fall back for the pure element -- Boron appears. BoronCarbide
+     * does not: it Bragg-decomposes into boron (Bethe-fallback tier) and carbon
+     * (tabulated tier), which resolve onto different energy grids and would fail to
+     * load with DEDX_ERR_INCONSISTENT_ENERGY_GRID (see test_auto_bethe_fallback()
+     * above) -- material_id_supported() now predicts that tier mismatch instead of
+     * advertising a combination dedx_load_config() is known to reject (issue #149
+     * finding B4: the availability API must stay accurate, not just "falls back
+     * rather than failing outright"). */
     dedx_get_material_list_for_ion(DEDX_AUTO, DEDX_PROTON, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
     failures += check_err(err, DEDX_OK, "AUTO+proton for_ion err");
     materials[len] = -1;
     failures += check_present(materials, DEDX_BORON, "AUTO+proton for_ion");
-    failures += check_present(materials, DEDX_BORON_CARBIDE, "AUTO+proton for_ion");
+    failures += check_absent(materials, DEDX_BORON_CARBIDE, "AUTO+proton for_ion");
 
     dedx_get_material_list_for_ion(DEDX_ICRU73, DEDX_LITHIUM, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
     failures += check_err(err, DEDX_OK, "ICRU73+lithium for_ion err");
@@ -284,6 +559,10 @@ int main(void) {
     failures += test_corrected_static_tables();
     failures += test_report_specific_programs_reject_boron();
     failures += test_auto_bethe_fallback();
+    failures += test_a150_boundary();
+    failures += test_ferrous_oxide_tabulated_program();
+    failures += test_compound_state_affects_bethe_fallback();
+    failures += test_mstar_availability_reflects_coefficient_gap();
     failures += test_material_list_for_ion();
     failures += test_fill_material_list_for_ion();
 

@@ -293,6 +293,115 @@ static int check_interpolation_mode(
     return 0;
 }
 
+/*
+ * Regression test for issue #149 finding A6: ion Z=11 (Sodium) in target 18 (Argon)
+ * is the one combination in the whole embedded ICRU73 table whose first tabulated
+ * stopping-power value is exactly 0.0. dedx_internal_calculate_coefficients() cannot
+ * represent a non-positive value in log-log space, so it silently falls back to a
+ * linear-space spline for the whole table -- silently, because before this fix
+ * ws->loaded_data[]->interpolation_mode still stored the caller's *requested* mode
+ * (DEDX_INTERPOLATION_LOG_LOG, the default), not the mode actually used. There was
+ * no way for a caller to detect the downgrade. dedx_get_effective_interpolation_mode()
+ * now reports what was actually used, so this must report DEDX_INTERPOLATION_LINEAR
+ * even though log-log (the default) was requested and nothing overrode it.
+ */
+static int check_effective_interpolation_mode_downgrade(void) {
+    int err = DEDX_OK;
+    int cleanup_err = DEDX_OK;
+    int requested_ok = 1;
+    int mode;
+    dedx_workspace *ws;
+    dedx_config *cfg = calloc(1, sizeof(dedx_config));
+
+    cfg->program = DEDX_ICRU73;
+    cfg->ion = DEDX_SODIUM;
+    cfg->target = DEDX_ARGON;
+    /* cfg->interpolation_mode left at 0 == DEDX_INTERPOLATION_LOG_LOG, the default. */
+
+    ws = dedx_allocate_workspace(1, &err);
+    dedx_load_config(ws, cfg, &err);
+    if (err != DEDX_OK) {
+        fprintf(stderr, "FAIL A6 load ICRU73+Na+Ar: err=%d\n", err);
+        dedx_free_config(cfg, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return 1;
+    }
+
+    if (cfg->interpolation_mode != DEDX_INTERPOLATION_LOG_LOG) {
+        fprintf(stderr, "FAIL A6: requested mode was not log-log (got %d)\n", cfg->interpolation_mode);
+        requested_ok = 0;
+    }
+
+    mode = dedx_get_effective_interpolation_mode(ws, cfg, &err);
+    dedx_free_config(cfg, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
+
+    if (err != DEDX_OK) {
+        fprintf(stderr, "FAIL A6 dedx_get_effective_interpolation_mode: err=%d\n", err);
+        return 1;
+    }
+    if (mode != DEDX_INTERPOLATION_LINEAR) {
+        fprintf(stderr, "FAIL A6: effective mode should downgrade to linear for ICRU73+Na+Ar, got %d\n", mode);
+        return 1;
+    }
+    return requested_ok ? 0 : 1;
+}
+
+/* A well-behaved table (no non-positive values) must report its effective mode as
+ * exactly what was requested -- the downgrade above must not become unconditional. */
+static int check_effective_interpolation_mode_no_downgrade(void) {
+    int err = DEDX_OK;
+    int cleanup_err = DEDX_OK;
+    int mode;
+    dedx_workspace *ws;
+    dedx_config *cfg = calloc(1, sizeof(dedx_config));
+
+    cfg->program = DEDX_PSTAR;
+    cfg->ion = DEDX_PROTON;
+    cfg->target = DEDX_WATER;
+
+    ws = dedx_allocate_workspace(1, &err);
+    dedx_load_config(ws, cfg, &err);
+    if (err != DEDX_OK) {
+        fprintf(stderr, "FAIL A6 load PSTAR+proton+water: err=%d\n", err);
+        dedx_free_config(cfg, &cleanup_err);
+        dedx_free_workspace(ws, &cleanup_err);
+        return 1;
+    }
+
+    mode = dedx_get_effective_interpolation_mode(ws, cfg, &err);
+    dedx_free_config(cfg, &cleanup_err);
+    dedx_free_workspace(ws, &cleanup_err);
+
+    if (err != DEDX_OK || mode != DEDX_INTERPOLATION_LOG_LOG) {
+        fprintf(stderr, "FAIL A6: PSTAR+proton+water should report log-log unchanged, got mode=%d err=%d\n", mode, err);
+        return 1;
+    }
+    return 0;
+}
+
+/* dedx_get_effective_interpolation_mode() must guard cfg_id the same way dedx_get_stp() does. */
+static int check_effective_interpolation_mode_invalid_id(void) {
+    int failures = 0;
+    int err = DEDX_OK;
+    int mode;
+    dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+    dedx_config *cfg = calloc(1, sizeof(dedx_config));
+
+    cfg->cfg_id = -1;
+    mode = dedx_get_effective_interpolation_mode(ws, cfg, &err);
+    /* -1, not 0 (== DEDX_INTERPOLATION_LOG_LOG): a caller that forgets to check *err
+     * must not be able to mistake a failed call for "log-log" -- raised in review. */
+    if (err != DEDX_ERR_INVALID_DATASET_ID || mode != -1) {
+        fprintf(stderr, "FAIL A6 invalid cfg_id: err=%d mode=%d\n", err, mode);
+        failures++;
+    }
+
+    dedx_free_config(cfg, &err);
+    dedx_free_workspace(ws, &err);
+    return failures;
+}
+
 static int check_internal_two_point_spline_cache(void) {
     dedx_internal_spline_base coef[2];
     dedx_internal_lookup_accelerator acc;
@@ -349,6 +458,10 @@ int main(void) {
                                          DEDX_INTERPOLATION_LINEAR,
                                          "ICRU73 explicit linear");
     failures += check_internal_two_point_spline_cache();
+
+    failures += check_effective_interpolation_mode_downgrade();
+    failures += check_effective_interpolation_mode_no_downgrade();
+    failures += check_effective_interpolation_mode_invalid_id();
 
     return failures;
 }

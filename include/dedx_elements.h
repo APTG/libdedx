@@ -8,6 +8,15 @@ extern "C" {
 /** Maximum number of tabulated energy points stored per dataset. */
 #define DEDX_MAX_ELEMENTS 150
 
+/** Highest material identifier that denotes an element (Z = atomic number); every
+ *  id greater than this is a compound or mixture -- DEDX_A150_TISSUE_EQUIVALENT_PLASTIC
+ *  (id 99) is the first compound entry, immediately after DEDX_CALIFORNIUM (id 98),
+ *  the last elemental one. Use this instead of a bare 98/99 literal when testing
+ *  whether a material id is an element: a stray `<= 99` here previously evaluated
+ *  A150 (a compound) as if it were elemental einsteinium (see issue #149, finding A2).
+ */
+#define DEDX_MAX_ELEMENT_ID 98
+
 /**
  * @defgroup ions_and_materials Ion and material identifiers
  * @brief Identifiers for projectile ions and target materials.

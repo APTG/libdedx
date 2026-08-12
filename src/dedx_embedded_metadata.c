@@ -19,6 +19,7 @@
 
 #include "data/embedded/dedx_composition.h"
 #include "data/embedded/dedx_metadata.h"
+#include "dedx_elements.h"
 
 static int find_target_index(int target) {
     int i;
@@ -38,7 +39,7 @@ int dedx_embedded_read_effective_charge(int id, float *charge) {
     if (charge == NULL) {
         return -1;
     }
-    if (id < 99) {
+    if (id <= DEDX_MAX_ELEMENT_ID) {
         *charge = (float) id;
         return 0;
     }
@@ -98,7 +99,7 @@ int dedx_embedded_get_i_value(int target, int state, float *pot) {
             continue;
         }
         value = dedx_embedded_compos_rows[i].i_value;
-        if (state == 2 && !dedx_embedded_target_is_gas(target) && target <= 99) {
+        if (state == 2 && !dedx_embedded_target_is_gas(target) && target <= DEDX_MAX_ELEMENT_ID) {
             value *= 1.13f;
         }
     }
