@@ -400,6 +400,60 @@ static int test_compound_state_affects_bethe_fallback(void) {
     return failures;
 }
 
+/*
+ * Regression test for a review follow-up to issue #149 findings B2/B4:
+ * dedx_mpaul.c's mode 'h' fit is only parametrized for ions {3-11,16,17,18} (see
+ * B2's fix, which reports DEDX_ERR_ION_NOT_SUPPORTED_MSTAR for the rest instead of
+ * silently computing with placeholder coefficients); ions 12-15 on a gas target hit
+ * that gap. material_id_supported() must not advertise a combination
+ * dedx_load_config() is known to reject the same way it already stopped advertising
+ * DEDX_AUTO's mismatched-grid compounds (B4) -- otherwise this reopens the exact
+ * false-advertisement defect class issue #149 was raised about, just for MSTAR
+ * instead of DEDX_AUTO.
+ *
+ * BUTANE is a gas whose non-gas constituent (carbon) makes the compound-vs-element
+ * state distinction observable: the check has to use BUTANE's own resolved state
+ * (gas -> mode 'h'), not carbon's own elemental state (condensed -> mode 'd', which
+ * is fully parametrized and would wrongly predict availability). WATER is condensed,
+ * so ion 13 must stay available there -- this is an ion/mode-combination gap, not a
+ * blanket rejection of ions 12-15. */
+static int test_mstar_availability_reflects_coefficient_gap(void) {
+    int failures = 0;
+    int materials[DEDX_MAX_MATERIAL_LIST + 1];
+    unsigned int len;
+    int err;
+    int ion;
+
+    for (ion = 12; ion <= 15; ion++) {
+        char label[64];
+
+        snprintf(label, sizeof(label), "MSTAR+ion%d for_ion", ion);
+        dedx_get_material_list_for_ion(DEDX_MSTAR, ion, materials, DEDX_MAX_MATERIAL_LIST, &len, &err);
+        failures += check_err(err, DEDX_OK, label);
+        materials[len] = -1;
+        failures += check_absent(materials, DEDX_BUTANE, label);
+        failures += check_present(materials, DEDX_WATER, label);
+    }
+
+    /* A direct dedx_load_config() call must agree with what's (no longer) advertised
+     * above -- the availability API and the loader must never disagree. */
+    {
+        dedx_workspace *ws = dedx_allocate_workspace(1, &err);
+        dedx_config *cfg = calloc(1, sizeof(dedx_config));
+
+        cfg->program = DEDX_MSTAR;
+        cfg->ion = 13;
+        cfg->target = DEDX_BUTANE;
+        err = 0;
+        dedx_load_config(ws, cfg, &err);
+        failures += check_err(err, DEDX_ERR_ION_NOT_SUPPORTED_MSTAR, "MSTAR+ion13+BUTANE load");
+        dedx_free_config(cfg, &err);
+        dedx_free_workspace(ws, &err);
+    }
+
+    return failures;
+}
+
 static int test_material_list_for_ion(void) {
     int failures = 0;
     int materials[DEDX_MAX_MATERIAL_LIST + 1];
@@ -508,6 +562,7 @@ int main(void) {
     failures += test_a150_boundary();
     failures += test_ferrous_oxide_tabulated_program();
     failures += test_compound_state_affects_bethe_fallback();
+    failures += test_mstar_availability_reflects_coefficient_gap();
     failures += test_material_list_for_ion();
     failures += test_fill_material_list_for_ion();
 

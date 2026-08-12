@@ -67,19 +67,32 @@
  *     TOTAL_COMBINATIONS 101886 -> 100222 (-1664, the compounds/programs that would
  *     have failed and are no longer advertised), load_failures 1470 -> 108,
  *     bound_mismatches 480 -> 470.
- *   - The 108 that remain are DEDX_MSTAR only, all DEDX_ERR_ION_NOT_SUPPORTED_MSTAR:
+ *   - The 108 that remained were DEDX_MSTAR only, all DEDX_ERR_ION_NOT_SUPPORTED_MSTAR:
  *     ions 12-15 combined with a gas target hit an "illegal mode" branch in
  *     dedx_mpaul.c that predates this whole PR (reproduced identically against
  *     `main`, e.g. DEDX_MSTAR + ion 12 + DEDX_ARGON) -- previously silent (a
  *     nonsense stopping power with err == DEDX_OK, also found in review, finding B2),
- *     now a clean, correctly-reported error. material_id_supported() does not yet
- *     model this for MSTAR specifically -- doing so needs either an mstar_mode
- *     parameter on the availability query (an API change) or a hardcoded assumption
- *     about the default mode, neither of which this PR takes on -- so it stays a
- *     documented, open gap here, the same shape as the FERROUSOXIDE gap before it.
+ *     now a clean, correctly-reported error.
+ *   - A second review follow-up closed that gap too: material_id_supported() and
+ *     element_supported_for_ion() now take an `mstar_state` parameter, not a new
+ *     public API surface but the "hardcoded assumption about the default mode"
+ *     option floated above -- find_data() itself already assumes mstar_mode 'b' when
+ *     a caller leaves it unset, so probing dedx_internal_calculate_mspaul_coef()
+ *     under that same default is exactly what dedx_load_config() would actually do.
+ *     For a *compound* target, that probe has to use the compound's own resolved
+ *     gas/condensed state, not each constituent's own -- load_compound() resolves
+ *     config->compound_state once, from the compound's own id, before its
+ *     constituent loop runs (see issue #149 finding A3), so a per-constituent guess
+ *     would both under- and over-advertise relative to what dedx_load_config() does.
+ *     TOTAL_COMBINATIONS: 100222 -> 100114 (-108, the MSTAR ion/gas-target
+ *     combinations that would have failed and are no longer advertised),
+ *     load_failures 108 -> 0. LOAD_FAILURE_BASELINES is now empty: every load failure
+ *     this sweep used to hit has either been fixed outright or stopped being
+ *     advertised, so dedx_load_config() is now expected to succeed for every
+ *     combination this sweep is asked to check.
  */
 
-#define TOTAL_COMBINATIONS 100222
+#define TOTAL_COMBINATIONS 100114
 
 /* Every (error code, count) pair load failures are currently expected to fall into.
  * Equality per code, not a ceiling: a future fix should remove an entry (or lower its
@@ -91,10 +104,15 @@ typedef struct {
     long baseline;
 } error_baseline;
 
-static const error_baseline LOAD_FAILURE_BASELINES[] = {
-    /* DEDX_MSTAR ions 12-15 + a gas target -- see the history note above. */
-    {DEDX_ERR_ION_NOT_SUPPORTED_MSTAR, 108},
-};
+/* Empty: as of the MSTAR-availability follow-up below, every load failure this sweep
+ * used to hit has a root cause that's either fixed outright or -- for the two open,
+ * documented physics-data gaps (FERROUSOXIDE's I-value, the ICRU73 Na-in-Ar zero) --
+ * no longer advertised as available in the first place, so this sweep now expects
+ * dedx_load_config() to succeed for every combination it's asked to check. A future
+ * regression that adds even one new load failure is therefore always a hard FAIL via
+ * load_failures_unexpected below (any error code, since none has an entry here to
+ * match against), not something a baseline entry could absorb. */
+static const error_baseline LOAD_FAILURE_BASELINES[] = {};
 
 #define BASELINE_BOUND_MISMATCHES 470
 #define BASELINE_DEAD_CONFIGS 0

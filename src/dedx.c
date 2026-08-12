@@ -25,6 +25,7 @@
 #include "dedx_data_access.h"
 #include "dedx_embedded_data.h"
 #include "dedx_lookup_data.h"
+#include "dedx_mpaul.h"
 #include "dedx_mstar.h"
 #include "dedx_periodic_table.h"
 #include "dedx_program_const.h"
@@ -57,8 +58,8 @@ static int find_data(stopping_data *data, dedx_config *config, float *energy, in
 static int load_compound(dedx_workspace *ws, dedx_config *config, int *err);
 static int load_bethe_2(stopping_data *data, dedx_config *config, float *energy, int *err);
 static int load_bethe_fallback(stopping_data *data, dedx_config *config, float *energy, int *err);
-static int element_supported_for_ion(int program, int ion, int element);
-static int material_id_supported(int program, int ion, int material);
+static int element_supported_for_ion(int program, int ion, int element, int mstar_state);
+static int material_id_supported(int program, int ion, int material, int mstar_state);
 
 dedx_workspace *dedx_allocate_workspace(unsigned int count, int *err) {
     unsigned int i = 0;
@@ -243,11 +244,17 @@ const int *dedx_get_material_list(int program) {
  * programs) so the answer stays consistent with what dedx_load_config() will
  * actually do.
  *
+ * `mstar_state` is DEDX_DEFAULT_STATE/DEDX_GAS/DEDX_CONDENSED and matters only for
+ * program == DEDX_MSTAR: DEDX_DEFAULT_STATE means "resolve gas/condensed from this
+ * element's own metadata", correct when `element` is checked as a standalone target.
+ * When `element` is one constituent of a compound, material_id_supported() passes the
+ * *compound's own* resolved state here instead -- see its comment for why.
+ *
  * Returns 1 if dedx_load_config() is expected to succeed for this exact
  * (program, ion, element) combination, 0 otherwise. `element` is assumed to already
  * be a plain element id (1..DEDX_MAX_ELEMENT_ID); callers are responsible for that
  * precondition -- see material_id_supported()'s own boundary check below. */
-static int element_supported_for_ion(int program, int ion, int element) {
+static int element_supported_for_ion(int program, int ion, int element, int mstar_state) {
     int ion_load = ion;
     int resolved;
 
@@ -263,6 +270,41 @@ static int element_supported_for_ion(int program, int ion, int element) {
     }
     if (program == DEDX_ICRU || program == DEDX_ICRU49 || program == DEDX_ICRU73) {
         return dedx_embedded_resolve_program(program, ion_load, element, &resolved) == 0;
+    }
+    if (program == DEDX_MSTAR) {
+        int gas_err = DEDX_OK;
+        int coef_err = DEDX_OK;
+        char mode;
+
+        if (!dedx_embedded_has_table(program, ion_load, element)) {
+            return 0;
+        }
+        /* Having the underlying MSTAR-helium base table is necessary but not
+         * sufficient: dedx_internal_calculate_mspaul_coef()'s per-ion fit is only
+         * parametrized for a subset of (mode, ion) pairs (see issue #149 finding A7's
+         * fix in dedx_mpaul.c, which now reports DEDX_ERR_ION_NOT_SUPPORTED_MSTAR for
+         * an unparametrized combination instead of silently computing with
+         * placeholder coefficients), and that gap is ion- and gas/condensed-state-
+         * dependent, not element-table-dependent, so dedx_embedded_has_table() alone
+         * cannot see it -- material_id_supported() kept advertising these
+         * combinations after A7's fix started correctly rejecting them (see the PR
+         * review discussion). Probe the actual coefficient computation the way
+         * find_data() would resolve it for an unconfigured caller (mstar_mode left at
+         * '\0' so find_data() assumes 'b'): resolve gas/condensed exactly as
+         * resolve_mstar_mode() does for mode 'b', then probe at one energy -- the
+         * failure this catches is energy-independent (it happens before
+         * dedx_internal_calculate_mspaul_coef() ever looks at its energy argument),
+         * so any single valid energy is representative of every energy in the loaded
+         * grid. */
+        if (mstar_state == DEDX_DEFAULT_STATE) {
+            mstar_state = dedx_internal_target_is_gas(element, &gas_err) ? DEDX_GAS : DEDX_CONDENSED;
+            if (gas_err != DEDX_OK) {
+                return 0; /* LCOV_EXCL_LINE -- every element reaching this point has known gas-state metadata */
+            }
+        }
+        mode = (mstar_state == DEDX_GAS) ? DEDX_MSTAR_MODE_H : DEDX_MSTAR_MODE_D;
+        dedx_internal_calculate_mspaul_coef(mode, ion, element, 10.0f, &coef_err);
+        return coef_err == DEDX_OK;
     }
     return dedx_embedded_has_table(program, ion_load, element);
 }
@@ -283,10 +325,23 @@ static int element_is_tabulated_for_auto(int ion, int element) {
  * element is itself reachable, matching the Bragg-additivity decomposition
  * load_compound() performs at calculation time.
  *
+ * `mstar_state` carries a compound's own resolved gas/condensed state down into its
+ * constituents' element_supported_for_ion() checks -- see that function's comment.
+ * Top-level callers pass DEDX_DEFAULT_STATE (resolve from whatever `material` itself
+ * turns out to be); the compound branch below resolves it once a compound's own state
+ * is known and passes it down uniformly, mirroring load_compound(), which resolves
+ * config->compound_state once, from the compound's own id, before its constituent
+ * loop runs -- and does so regardless of program, since dedx_internal_validate_config()
+ * only calls dedx_internal_validate_state() for program >= 100, leaving MSTAR/AUTO/
+ * other tabulated-program compounds to reach load_compound()'s own resolve step (see
+ * issue #149 finding A3). The distinction is invisible for every other program; it
+ * changes the answer only for DEDX_MSTAR, where an unparametrized (mode, ion) pair
+ * can be fine for one gas/condensed state and undefined for the other (finding A7).
+ *
  * Returns 1 if dedx_load_config() is expected to succeed for this exact
  * (program, ion, material) combination, 0 otherwise -- for a compound, this recurses
  * once per constituent element and is 1 only if every one of them is reachable. */
-static int material_id_supported(int program, int ion, int material) {
+static int material_id_supported(int program, int ion, int material, int mstar_state) {
     float composition[20][2];
     unsigned int comp_len;
     unsigned int i;
@@ -308,7 +363,7 @@ static int material_id_supported(int program, int ion, int material) {
         return 0;
     } /* LCOV_EXCL_STOP */
     if (material <= DEDX_MAX_ELEMENT_ID) {
-        return element_supported_for_ion(program, ion, material);
+        return element_supported_for_ion(program, ion, material, mstar_state);
     }
 
     /* Analytical programs (program >= DEDX_DEFAULT) evaluate the Bethe-Bloch formula
@@ -338,6 +393,15 @@ static int material_id_supported(int program, int ion, int material) {
         }
     }
 
+    if (program == DEDX_MSTAR && mstar_state == DEDX_DEFAULT_STATE) {
+        int gas_err = DEDX_OK;
+
+        mstar_state = dedx_internal_target_is_gas(material, &gas_err) ? DEDX_GAS : DEDX_CONDENSED;
+        if (gas_err != DEDX_OK) {
+            return 0; /* LCOV_EXCL_LINE -- every compound in the master material list has known gas-state metadata */
+        }
+    }
+
     dedx_internal_get_composition(material, composition, &comp_len, &comp_err);
     if (comp_err != DEDX_OK || comp_len == 0) { /* LCOV_EXCL_START -- every compound in the master
                                                     material list has known embedded composition */
@@ -346,7 +410,7 @@ static int material_id_supported(int program, int ion, int material) {
     for (i = 0; i < comp_len; i++) {
         int constituent = (int) composition[i][0];
 
-        if (!material_id_supported(program, ion, constituent)) {
+        if (!material_id_supported(program, ion, constituent, mstar_state)) {
             return 0;
         }
         if (program == DEDX_AUTO && constituent > 0 && constituent <= DEDX_MAX_ELEMENT_ID) {
@@ -384,7 +448,7 @@ void dedx_get_material_list_for_ion(
     }
 
     for (i = 0; candidates[i] != -1 && count < max_materials; i++) {
-        if (material_id_supported(program, ion, candidates[i])) {
+        if (material_id_supported(program, ion, candidates[i], DEDX_DEFAULT_STATE)) {
             materials[count++] = candidates[i];
         }
     }
@@ -392,14 +456,28 @@ void dedx_get_material_list_for_ion(
 }
 
 const int *dedx_get_ion_list(int program) {
-    /* Returns a -1-terminated list of ions available for the program. Both branches
+    /* Returns a -1-terminated list of ions available for the program. All branches
      * return immutable const data -- the shared full-ion table for unrestricted
-     * programs, or the program's row in dedx_program_available_ions -- so the function
-     * performs no writes and is safe to call concurrently from multiple threads. */
+     * programs, the empty list below for an unrecognized program, or the program's
+     * row in dedx_program_available_ions -- so the function performs no writes and
+     * is safe to call concurrently from multiple threads. */
+    static const int empty_ion_list[] = {-1};
+
     if (program == DEDX_BETHE_EXT00 || program == DEDX_DEFAULT || program == DEDX_AUTO) /* any ion, no restrictions */
         return dedx_full_ion_list;
-    else
-        return dedx_program_available_ions[program];
+    /* dedx_internal_check_ion() (dedx_validate.c) already guards its own call into
+     * this function against an unrecognized program, closing the crash finding #149
+     * B3 was raised about for the internal dedx_load_config() path. This function is
+     * public API too, though, callable directly with any int -- and
+     * dedx_program_available_ions only has real, -1-terminated rows for indices 0
+     * (unused placeholder, "all ions") through DEDX_ICRU (9); every other row in its
+     * 110-row declaration is implicitly zero-filled with no -1 terminator, and a
+     * negative index is undefined behavior regardless. Bounds-check here too instead
+     * of relying on every caller to have gone through dedx_internal_check_ion()
+     * first (see the PR review discussion following B3's fix). */
+    if (program < 0 || program > DEDX_ICRU)
+        return empty_ion_list;
+    return dedx_program_available_ions[program];
 }
 
 float dedx_get_min_energy(int program, int ion) {
